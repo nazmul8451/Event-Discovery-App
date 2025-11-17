@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
+import 'package:provider/provider.dart';
 
 import 'View/app.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+      MultiProvider(providers: [
+          ChangeNotifierProvider(create: (context)=> InterestScreenController()),
+
+  ],
+  child: MyApp(),
+
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -14,10 +25,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(439,956),
+      designSize: const Size(439, 956),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_,child){
+      builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Gathering App',

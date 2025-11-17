@@ -4,6 +4,8 @@ import 'package:gathering_app/Utils/getStartedData.dart';
 import 'package:gathering_app/View/Screen/Onboarding_screen/interest_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../Widgets/CustomButton.dart';
+
 class GetStartScreen extends StatefulWidget {
   const GetStartScreen({super.key});
 
@@ -84,61 +86,16 @@ class _GetStartScreenState extends State<GetStartScreen> {
               ),
             ),
           ),
+
           SizedBox(height: 20.h,),
 
           GestureDetector(
             onTap: ()=>nextPage(),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              height: 40.h,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.5),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  )
-                ]
-              ),
-              child: Center(child: Text(
-                'Get Started',
-                style: TextStyle(
-                  fontSize: 18.sp.clamp(18, 20),
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
-              ),),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: CustomButton(buttonName: 'Get Started',),
             ),
           ),
-
-          // SizedBox(
-          //   width: double.infinity,
-          //   height: 40.h,
-          //   child: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 20),
-          //     child: ElevatedButton(
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Colors.white,
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(12),
-          //         ),
-          //       ),
-          //       onPressed: nextPage,
-          //       child: Text(
-          //         'Get Started',
-          //         style: TextStyle(
-          //           fontSize: 18.sp.clamp(18, 20),
-          //           fontWeight: FontWeight.w700,
-          //           color: Colors.black,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
           SizedBox(height: 15.h),
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
@@ -157,3 +114,4 @@ class _GetStartScreenState extends State<GetStartScreen> {
     );
   }
 }
+
