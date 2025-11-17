@@ -20,7 +20,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -104,7 +104,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                         SizedBox(height: 20.h),
-                        CustomButton(buttonName: 'Sign up'),
+                        InkWell(
+                          onTap: (){
+                            onTapSignUp_button();
+                          },
+                            child: CustomButton(buttonName: 'Sign up')),
                         SizedBox(height: 20.h),
                         Text(
                           'OR CONTINUE WITH',
@@ -161,6 +165,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  void onTapSignUp_button(){
+    //TODO: validate user
+    //right now navigate log in screen..
+    Navigator.pushReplacementNamed(context, LogInScreen.name);
   }
 
   void onTapLogIn_button() {

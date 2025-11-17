@@ -1,0 +1,27 @@
+// View/app.dart
+import 'package:flutter/material.dart';
+import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
+import '../../View/Screen/Onboarding_screen/interest_screen.dart';
+import '../../View/Screen/Onboarding_screen/splash_screen.dart';
+import '../../View/Screen/authentication_screen/forgot_pass_screen.dart';
+import '../../View/Screen/authentication_screen/log_in_screen.dart';
+import '../../View/Screen/authentication_screen/sign_up_screen.dart';
+
+
+class AppRoutes {
+  static const String splash = SplashScreen.name;
+  static const String getStart = GetStartScreen.name;
+  static const String interest = InterestScreen.name;
+  static const String login = LogInScreen.name;
+  static const String signup = SignUpScreen.name;
+  static const String forgotPass = ForgotPassScreen.name;
+
+  static final routes = {
+    splash: (context) => const SplashScreen(),
+    getStart: (context) => const GetStartScreen(),
+    interest: (context) => InterestScreen(),
+    login: (context) => const LogInScreen(),
+    signup: (context) => const SignUpScreen(),
+    forgotPass: (context) => const ForgotPassScreen(),
+  };
+}

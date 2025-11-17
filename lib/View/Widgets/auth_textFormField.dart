@@ -1,63 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class AuthTextField extends StatelessWidget {
   final String labelText;
   final String hintText;
   final IconData? icon;
+  final bool obscureText;
 
   const AuthTextField({
     super.key,
     this.icon,
     required this.hintText,
     required this.labelText,
+    this.obscureText = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             labelText,
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 8.h),
+
+          // main container
           Container(
-            height: 40,
-            width: double.infinity,
+            height: 56.h,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: isDark
+                  ? Colors.white.withOpacity(0.09)
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              // border: Border.all(
+              //   color: isDark
+              //       ? Colors.white.withOpacity(0.2)
+              //       : Colors.grey.shade300,
+              //   width: 1.2,
+              // ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  // withValues -> withOpacity
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
+                  color: isDark
+                      ? Colors.black.withOpacity(0.2)
+                      : Colors.black.withOpacity(0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                  spreadRadius: 0,
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextFormField(
-                cursorColor: Colors.grey,
-                textAlign: TextAlign.start, // টেক্সট সেন্টারে
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  hintStyle: TextStyle(color: Color(0xFF515151)),
-                  suffixIcon: Icon(icon as IconData?, color: Color(0xFF515151)),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
-                  // স্মুথ ফিটিং
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
+            child: TextFormField(
+              obscureText: obscureText,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+                fontSize: 16.sp,
+              ),
+              cursorColor: const Color(0xFFCC18CA),
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: TextStyle(
+                  color: isDark ? Colors.white60 : const Color(0xFF515151),
+                  fontSize: 15.sp,
+                ),
+                suffixIcon: icon != null
+                    ? Icon(
+                  icon,
+                  color: isDark ? Colors.white60 : const Color(0xFF515151),
+                  size: 22.w,
+                )
+                    : null,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20.w,
+                  vertical: 18.h,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFCC18CA),
+                    width: 1,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  errorBorder: OutlineInputBorder(borderSide: BorderSide.none),
                 ),
               ),
             ),

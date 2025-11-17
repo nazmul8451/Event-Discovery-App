@@ -1,31 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:provider/provider.dart';
+
+import '../../Widgets/appbar.dart';
 
 class ForgotPassScreen extends StatelessWidget {
   const ForgotPassScreen({super.key});
+
   static const String name = '/forgot-pass-screen';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        leading: IconButton(onPressed: (){
-          Navigator.pop(context);
-        }, icon: Icon(Icons.arrow_back_outlined, color: Color(0xFFCC18CA))),
-        title: Text(
-          'Forgot Password',
-          style: TextStyle(
-            color: Color(0xFFCC18CA),
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: common_appbar(),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -51,10 +42,21 @@ class ForgotPassScreen extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 20.h,),
+              SizedBox(height: 20.h),
               AuthTextField(hintText: 'your@email.com', labelText: "Email"),
-              SizedBox(height: 20.h,),
-              CustomButton(buttonName: 'Reset')
+              SizedBox(height: 20.h),
+              CustomButton(buttonName: 'Reset'),
+              SizedBox(height: 50.h),
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return Switch(
+                    value: themeProvider.isDarkMode,
+                    onChanged: (val) {
+                      themeProvider.toggleTheme();
+                    },
+                  );
+                },
+              )
             ],
           ),
         ),

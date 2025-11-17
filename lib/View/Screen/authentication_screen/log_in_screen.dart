@@ -19,19 +19,19 @@ class _LogInScreenState extends State<LogInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: 1.sh, // স্ক্রিনের পূর্ণ উচ্চতা
+            minHeight: 1.sh,
           ),
           child: IntrinsicHeight(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // কেন্দ্রীভূত
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: SizedBox(), // উপরের স্পেস
+                  child: SizedBox(),
                 ),
                 Center(
                   child: Image.asset(
@@ -67,6 +67,32 @@ class _LogInScreenState extends State<LogInScreen> {
                         ],
                       ),
                       SizedBox(height: 20.h),
+
+
+                      // TextFormField(
+                      //   decoration: InputDecoration(
+                      //     hintText: 'email',
+                      //     hintStyle: TextStyle(color: Color(0xFF515151)),
+                      //     filled: true,
+                      //     fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                      //
+                      //     contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // এটাই height কমাবে
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: BorderSide.none,
+                      //     ),
+                      //
+                      //     enabledBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: BorderSide.none,
+                      //     ),
+                      //     focusedBorder: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       borderSide: BorderSide.none,
+                      //     ),
+                      //   ),
+                      // ),
+
                       AuthTextField(
                         icon: Icons.check,
                         hintText: 'your@email.com',
