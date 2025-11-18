@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -105,7 +106,13 @@ class _LogInScreenState extends State<LogInScreen> {
                       SizedBox(height: 10.h),
 
                       // Login Button
-                      CustomButton(buttonName: 'Login'),
+                      CustomButton(
+                        onPressed: (){
+                          //TODO: Navigate to NabButton after validation and api calling
+                          Navigator.pushNamedAndRemoveUntil(context,BottomNavBarScreen.name , (predicate)=>false);
+                        },
+                          buttonName: 'Login'),
+
                       SizedBox(height: 30.h),
 
                       // OR Continue With
