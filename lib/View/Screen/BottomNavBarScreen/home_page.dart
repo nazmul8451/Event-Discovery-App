@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
             SearchTextField(hintText: 'Search events,venues'),
@@ -295,40 +296,72 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  // GridView.builder(
-                  //   physics: NeverScrollableScrollPhysics(),
-                  //   itemCount: 10,
-                  //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //     crossAxisCount: 2,
-                  //   ),
-                  //   itemBuilder: (context,index){
-                  //     return
-                  //   },
-                  // ),
-                  Container(
-                    height: 224.h,
-                    width: 197.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(width: 1, color: Colors.grey),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    // এটা জরুরি
+                    physics: const NeverScrollableScrollPhysics(),
+                    // ডাবল স্ক্রল বন্ধ
+                    padding: EdgeInsets.only(top: 16.h, bottom: 120.h),
+                    // নিচে গ্যাপ
+                    itemCount: 10,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
                     ),
-                    child: Column(
-                      children: [
-                        Align(
-                          child: Container(
-                            height: 160.h,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  'assets/images/home_img1.png',
+                    itemBuilder: (context, index) {
+                      return Container(
+                        height: 224.h,
+                        width: 197.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(width: 1, color: Colors.grey),
+                        ),
+                        child: Column(
+                          children: [
+                            Align(
+                              child: Container(
+                                height: 150.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      'assets/images/home_img1.png',
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                fit: BoxFit.cover,
+                                child: Stack(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          height: 30.h,
+                                          width: 70.w,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFB026FF),
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'Music',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),

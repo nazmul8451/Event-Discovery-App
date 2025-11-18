@@ -27,13 +27,12 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w,),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24.r),
           child: BottomNavigationBar(
             elevation: 0,
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
+            backgroundColor:Theme.of(context).scaffoldBackgroundColor,
             selectedItemColor: Theme.of(context).primaryColor,
             unselectedItemColor: Colors.grey.shade400,
             currentIndex: _selectedIndex,
