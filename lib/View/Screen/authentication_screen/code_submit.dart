@@ -66,12 +66,10 @@ class _CodeSubmitState extends State<CodeSubmit> {
                 fieldHeight: 64.h,
                 fieldWidth: 64.w,
 
-                // বর্ডার + আন্ডারলাইন পুরোপুরি লুকিয়ে দাও
                 activeColor: Colors.transparent,
                 inactiveColor: Colors.transparent,
                 selectedColor: Colors.transparent,
 
-                // ফিল কালার (হালকা পার্পল)
                 activeFillColor: const Color(0xFFCC18CA).withOpacity(0.25),
                 selectedFillColor: const Color(0xFFCC18CA).withOpacity(0.35),
                 inactiveFillColor: const Color(0xFFCC18CA).withOpacity(0.15),
@@ -79,10 +77,8 @@ class _CodeSubmitState extends State<CodeSubmit> {
                 borderWidth: 0,
               ),
 
-              // ম্যাজিক লাইনগুলো — এই ৩টা না দিলে কখনো ঠিক হবে না
               enableActiveFill: true,
               boxShadows: const [],
-              // নিচের shadow চলে যাবে
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
               animationDuration: const Duration(milliseconds: 200),
