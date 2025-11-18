@@ -3,46 +3,70 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {
   final String buttonName;
-  final VoidCallback? onPressed;        // নতুন প্রপার্টি
-  final bool isLoading = false;         // যদি লোডিং স্টেট লাগে পরে যোগ করবেন
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
     required this.buttonName,
     this.onPressed,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(                       // InkWell এর জন্য Material দরকার
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12.r),
-        splashColor: Colors.grey.withOpacity(0.3),
-        highlightColor: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16.r),
+        splashColor: const Color(0xFFCC18CA).withOpacity(0.3),
+        highlightColor: const Color(0xFFCC18CA).withOpacity(0.1),
         onTap: onPressed,
         child: Container(
-          height: 40.h,
+          height: 56.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            // ব্যাকগ্রাউন্ড কালার অটো
+            color: isDark
+                ? const Color(0xFFCC18CA)           // Dark mode এ পার্পল বাটন
+                : Colors.white,                     // Light mode এ সাদা
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withOpacity(0.2)
+                  : Colors.grey.shade300,
+              width: 1.2,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.4),
-                spreadRadius: 1,
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: isDark
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.grey.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+                spreadRadius: 0,
               ),
             ],
           ),
           child: Center(
-            child: Text(
+            child: isLoading
+                ? SizedBox(
+              height: 24.h,
+              width: 24.h,
+              child: const CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2.5,
+              ),
+            )
+                : Text(
               buttonName,
               style: TextStyle(
                 fontSize: 16.sp.clamp(16, 18),
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                // টেক্সট কালার অটো
+                color: isDark ? Colors.white : Colors.black,
               ),
             ),
           ),

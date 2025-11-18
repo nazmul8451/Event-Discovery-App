@@ -1,5 +1,7 @@
 // View/app.dart
 import 'package:flutter/material.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
 import '../../View/Screen/Onboarding_screen/interest_screen.dart';
 import '../../View/Screen/Onboarding_screen/splash_screen.dart';
@@ -15,6 +17,9 @@ class AppRoutes {
   static const String login = LogInScreen.name;
   static const String signup = SignUpScreen.name;
   static const String forgotPass = ForgotPassScreen.name;
+  static const String codeSend = CodeSend.name;
+  static const String codeSubmit = CodeSubmit.name;
+
 
   static final routes = {
     splash: (context) => const SplashScreen(),
@@ -23,5 +28,7 @@ class AppRoutes {
     login: (context) => const LogInScreen(),
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
+    codeSend: (context) => const CodeSend(),
+    codeSubmit: (context) => const CodeSubmit(),
   };
 }

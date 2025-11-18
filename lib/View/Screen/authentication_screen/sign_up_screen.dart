@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:provider/provider.dart';
 
+import '../../Theme/theme_provider.dart';
 import 'forgot_pass_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -35,22 +37,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Expanded(
                     child: SizedBox(), // উপরের স্পেস
                   ),
-                  Center(
-                    child: Image.asset(
-                      'assets/images/splash_img.png',
-                      height: 80.h,
-                      width: 80.h,
-                    ),
+                  Consumer<ThemeProvider>(
+                    builder: (context, controller, child) {
+                      return Center(
+                        child: Image.asset(
+                          controller.isDarkMode
+                              ? 'assets/images/splash2.png'
+                              : 'assets/images/splash_img.png',
+                          height: 80.h,
+                          width: 80.h,
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(height: 10.h),
                   Text(
                     'Sign up to discover amazing events',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w400,
-                      color: Colors.black,
                     ),
-                    textAlign: TextAlign.center, // টেক্সট কেন্দ্রে
+                    textAlign: TextAlign.center,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -61,10 +68,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             Text(
                               'Create Account',
-                              style: TextStyle(
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontSize: 24.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -85,23 +91,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           labelText: 'Password',
                         ),
                         SizedBox(height: 3.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap:(){
-                                Navigator.pushNamed(context, ForgotPassScreen.name);
-                              },
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Color(0xFF9810FA),
-                                  fontWeight: FontWeight.w400,
-                                ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, ForgotPassScreen.name);
+                            },
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: const Color(0xFFCC18CA),
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
+                          ),
                         ),
                         SizedBox(height: 20.h),
                         InkWell(
@@ -136,12 +140,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         SizedBox(height: 30.h),
                         RichText(
                           text: TextSpan(
+                            style: Theme.of(context).textTheme.bodyMedium,
                             text: "Have an account? ",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
                             children: [
                               TextSpan(
                                 text: 'Log in',
@@ -177,22 +177,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Navigator.pushReplacementNamed(context, LogInScreen.name);
   }
 }
-
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
-
   const ContinueWithContainer({super.key, required this.iconImg});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      margin: const EdgeInsets.only(right: 10),
+      margin: EdgeInsets.only(right: 12.w),
       height: 36.h,
       width: 98.w,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(width: 1, color: Color(0xFFE2E8F0)),
+        color: isDark ? Colors.white.withOpacity(0.08) : Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.2) : const Color(0xFFE2E8F0),
+          width: 1.2,
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Center(
         child: Image.asset(iconImg, height: 15.h, width: 15.h),

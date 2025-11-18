@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -18,122 +20,110 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: 1.sh,
-          ),
+          constraints: BoxConstraints(minHeight: 1.sh),
           child: IntrinsicHeight(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: SizedBox(),
-                ),
-                Center(
-                  child: Image.asset(
-                    'assets/images/splash_img.png',
-                    height: 80.h,
-                    width: 80.h,
-                  ),
+                const Spacer(),
+
+                // Logo
+                Consumer<ThemeProvider>(
+                  builder: (context, controller, child) {
+                    return Center(
+                      child: Image.asset(
+                        controller.isDarkMode
+                            ? 'assets/images/splash2.png'
+                            : 'assets/images/splash_img.png',
+                        height: 80.h,
+                        width: 80.h,
+                      ),
+                    );
+                  },
                 ),
                 SizedBox(height: 10.h),
+
+                // Welcome Text
                 Text(
                   'Welcome Back',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w400,
-                    color: Colors.black,
                   ),
                 ),
+
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20.w),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Log in to continue',
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Log in to continue',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 30.h),
 
-
-                      // TextFormField(
-                      //   decoration: InputDecoration(
-                      //     hintText: 'email',
-                      //     hintStyle: TextStyle(color: Color(0xFF515151)),
-                      //     filled: true,
-                      //     fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                      //
-                      //     contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), // এটাই height কমাবে
-                      //     border: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(12),
-                      //       borderSide: BorderSide.none,
-                      //     ),
-                      //
-                      //     enabledBorder: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(12),
-                      //       borderSide: BorderSide.none,
-                      //     ),
-                      //     focusedBorder: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(12),
-                      //       borderSide: BorderSide.none,
-                      //     ),
-                      //   ),
-                      // ),
-
-                      AuthTextField(
+                      // TextFields
+                      const AuthTextField(
                         icon: Icons.check,
                         hintText: 'your@email.com',
                         labelText: 'Email',
                       ),
-                      AuthTextField(
-                        icon: Icons.remove_red_eye,
+                      SizedBox(height: 16.h),
+                      const AuthTextField(
+                        icon: Icons.visibility_off,
                         hintText: '••••••••',
                         labelText: 'Password',
+                        obscureText: true,
                       ),
-                      SizedBox(height: 3.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap:(){
-                              Navigator.pushNamed(context, ForgotPassScreen.name);
-                            },
-                            child: Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Color(0xFF9810FA),
-                                fontWeight: FontWeight.w400,
-                              ),
+
+                      // Forgot Password
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, ForgotPassScreen.name);
+                          },
+                          child: Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: const Color(0xFFCC18CA),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 10.h),
+
+                      // Login Button
                       CustomButton(buttonName: 'Login'),
-                      SizedBox(height: 20.h),
-                      Text(
-                        'OR CONTINUE WITH',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF6A7282),
+                      SizedBox(height: 30.h),
+
+                      // OR Continue With
+                      Center(
+                        child: Text(
+                          'OR CONTINUE WITH',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: isDark
+                                ? Colors.white60
+                                : const Color(0xFF6A7282),
+                            letterSpacing: 1.2,
+                          ),
                         ),
                       ),
                       SizedBox(height: 20.h),
+
+                      // Social Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -148,31 +138,30 @@ class _LogInScreenState extends State<LogInScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 30.h),
-                      RichText(
-                        text: TextSpan(
-                          text: "Don't have an account? ",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+                      SizedBox(height: 40.h),
+
+                      // Sign Up Text
+                      Center(
+                        child: RichText(
+                          text: TextSpan(
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            text: "Have an account? ",
+                            children: [
+                              TextSpan(
+                                text: 'Sign up',
+                                style: TextStyle(color: Color(0xFF9810FA)),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = onTapSignUp_button,
+                              ),
+                            ],
                           ),
-                          children: [
-                            TextSpan(
-                              text: 'Sign up',
-                              style: TextStyle(color: Color(0xFF9810FA)),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = onTapSignUp_button,
-                            ),
-                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: SizedBox(), // নিচের স্পেস
-                ),
+
+                const Spacer(),
               ],
             ),
           ),
@@ -182,10 +171,13 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void onTapSignUp_button() {
-    Navigator.pushNamed(context, SignUpScreen.name);
+    //TODO: validate user
+    //right now navigate log in screen..
+    Navigator.pushReplacementNamed(context, SignUpScreen.name);
   }
 }
 
+// Social Login Container – Dark Mode Ready
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
 
@@ -193,14 +185,30 @@ class ContinueWithContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      margin: const EdgeInsets.only(right: 10),
+      margin: EdgeInsets.only(right: 12.w),
       height: 36.h,
       width: 98.w,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(width: 1, color: Color(0xFFE2E8F0)),
+        color: isDark ? Colors.white.withOpacity(0.08) : Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.2)
+              : const Color(0xFFE2E8F0),
+          width: 1.2,
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Center(
         child: Image.asset(iconImg, height: 15.h, width: 15.h),
