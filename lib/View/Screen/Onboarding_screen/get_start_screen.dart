@@ -61,7 +61,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
                       SizedBox(height: 25.h),
                       Text(
                         getStartedContent.getStartedData[index].title,
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontSize: 20.sp,
                           fontWeight: FontWeight.w400,
                         ),

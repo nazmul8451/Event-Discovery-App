@@ -20,9 +20,9 @@ class InterestScreen extends StatelessWidget {
     {'icon': "assets/images/wellness_icon.png", 'name': 'Wellness'},
     {'icon': "assets/images/networking_icon.png", 'name': 'Networking'},
   ];
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
@@ -31,10 +31,9 @@ class InterestScreen extends StatelessWidget {
             Center(
               child: Text(
                 'What interests you?',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
                 ),
               ),
             ),
@@ -42,10 +41,9 @@ class InterestScreen extends StatelessWidget {
             Center(
               child: Text(
                 'Select your favorite event types to personalize\nyour feed',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w400,
-                  color: Colors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -77,14 +75,16 @@ class InterestScreen extends StatelessWidget {
                           child: Container(
                             // height: 187.h,width: 150.w,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.background,
                               borderRadius: BorderRadius.circular(15),
                               border: isSelected
                                   ? null
                                   : Border.all(
-                                      color: Color(0xFFE2E8F0),
-                                      width: 1,
-                                    ),
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? const  Color(0xFFCC18CA).withOpacity(0.25)// Dark mode border
+                                    : const Color(0xFFE2E8F0), // Light mode border
+                                width: 1,
+                              ),
                             ),
                             child: Stack(
                               children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = [
-    Center(child: Text('Home Page')),
+    HomePage(),
     Center(child: Text('Map Page')),
     Center(child: Text('Saved Page')),
     Center(child: Text('Chat Page')),
@@ -52,7 +53,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   BottomNavigationBarItem _navItem(String iconPath, String label, int index) {
     final bool isSelected = _selectedIndex == index;
-    final Color primary = Theme.of(context).primaryColor;
+    // final Color primary = Theme.of(context).primaryColor;
 
     return BottomNavigationBarItem(
       label: '',
