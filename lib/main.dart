@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'Core/AppRoute/app_route.dart';
 import 'View/Screen/Onboarding_screen/splash_screen.dart';
 import 'View/Theme/theme.dart';
+import 'View/view_controller/saved_event_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +21,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
+        ChangeNotifierProvider(create: (_) => SavedEventController()),
+
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

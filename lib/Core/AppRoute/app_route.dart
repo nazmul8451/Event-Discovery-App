@@ -1,6 +1,7 @@
 // View/app.dart
 import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String codeSend = CodeSend.name;
   static const String codeSubmit = CodeSubmit.name;
   static const String bottomNavBar = BottomNavBarScreen.name;
+  static const String notificationScreen = NotificationScreen.name;
 
 
   static final routes = {
@@ -33,5 +35,6 @@ class AppRoutes {
     codeSend: (context) => const CodeSend(),
     codeSubmit: (context) => const CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
+    notificationScreen: (context) => const NotificationScreen(),
   };
 }
