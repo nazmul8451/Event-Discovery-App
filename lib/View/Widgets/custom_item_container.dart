@@ -7,19 +7,14 @@ import 'package:provider/provider.dart';
 class Custom_item_container extends StatelessWidget {
   final EventCartmodel event;
 
-  const Custom_item_container({
-    super.key,
-    required this.event,
-  });
+  const Custom_item_container({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SavedEventController>(
       builder: (context, savedProvider, child) {
         final bool isSaved = savedProvider.isSaved(event);
-
         return Container(
-
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
@@ -36,7 +31,9 @@ class Custom_item_container extends StatelessWidget {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(12.r),
+                    ),
                     child: Image.asset(
                       event.image,
                       height: 150.h,
@@ -50,7 +47,10 @@ class Custom_item_container extends StatelessWidget {
                     top: 8.h,
                     left: 8.w,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFB026FF),
                         borderRadius: BorderRadius.circular(15.r),
@@ -68,7 +68,7 @@ class Custom_item_container extends StatelessWidget {
                     right: 8.w,
                     child: IconButton(
                       onPressed: () {
-                        savedProvider.toggleSaveEvent(event);
+                        savedProvider.toggleSave(event);
                       },
                       icon: Icon(
                         isSaved ? Icons.bookmark : Icons.bookmark_border,
@@ -84,7 +84,10 @@ class Custom_item_container extends StatelessWidget {
                       bottom: 8.h,
                       right: 8.w,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF00D9FF),
                           borderRadius: BorderRadius.circular(15.r),
@@ -131,7 +134,10 @@ class Custom_item_container extends StatelessWidget {
                         SizedBox(width: 6.w),
                         Text(
                           event.date,
-                          style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
@@ -149,7 +155,10 @@ class Custom_item_container extends StatelessWidget {
                         Expanded(
                           child: Text(
                             event.location,
-                            style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.grey[600],
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -163,7 +172,10 @@ class Custom_item_container extends StatelessWidget {
                             SizedBox(width: 4.w),
                             Text(
                               event.rating.toStringAsFixed(1),
-                              style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),

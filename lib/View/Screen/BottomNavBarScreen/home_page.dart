@@ -44,6 +44,26 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),
+    EventCartmodel(
+      id: "2",
+      title: "Electric",
+      image: "assets/images/home_img1.png",
+      category: "Music",
+      price: "\$50",
+      date: "Nov 15 • 8:00 PM",
+      location: "Downtown Arena • 2.3 km",
+      rating: 3.6,
+    ),
+    EventCartmodel(
+      id: "3",
+      title: "Night Club",
+      image: "assets/images/home_img1.png",
+      category: "Music",
+      price: "\$50",
+      date: "Nov 15 • 8:00 PM",
+      location: "Downtown Arena • 2.3 km",
+      rating: 3.6,
+    ),
 
 
   ];
@@ -120,84 +140,87 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            const SearchTextField(hintText: 'Search events, venues'),
-            // Filter Chips
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: categories.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var category = entry.value;
-                    bool isSelected = selectedCategoryIndex == index;
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 120.0),
+          child: Column(
+            children: [
+              const SearchTextField(hintText: 'Search events, venues'),
+              // Filter Chips
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      var category = entry.value;
+                      bool isSelected = selectedCategoryIndex == index;
 
-                    return Padding(
-                      padding: EdgeInsets.only(right: 8.w),
-                      child: _buildCustomFilterChip(
-                        label: category["label"],
-                        icon: category["icon"],
-                        isSelected: isSelected,
-                        onTap: () {
-                          setState(() {
-                            selectedCategoryIndex = index;
-                            // পরে এখানে API filter call করবে
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
+                      return Padding(
+                        padding: EdgeInsets.only(right: 8.w),
+                        child: _buildCustomFilterChip(
+                          label: category["label"],
+                          icon: category["icon"],
+                          isSelected: isSelected,
+                          onTap: () {
+                            setState(() {
+                              selectedCategoryIndex = index;
+                              // পরে এখানে API filter call করবে
+                            });
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 10.h),
+              SizedBox(height: 10.h),
 
-            // Featured Banners (দুইটা)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
-                  SizedBox(height: 12.h),
-                  _buildFeaturedEvent("Sunset Vibes", "Weekend Beach Party", ["Music", "Free"]),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 20.h),
-
-            // Trending Title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  trendName,
-                  style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+              // Featured Banners (দুইটা)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                    SizedBox(height: 12.h),
+                    _buildFeaturedEvent("Sunset Vibes", "Weekend Beach Party", ["Music", "Free"]),
+                  ],
                 ),
               ),
-            ),
 
-            // GridView
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(16.w),
-              itemCount: events.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 7 / 9,
+              SizedBox(height: 20.h),
+
+              // Trending Title
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    trendName,
+                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                  ),
+                ),
               ),
-              itemBuilder: (context, index) {
-                return Custom_item_container(event: events[index]);
-              },
-            ),
-          ],
+
+              // GridView
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.all(16.w),
+                itemCount: events.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 7 / 9,
+                ),
+                itemBuilder: (context, index) {
+                  return Custom_item_container(event: events[index]);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

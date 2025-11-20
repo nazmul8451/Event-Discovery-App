@@ -1,25 +1,27 @@
+// saved_event_controller.dart
+
 import 'package:flutter/cupertino.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
-import 'package:gathering_app/ViewModel/event_cartModel.dart';
+
+import '../../ViewModel/event_cartModel.dart';
 
 class SavedEventController extends ChangeNotifier {
   final List<EventCartmodel> _savedEvents = [];
 
   List<EventCartmodel> get savedEvents => _savedEvents;
 
+  // এই ফাংশনটা ঠিক করো
   bool isSaved(EventCartmodel event) {
-    return _savedEvents.any((event) => event.id == event.id);
+    return _savedEvents.any((e) => e.id == event.id); // এখানে id চেক করতে হবে
   }
 
-  void toggleSaveEvent(EventCartmodel event) {
+  void toggleSave(EventCartmodel event) {
     if (isSaved(event)) {
       _savedEvents.removeWhere((e) => e.id == event.id);
-      print('${event.title} removed');
+      print("${event.title} removed from saved");
     } else {
       _savedEvents.add(event);
-
-      print('saved');
+      print("${event.title} saved!");
     }
-    notifyListeners();
+    notifyListeners(); // এটা না থাকলে UI আপডেট হবে না
   }
 }

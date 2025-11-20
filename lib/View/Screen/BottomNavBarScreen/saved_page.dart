@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
+import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:gathering_app/ViewModel/event_cartModel.dart';
+import 'package:provider/provider.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -10,6 +13,8 @@ class SavedPage extends StatefulWidget {
 }
 
 class _SavedPageState extends State<SavedPage> {
+  // EventCartmodel event;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,18 +34,30 @@ class _SavedPageState extends State<SavedPage> {
                 '2 events saved',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              SizedBox(height: 10.h,),
+              SizedBox(height: 10.h),
               Expanded(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 7 / 9,
-                  ),
-                  itemBuilder: (context, index) {
-                    // return Custom_item_container(event: ,);
-                  },
+                child: Consumer<SavedEventController>(
+                  builder:(context,controller,child) {
+                  return  GridView.builder(
+                      itemCount:controller.savedEvents.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 7 / 9,
+                      ),
+                      itemBuilder: (context, index) {
+                        return Consumer<SavedEventController>(
+                          builder: (context, controller, child) {
+                            final saveEventList = controller.savedEvents;
+                            return Custom_item_container(
+                              event: saveEventList[index],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
                 ),
               ),
             ],

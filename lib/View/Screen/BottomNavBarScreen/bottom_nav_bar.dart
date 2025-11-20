@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
 
+import 'chat_page.dart';
+
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({Key? key}) : super(key: key);
   static const String name = '/bottom-navbar-screen';
@@ -18,7 +20,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     HomePage(),
     Center(child: Text('Map Page')),
     SavedPage(),
-    Center(child: Text('Chat Page')),
+    ChatPage(),
     Center(child: Text('Profile Page')),
   ];
 
