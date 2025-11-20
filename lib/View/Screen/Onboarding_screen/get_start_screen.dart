@@ -39,77 +39,82 @@ class _GetStartScreenState extends State<GetStartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 200,
-            child: Expanded(
-              child: PageView.builder(
-                itemCount: getStartedContent.getStartedData.length,
-                controller: _controller,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20.h),
-                      Image.asset(
-                        getStartedContent.getStartedData[index].icon,
-                        height: 48.h,
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        getStartedContent.getStartedData[index].title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 10.h),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          getStartedContent.getStartedData[index].subtitle,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+      body: Center(
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 200,
+                child: Expanded(
+                  child: PageView.builder(
+                    itemCount: getStartedContent.getStartedData.length,
+                    controller: _controller,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20.h),
+                          Image.asset(
+                            getStartedContent.getStartedData[index].icon,
+                            height: 48.h,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                          SizedBox(height: 25.h),
+                          Text(
+                            getStartedContent.getStartedData[index].title,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 10.h),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              getStartedContent.getStartedData[index].subtitle,
+                              style: TextStyle(
+                                fontSize: 16.sp.clamp(16, 20),
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          SizedBox(height: 20.h,),
+              SizedBox(height: 20.h,),
 
-          GestureDetector(
-            onTap: ()=>nextPage(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: CustomButton(buttonName: 'Get Started',),
-            ),
-          ),
-          SizedBox(height: 15.h),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: SmoothPageIndicator(
-              controller: _controller,
-              count: getStartedContent.getStartedData.length,
-              effect: const SlideEffect(
-                activeDotColor: Colors.purple,
-                dotHeight: 8,
-                dotWidth: 8,
+              GestureDetector(
+                onTap: ()=>nextPage(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: CustomButton(buttonName: 'Get Started',),
+                ),
               ),
-            ),
+              SizedBox(height: 15.h),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: SmoothPageIndicator(
+                  controller: _controller,
+                  count: getStartedContent.getStartedData.length,
+                  effect: const SlideEffect(
+                    activeDotColor: Colors.purple,
+                    dotHeight: 8,
+                    dotWidth: 8,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

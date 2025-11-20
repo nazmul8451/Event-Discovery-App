@@ -48,7 +48,6 @@ class _LogInScreenState extends State<LogInScreen> {
                   },
                 ),
                 SizedBox(height: 10.h),
-
                 // Welcome Text
                 Text(
                   'Welcome Back',

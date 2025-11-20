@@ -1,7 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'chat_page.dart';
 
@@ -21,7 +26,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     Center(child: Text('Map Page')),
     SavedPage(),
     ChatPage(),
-    Center(child: Text('Profile Page')),
+    ProfilePage()
   ];
 
   @override
@@ -29,24 +34,73 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     return Scaffold(
       extendBody: true,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w,),
-        child: ClipRRect(
-          child: BottomNavigationBar(
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor:Theme.of(context).scaffoldBackgroundColor,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Colors.grey.shade400,
-            currentIndex: _selectedIndex,
-            onTap: (i) => setState(() => _selectedIndex = i),
-            items: [
-              _navItem('assets/images/home_icon.png', 'Home', 0),
-              _navItem('assets/images/map_icon.png', 'Map', 1),
-              _navItem('assets/images/saved_icon.png', 'Saved', 2),
-              _navItem('assets/images/chat_icon.png', 'Chat', 3),
-              _navItem('assets/images/profile_icon.png', 'Profile', 4),
+      bottomNavigationBar: Container(
+        height: 70.h + MediaQuery.of(context).padding.bottom,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Container(
+          height: 70.h,
+          margin: EdgeInsets.only(
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
             ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(5, (index) {
+              final bool isSelected = _selectedIndex == index;
+              final List<String> icons = [
+                'assets/images/home_icon.png',
+                'assets/images/map_icon.png',
+                'assets/images/saved_icon.png',
+                'assets/images/chat_icon.png',
+                'assets/images/profile_icon.png',
+              ];
+              final List<String> labels = ['Home', 'Map', 'Saved', 'Chat', 'Profile'];
+
+              return GestureDetector(
+                onTap: () => setState(() => _selectedIndex = index),
+                child: Consumer<ThemeProvider>(
+                  builder:(context,controller,child) =>AnimatedContainer(
+                    width: 70.w,
+                    duration: const Duration(milliseconds: 200),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    decoration: isSelected
+                        ? BoxDecoration(
+                      color: const Color(0xFFCC18CA).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    )
+                        : null,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          icons[index],
+                          width: 26.w,
+                          height: 26.h,
+                          color: isSelected ? const Color(0xFFB026FF) : controller.isDarkMode? Colors.grey: Colors.black,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          labels[index],
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: isSelected ? const Color(0xFFB026FF) :controller.isDarkMode? Colors.grey: Colors.black,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ),
@@ -55,8 +109,6 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   BottomNavigationBarItem _navItem(String iconPath, String label, int index) {
     final bool isSelected = _selectedIndex == index;
-    // final Color primary = Theme.of(context).primaryColor;
-
     return BottomNavigationBarItem(
       label: '',
       icon: Container(

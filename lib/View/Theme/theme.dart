@@ -100,6 +100,7 @@ class ThemeColor {
       onBackground: Colors.white,
       surface: Color(0xFF1E1530),
       onSurface: Colors.white,
+      onSurfaceVariant: Colors.grey,    // ← এটাই তোমার গ্রে হিন্ট
       surfaceVariant: Color(0xFF2A1E3F),
     ),
 

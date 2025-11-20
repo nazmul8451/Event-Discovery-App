@@ -27,6 +27,18 @@ class ChatPage extends StatelessWidget {
       "time": "2 days ago",
       "image": "assets/images/group_icon.png",
       "isOrganizer": false,
+    },    {
+      "name": "Event Organizers",
+      "message": "Community updates available",
+      "time": "2 days ago",
+      "image": "assets/images/group_icon.png",
+      "isOrganizer": false,
+    },    {
+      "name": "Event Organizers",
+      "message": "Community updates available",
+      "time": "2 days ago",
+      "image": "assets/images/group_icon.png",
+      "isOrganizer": false,
     },
   ];
 
@@ -43,7 +55,7 @@ class ChatPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
                Text("Messages",style: Theme.of(context).textTheme.titleLarge,),
-              Text('Connect with Community',style: Theme.of(context).textTheme.titleMedium,)
+              Text('Connect with Community',style: Theme.of(context).textTheme.titleSmall,)
             ],
           ),
         ),
