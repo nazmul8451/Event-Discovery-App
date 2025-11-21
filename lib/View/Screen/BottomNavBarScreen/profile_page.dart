@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(height: 15.h),
                 //favorite spots list
                 SizedBox(
-                  height: 220.h, // এই লাইনটা যোগ করো
+                  height: 230.h, // এই লাইনটা যোগ করো
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: 10,

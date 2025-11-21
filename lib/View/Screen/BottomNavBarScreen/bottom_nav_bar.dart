@@ -35,7 +35,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-        height: 70.h + MediaQuery.of(context).padding.bottom,
+        height: 80.h + MediaQuery.of(context).padding.bottom,
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
           height: 70.h,

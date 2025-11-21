@@ -8,16 +8,11 @@ import 'package:provider/provider.dart';
 
 import '../../Widgets/appbar.dart';
 
-class ForgotPassScreen extends StatefulWidget {
+class ForgotPassScreen extends StatelessWidget {
   const ForgotPassScreen({super.key});
 
   static const String name = '/forgot-pass-screen';
 
-  @override
-  State<ForgotPassScreen> createState() => _ForgotPassScreenState();
-}
-
-class _ForgotPassScreenState extends State<ForgotPassScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +49,16 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                   },
                   child: CustomButton(buttonName: 'Reset')),
               SizedBox(height: 50.h),
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return Switch(
+                    value: themeProvider.isDarkMode,
+                    onChanged: (val) {
+                      themeProvider.toggleTheme();
+                    },
+                  );
+                },
+              )
             ],
           ),
         ),

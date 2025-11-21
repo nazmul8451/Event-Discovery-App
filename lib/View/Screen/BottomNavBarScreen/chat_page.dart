@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 
 import '../../Widgets/serch_textfield.dart';
 
@@ -115,8 +116,7 @@ class ChatPage extends StatelessWidget {
                     style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                   ),
                   onTap: () {
-                    // পরে Chat Details Screen এ নিয়ে যাবে
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => ChatDetailScreen(chat: chat)));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: chat)));
                   },
                 );
               },
