@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -28,6 +29,147 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    void CustomAlertDialogue(BuildContext context) {
+      // context নিবে
+      showDialog(
+        context: context, // এখন ঠিক আছে
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Edit Profile",
+                            style: TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 25.sp,fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Update your personal information",
+                            style:TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 15.sp,fontWeight: FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                      Consumer<ThemeProvider>(
+                        builder: (context, controller, child) => GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            margin: EdgeInsets.only(right: 10),
+                            height: 40.w,
+                            width: 40.w,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: controller.isDarkMode
+                                  ? Color(0xFF3E043F)
+                                  : Color(0xFF686868),
+                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Image.asset(
+                                'assets/images/cross_icon.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  // তোমার ফর্ম ফিল্ড
+                  AuthTextField(hintText: 'user name', labelText: 'Name'),
+                  AuthTextField(hintText: 'your email', labelText: 'Email'),
+                  AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
+                  AuthTextField(
+                    hintText: 'Change Location',
+                    labelText: 'Location',
+                  ),
+                  AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
+                  SizedBox(height: 20.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        height: 55.h,
+                        width: 150.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDark? Colors.black: Colors.black,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          ),
+                          onPressed: (){
+                            Navigator.pop(context);
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Save Change',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: isDark? Colors.white: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 55.h,
+                        width: 150.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:isDark? Colors.black : Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          ),
+                          onPressed: (){
+
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: isDark? Colors.white: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
@@ -159,7 +301,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                         ),
-                        onPressed: () {},
+                        onPressed: () => CustomAlertDialogue(context),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
@@ -723,16 +865,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                             0xFFCC18CA,
                                           ).withOpacity(0.15),
                                         ),
-                                        SizedBox(height: 20.h,),
+                                        SizedBox(height: 20.h),
                                         Row(
                                           children: [
-                                            Icon(Icons.logout_outlined,color: Colors.red,),
+                                            Icon(
+                                              Icons.logout_outlined,
+                                              color: Colors.red,
+                                            ),
                                             SizedBox(width: 5.w),
                                             Text(
                                               'Sign Out',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium!.copyWith(color: Colors.red),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(color: Colors.red),
                                             ),
                                           ],
                                         ),

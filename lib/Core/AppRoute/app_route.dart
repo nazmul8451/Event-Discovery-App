@@ -1,6 +1,7 @@
 // View/app.dart
 import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
@@ -25,6 +26,7 @@ class AppRoutes {
   static const String bottomNavBar = BottomNavBarScreen.name;
   static const String notificationScreen = NotificationScreen.name;
   static const String userchatScreen = UserChatScreen.name;
+  static const String detaisScreen = DetailsScreen.name;
 
 
   static final routes = {
@@ -39,5 +41,6 @@ class AppRoutes {
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
     userchatScreen: (context) => const UserChatScreen(chat: {},),
+    detaisScreen: (context) => const DetailsScreen(),
   };
 }

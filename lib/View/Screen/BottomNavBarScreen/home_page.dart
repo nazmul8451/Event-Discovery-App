@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
@@ -82,6 +83,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         title: Align(
           alignment: Alignment.centerLeft,
           child: Column(
@@ -182,7 +184,11 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   children: [
-                    _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                    GestureDetector(
+                        onTap:(){
+                          Navigator.pushNamed(context, DetailsScreen.name);
+                        },
+                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"])),
                     SizedBox(height: 12.h),
                     _buildFeaturedEvent("Sunset Vibes", "Weekend Beach Party", ["Music", "Free"]),
                   ],

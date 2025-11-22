@@ -20,7 +20,7 @@ class Custom_item_container extends StatelessWidget {
             border: Border.all(
               width: 1,
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFFCC18CA)
+                  ?   Color(0xFFCC18CA).withOpacity(0.15)
                   : Colors.grey.shade300,
             ),
           ),

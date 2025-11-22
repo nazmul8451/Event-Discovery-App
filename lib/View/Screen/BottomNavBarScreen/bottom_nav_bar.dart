@@ -38,7 +38,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
         height: 80.h + MediaQuery.of(context).padding.bottom,
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
-          height: 70.h,
+          height: 60.h,
           margin: EdgeInsets.only(
           ),
           decoration: BoxDecoration(
@@ -64,17 +64,18 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
               ];
               final List<String> labels = ['Home', 'Map', 'Saved', 'Chat', 'Profile'];
 
-              return GestureDetector(
-                onTap: () => setState(() => _selectedIndex = index),
-                child: Consumer<ThemeProvider>(
-                  builder:(context,controller,child) =>AnimatedContainer(
+              return Consumer<ThemeProvider>(
+                builder: (context, controller, child) => GestureDetector(
+                  onTap: () => setState(() => _selectedIndex = index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
                     width: 70.w,
-                    duration: const Duration(milliseconds: 200),
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                     decoration: isSelected
                         ? BoxDecoration(
                       color: const Color(0xFFCC18CA).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24.r),
                     )
                         : null,
                     child: Column(
@@ -82,17 +83,25 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                       children: [
                         Image.asset(
                           icons[index],
-                          width: 26.w,
-                          height: 26.h,
-                          color: isSelected ? const Color(0xFFB026FF) : controller.isDarkMode? Colors.grey: Colors.black,
+                          width: 28.w,
+                          height: 28.h,
+                          color: isSelected
+                              ? const Color(0xFFB026FF)
+                              : controller.isDarkMode
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade600,
                         ),
-                        SizedBox(height: 4.h),
+                        SizedBox(height: 6.h),
                         Text(
                           labels[index],
                           style: TextStyle(
-                            fontSize: 12.sp,
-                            color: isSelected ? const Color(0xFFB026FF) :controller.isDarkMode? Colors.grey: Colors.black,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                            fontSize: 11.sp,
+                            color: isSelected
+                                ? const Color(0xFFB026FF)
+                                : controller.isDarkMode
+                                ? Colors.grey.shade500
+                                : Colors.grey.shade600,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           ),
                         ),
                       ],

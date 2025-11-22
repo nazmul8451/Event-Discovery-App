@@ -4,6 +4,8 @@ import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 
+import '../../Widgets/notification_container.dart';
+
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
@@ -19,6 +21,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: Align(
           alignment: Alignment.centerLeft,
@@ -79,47 +82,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 physics: BouncingScrollPhysics(),
                 itemCount: 15,
                 itemBuilder: (context, index) {
-                  return Consumer<ThemeProvider>(
-                    builder: (context, controller, child) => SizedBox(
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(width: 1, color: Color(0xFFB026FF)),
-                        ),
-                        child: ListTile(
-                          leading: Container(
-                            height: 10.h,
-                            width: 10.w,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.pink,
-                            ),
-                          ),
-                          title: Text(
-                            'New event near you: Midnight Groove',
-                            style: TextStyle(
-                              color: controller.isDarkMode
-                                  ? Color(0xFFF0F0F5)
-                                  : Colors.black,
-                            ),
-                          ),
-                          subtitle: Text(
-                            '2 hours ago',
-                            style: TextStyle(
-                              color: controller.isDarkMode
-                                  ? Color(0xFFF0F0F5)
-                                  : Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  return NotificationContainer(notificationMessage: 'New Event near you : Midnight Groove',
                   );
                 },
               ),
             ),
-
             Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: CustomButton(buttonName: 'Mark all as read'),
@@ -130,3 +97,4 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 }
+
