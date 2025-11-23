@@ -36,7 +36,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    void CustomAlertDialogue(BuildContext context) {
+    void WriteCommentAlertDialogue(BuildContext context) {
       // context নিবে
       showDialog(
         context: context, // এখন ঠিক আছে
@@ -58,19 +58,33 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Write a Review",
-                            style: TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 25.sp,fontWeight: FontWeight.w600),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            "Share your experience at Electric Paradise Festival",
-                            style:TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 15.sp,fontWeight: FontWeight.w400),
-                          ),
-                        ],
+                      // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Write a Review",
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 25.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Share your experience at Electric Paradise Festival",
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                       Consumer<ThemeProvider>(
                         builder: (context, controller, child) => GestureDetector(
@@ -98,50 +112,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ],
                   ),
                   SizedBox(height: 24.h),
-                  // তোমার ফর্ম ফিল্ড
-                  AuthTextField(hintText: 'user name', labelText: 'Name'),
-                  AuthTextField(hintText: 'your email', labelText: 'Email'),
-                  AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
-                  AuthTextField(
-                    hintText: 'Change Location',
-                    labelText: 'Location',
-                  ),
                   AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
                   SizedBox(height: 20.h),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
                         height: 55.h,
-                        width: 150.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark? Colors.black: Colors.black,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Save Change',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: isDark? Colors.white: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 55.h,
-                        width: 150.w,
+                        width:300.w,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:isDark? Colors.black : Colors.white,
@@ -157,7 +135,164 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              'Cancel',
+                              'Submit Review',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: isDark? Colors.white: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    };
+
+    void GetTicketAlertDialogue(BuildContext context) {
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Book Tickets',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 25.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "Complete your booking for Live Jazz Night",
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Consumer<ThemeProvider>(
+                        builder: (context, controller, child) => GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            margin: EdgeInsets.only(right: 10),
+                            height: 40.w,
+                            width: 40.w,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: controller.isDarkMode
+                                  ? Color(0xFF3E043F)
+                                  : Color(0xFF686868),
+                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Image.asset(
+                                'assets/images/cross_icon.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  AuthTextField(hintText: 'Summer 25', labelText: 'Coupon'),
+                  AuthTextField(hintText: '1', labelText: 'Number of Tickets'),
+                  AuthTextField(hintText: 'Email', labelText: 'your@email.com'),
+                  AuthTextField(hintText: 'Phone Number', labelText: '+1 (555) 000-0000'),
+                  SizedBox(height: 20.h),
+                  Divider(
+                    color: Color(
+                      0xFFCC18CA,
+                    ).withOpacity(0.15),
+                  ),
+                  SizedBox(height: 20.h,),
+                  Column(
+                    children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                      children: [
+                        Text('Price per ticket',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                        Text('\$30',style: Theme.of(context).textTheme.titleSmall,),
+                      ],
+                    ),
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Quantity',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Text('1',style: Theme.of(context).textTheme.titleSmall,),
+                        ],
+                      ),
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total',style: Theme.of(context).textTheme.titleSmall),
+                          Text('\$30',style: Theme.of(context).textTheme.titleSmall?.copyWith(color:Color(0xFFCC18CA) )),
+                        ],
+                      ),
+                  ],
+                  ),
+                  SizedBox(height: 20.h,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 55.h,
+                        width:300.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:isDark? Colors.black : Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          ),
+                          onPressed: (){
+
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Confirm Booking',
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 color: isDark? Colors.white: Colors.black,
@@ -424,7 +559,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
 
               SizedBox(height: 20.h),
-              CustomButton(buttonName: 'Get Ticket'),
+              GestureDetector(
+                onTap: ()=>GetTicketAlertDialogue(context),
+                  child: CustomButton(buttonName: 'Get Ticket')),
               SizedBox(height: 10.h),
 
               Align(
@@ -779,7 +916,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     height: 40.h,
                     width: 150.w,
                     child: GestureDetector(
-                      onTap: ()=>CustomAlertDialogue(context),
+                      onTap: ()=>WriteCommentAlertDialogue(context),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20.r),
