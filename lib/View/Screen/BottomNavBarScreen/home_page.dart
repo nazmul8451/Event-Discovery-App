@@ -65,8 +65,6 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),
-
-
   ];
 
   // ক্যাটাগরি লিস্ট (পরে API থেকে আনবে)
@@ -127,7 +125,10 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xFFFF006E),
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(minHeight: 18, minWidth: 18),
+                    constraints: const BoxConstraints(
+                      minHeight: 18,
+                      minWidth: 18,
+                    ),
                     child: const Text(
                       '5',
                       style: TextStyle(color: Colors.white, fontSize: 10),
@@ -185,12 +186,26 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     GestureDetector(
-                        onTap:(){
-                          Navigator.pushNamed(context, DetailsScreen.name);
-                        },
-                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"])),
+                      onTap: () {
+                        Navigator.pushNamed(context, DetailsScreen.name);
+                      },
+                      child: _buildFeaturedEvent(
+                        "Kickback",
+                        "TONIGHT: House Party",
+                        ["Chill", "Social"],
+                      ),
+                    ),
                     SizedBox(height: 12.h),
-                    _buildFeaturedEvent("Sunset Vibes", "Weekend Beach Party", ["Music", "Free"]),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, DetailsScreen.name);
+                      },
+                      child: _buildFeaturedEvent(
+                        "Kickback",
+                        "TONIGHT: House Party",
+                        ["Chill", "Social"],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -204,7 +219,10 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     trendName,
-                    style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -289,10 +307,12 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const Spacer(),
-                    ...tags.map((tag) => Padding(
-                      padding: EdgeInsets.only(left: 8.w),
-                      child: _buildTag(tag),
-                    )),
+                    ...tags.map(
+                      (tag) => Padding(
+                        padding: EdgeInsets.only(left: 8.w),
+                        child: _buildTag(tag),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -312,7 +332,11 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Text(
         text,
-        style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

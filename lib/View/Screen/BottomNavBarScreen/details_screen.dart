@@ -11,6 +11,7 @@ import 'package:progress_bar/progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../Widgets/auth_textFormField.dart';
 import '../../Widgets/custom carosel_slider.dart';
 
 class DetailsScreen extends StatefulWidget {
@@ -34,6 +35,149 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    void CustomAlertDialogue(BuildContext context) {
+      // context নিবে
+      showDialog(
+        context: context, // এখন ঠিক আছে
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Write a Review",
+                            style: TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 25.sp,fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Share your experience at Electric Paradise Festival",
+                            style:TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 15.sp,fontWeight: FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                      Consumer<ThemeProvider>(
+                        builder: (context, controller, child) => GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            margin: EdgeInsets.only(right: 10),
+                            height: 40.w,
+                            width: 40.w,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: controller.isDarkMode
+                                  ? Color(0xFF3E043F)
+                                  : Color(0xFF686868),
+                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Image.asset(
+                                'assets/images/cross_icon.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  // তোমার ফর্ম ফিল্ড
+                  AuthTextField(hintText: 'user name', labelText: 'Name'),
+                  AuthTextField(hintText: 'your email', labelText: 'Email'),
+                  AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
+                  AuthTextField(
+                    hintText: 'Change Location',
+                    labelText: 'Location',
+                  ),
+                  AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
+                  SizedBox(height: 20.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        height: 55.h,
+                        width: 150.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDark? Colors.black: Colors.black,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          ),
+                          onPressed: (){
+                            Navigator.pop(context);
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Save Change',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: isDark? Colors.white: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 55.h,
+                        width: 150.w,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:isDark? Colors.black : Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          ),
+                          onPressed: (){
+
+                          },
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: isDark? Colors.white: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    
+    
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: false,
@@ -634,24 +778,27 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   SizedBox(
                     height: 40.h,
                     width: 150.w,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
-                          width: 1,
-                          color: Color(0xFFCC18CA).withOpacity(0.15),
+                    child: GestureDetector(
+                      onTap: ()=>CustomAlertDialogue(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            width: 1,
+                            color: Color(0xFFCC18CA).withOpacity(0.15),
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.star_border_outlined),
-                            Text(
-                              'Write Review',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ],
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.star_border_outlined),
+                              Text(
+                                'Write Review',
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
