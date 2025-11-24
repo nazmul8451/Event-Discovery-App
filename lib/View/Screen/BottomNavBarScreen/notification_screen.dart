@@ -54,8 +54,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
               onTap: () => Navigator.pop(context),
               child: Container(
                 margin: EdgeInsets.only(right: 10),
-                height: 40.w,
-                width: 40.w,
+                height: 36,
+                width: 36,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: controller.isDarkMode

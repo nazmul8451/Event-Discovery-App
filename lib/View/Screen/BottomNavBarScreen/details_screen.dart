@@ -91,8 +91,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           onTap: () => Navigator.pop(context),
                           child: Container(
                             margin: EdgeInsets.only(right: 10),
-                            height: 40.w,
-                            width: 40.w,
+                            height: 40,
+                            width: 40,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               color: controller.isDarkMode
@@ -114,39 +114,33 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   SizedBox(height: 24.h),
                   AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
                   SizedBox(height: 20.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 55.h,
-                        width:300.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:isDark? Colors.black : Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w), // দু’পাশে gap
+                    child: SizedBox(
+                      width: double.infinity, // full width inside dialog
+                      height: 55.h,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? Colors.black : Colors.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
-                          onPressed: (){
-
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Submit Review',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: isDark? Colors.white: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          padding: EdgeInsets.zero, // overflow রোধ
+                        ),
+                        onPressed: () {},
+                        child: Text(
+                          'Submit Review',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            color: isDark ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  )
+
                 ],
               ),
             ),
@@ -166,145 +160,143 @@ class _DetailsScreenState extends State<DetailsScreen> {
             borderRadius: BorderRadius.circular(28),
           ),
           contentPadding: EdgeInsets.zero,
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Padding(
-              padding: EdgeInsets.all(24.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Book Tickets',
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 25.sp,
-                                fontWeight: FontWeight.w600,
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: double.maxFinite,
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Book Tickets',
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "Complete your booking for Live Jazz Night",
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w400,
+                              SizedBox(height: 4.h),
+                              Text(
+                                textAlign: TextAlign.center,
+                                "Complete your booking for Live Jazz Night",
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Consumer<ThemeProvider>(
-                        builder: (context, controller, child) => GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            margin: EdgeInsets.only(right: 10),
-                            height: 40.w,
-                            width: 40.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: controller.isDarkMode
-                                  ? Color(0xFF3E043F)
-                                  : Color(0xFF686868),
-                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Image.asset(
-                                'assets/images/cross_icon.png',
+                        SizedBox(width: 20.w,),
+                        Consumer<ThemeProvider>(
+                          builder: (context, controller, child) => GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10),
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: controller.isDarkMode
+                                    ? Color(0xFF3E043F)
+                                    : Color(0xFF686868),
+                                // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Image.asset(
+                                  'assets/images/cross_icon.png',
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  AuthTextField(hintText: 'Summer 25', labelText: 'Coupon'),
-                  AuthTextField(hintText: '1', labelText: 'Number of Tickets'),
-                  AuthTextField(hintText: 'Email', labelText: 'your@email.com'),
-                  AuthTextField(hintText: 'Phone Number', labelText: '+1 (555) 000-0000'),
-                  SizedBox(height: 20.h),
-                  Divider(
-                    color: Color(
-                      0xFFCC18CA,
-                    ).withOpacity(0.15),
-                  ),
-                  SizedBox(height: 20.h,),
-                  Column(
-                    children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                      children: [
-                        Text('Price per ticket',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                        Text('\$30',style: Theme.of(context).textTheme.titleSmall,),
                       ],
                     ),
-                      SizedBox(height: 10.h,),
+                    SizedBox(height: 24.h),
+                    AuthTextField(hintText: 'Summer 25', labelText: 'Coupon'),
+                    AuthTextField(hintText: '1', labelText: 'Number of Tickets'),
+                    AuthTextField(hintText: 'Email', labelText: 'your@email.com'),
+                    AuthTextField(hintText: 'Phone Number', labelText: '+1 (555) 000-0000'),
+                    SizedBox(height: 20.h),
+                    Divider(
+                      color: Color(
+                        0xFFCC18CA,
+                      ).withOpacity(0.15),
+                    ),
+                    SizedBox(height: 20.h,),
+                    Column(
+                      children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            
                         children: [
-                          Text('Quantity',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                          Text('1',style: Theme.of(context).textTheme.titleSmall,),
+                          Text('Price per ticket',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Text('\$30',style: Theme.of(context).textTheme.titleSmall,),
                         ],
                       ),
-                      SizedBox(height: 10.h,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Total',style: Theme.of(context).textTheme.titleSmall),
-                          Text('\$30',style: Theme.of(context).textTheme.titleSmall?.copyWith(color:Color(0xFFCC18CA) )),
-                        ],
-                      ),
-                  ],
-                  ),
-                  SizedBox(height: 20.h,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
+                        SizedBox(height: 10.h,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Quantity',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                            Text('1',style: Theme.of(context).textTheme.titleSmall,),
+                          ],
+                        ),
+                        SizedBox(height: 10.h,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Total',style: Theme.of(context).textTheme.titleSmall),
+                            Text('\$30',style: Theme.of(context).textTheme.titleSmall?.copyWith(color:Color(0xFFCC18CA) )),
+                          ],
+                        ),
+                    ],
+                    ),
+                    SizedBox(height: 20.h,),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w), // দু’পাশে gap
+                      child: SizedBox(
+                        width: double.infinity, // full width inside dialog
                         height: 55.h,
-                        width:300.w,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:isDark? Colors.black : Colors.white,
+                            backgroundColor: isDark ? Colors.black : Colors.white,
                             elevation: 2,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            padding: EdgeInsets.zero, // overflow রোধ
                           ),
-                          onPressed: (){
-
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Confirm Booking',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: isDark? Colors.white: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          onPressed: () {},
+                          child: Text(
+                            'Confirm Booking',
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    )
+            
+                  ],
+                ),
               ),
             ),
           ),
@@ -331,9 +323,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        margin: EdgeInsets.only(right: 10),
-                        height: 40.w,
-                        width: 40.w,
+                        height: 36,
+                        width: 36,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: controller.isDarkMode
@@ -359,9 +350,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        margin: EdgeInsets.only(right: 10),
-                        height: 40.w,
-                        width: 40.w,
+                        height: 36,
+                        width: 36,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: controller.isDarkMode

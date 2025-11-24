@@ -29,10 +29,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    void CustomAlertDialogue(BuildContext context) {
-      // context নিবে
+    void Edit_profile_dialgue(BuildContext context) {
       showDialog(
-        context: context, // এখন ঠিক আছে
+        context: context,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -40,129 +39,149 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(28),
           ),
           contentPadding: EdgeInsets.zero,
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Padding(
-              padding: EdgeInsets.all(24.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Edit Profile",
-                            style: TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 25.sp,fontWeight: FontWeight.w600),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: double.maxFinite,
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Edit Profile',
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                textAlign: TextAlign.center,
+                                "Update your personal information",
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            "Update your personal information",
-                            style:TextStyle(color: isDark? Colors.white: Colors.black,fontSize: 15.sp,fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      Consumer<ThemeProvider>(
-                        builder: (context, controller, child) => GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            margin: EdgeInsets.only(right: 10),
-                            height: 40.w,
-                            width: 40.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: controller.isDarkMode
-                                  ? Color(0xFF3E043F)
-                                  : Color(0xFF686868),
-                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Image.asset(
-                                'assets/images/cross_icon.png',
+                        ),
+                        SizedBox(width: 10.w,),
+                        Consumer<ThemeProvider>(
+                          builder: (context, controller, child) => GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10),
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: controller.isDarkMode
+                                    ? Color(0xFF3E043F)
+                                    : Color(0xFF686868),
+                                // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Image.asset(
+                                  'assets/images/cross_icon.png',
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  // তোমার ফর্ম ফিল্ড
-                  AuthTextField(hintText: 'user name', labelText: 'Name'),
-                  AuthTextField(hintText: 'your email', labelText: 'Email'),
-                  AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
-                  AuthTextField(
-                    hintText: 'Change Location',
-                    labelText: 'Location',
-                  ),
-                  AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
-                  SizedBox(height: 20.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        height: 55.h,
-                        width: 150.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark? Colors.black: Colors.black,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Save Change',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: isDark? Colors.white: Colors.white,
-                                fontWeight: FontWeight.w600,
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    // তোমার ফর্ম ফিল্ড
+                    AuthTextField(hintText: 'user name', labelText: 'Name'),
+                    AuthTextField(hintText: 'your email', labelText: 'Email'),
+                    AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
+                    AuthTextField(
+                      hintText: 'Change Location',
+                      labelText: 'Location',
+                    ),
+                    AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
+                    SizedBox(height: 20.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 55.h,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDark? Colors.black: Colors.black,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              ),
+                              onPressed: (){
+                                Navigator.pop(context);
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Save Change',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: isDark? Colors.white: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 55.h,
-                        width: 150.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:isDark? Colors.black : Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          onPressed: (){
-
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: isDark? Colors.white: Colors.black,
-                                fontWeight: FontWeight.w600,
+                        SizedBox(width: 10.w,),
+                        Expanded(
+                          child: SizedBox(
+                            height: 55.h,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:isDark? Colors.black : Colors.white,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              ),
+                              onPressed: (){
+                              },
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: isDark? Colors.white: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -301,7 +320,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                         ),
-                        onPressed: () => CustomAlertDialogue(context),
+                        onPressed: () => Edit_profile_dialgue(context),
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
@@ -726,7 +745,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  'Profile Status ',
+                                                  'Profile Status',
                                                   style: Theme.of(
                                                     context,
                                                   ).textTheme.titleMedium,
@@ -758,41 +777,44 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ],
                                         ),
                                         SizedBox(height: 20.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                        Consumer<ThemeProvider>(
+                                          builder: (context, themeProvider, child) {
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Text(
-                                                  'Dark Mode',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Dark Mode',
+                                                      style: Theme.of(context).textTheme.titleMedium,
+                                                    ),
+                                                    SizedBox(height: 4.h),
+                                                    Text(
+                                                      themeProvider.isDarkMode ? 'Currently Dark' : 'Currently Light',
+                                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                        color: Colors.grey,
+                                                        fontSize: 14.sp,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Transform.scale(
+                                                  scale: 0.85,
+                                                  child: Switch(
+                                                    value: themeProvider.isDarkMode,
+                                                    onChanged: (value) {
+                                                      themeProvider.toggleTheme(); // ei line e sob magic
+                                                    },
+                                                  ),
                                                 ),
                                               ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.78,
-                                              child: Switch(
-                                                value: switchON,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    switchON = newValue;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
+                                            );
+                                          },
                                         ),
+                                        SizedBox(height: 20.h),
+                                        Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
                                         SizedBox(height: 10.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
                                       ],
                                     ),
                                   ),

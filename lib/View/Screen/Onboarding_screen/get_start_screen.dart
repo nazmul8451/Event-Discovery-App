@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Utils/getStartedData.dart';
 import 'package:gathering_app/View/Screen/Onboarding_screen/interest_screen.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Widgets/CustomButton.dart';
@@ -48,44 +50,42 @@ class _GetStartScreenState extends State<GetStartScreen> {
               SizedBox(
                 height: 200,
                 child: Expanded(
-                  child: PageView.builder(
-                    itemCount: getStartedContent.getStartedData.length,
-                    controller: _controller,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 20.h),
-                          Image.asset(
-                            getStartedContent.getStartedData[index].icon,
-                            height: 48.h,
-                          ),
-                          SizedBox(height: 25.h),
-                          Text(
-                            getStartedContent.getStartedData[index].title,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w400,
+                  child: Consumer<ThemeProvider>(
+                    builder:(context,controller,child)=> PageView.builder(
+                      itemCount: getStartedContent.getStartedData.length,
+                      controller: _controller,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 20.h),
+                            Image.asset(
+                              getStartedContent.getStartedData[index].icon,color: controller.isDarkMode? Colors.white: Colors.black,
+                              height: 48.h,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 10.h),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              getStartedContent.getStartedData[index].subtitle,
-                              style: TextStyle(
-                                fontSize: 16.sp.clamp(16, 20),
+                            SizedBox(height: 25.h),
+                            Text(
+                              getStartedContent.getStartedData[index].title,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                          ),
-                        ],
-                      );
-                    },
+                            SizedBox(height: 10.h),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                getStartedContent.getStartedData[index].subtitle,
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400,color: Color(0xFFA0A0B0)),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
