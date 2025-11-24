@@ -311,8 +311,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
       );
     }
-    
-    
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: false,

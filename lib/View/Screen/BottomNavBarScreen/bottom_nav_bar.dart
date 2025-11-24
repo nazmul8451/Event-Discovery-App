@@ -21,12 +21,12 @@ class BottomNavBarScreen extends StatefulWidget {
 class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = [
-    HomePage(),
-    Center(child: Text('Map Page')),
-    SavedPage(),
+  static final List<Widget> _pages = [
+    const HomePage(),
+    const Center(child: Text('Map Page')),
+    const SavedPage(),
     ChatPage(),
-    ProfilePage()
+    const ProfilePage()
   ];
 
   @override

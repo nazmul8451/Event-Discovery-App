@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 class ThemeColor {
   static final ThemeData lightMode = ThemeData(
     brightness: Brightness.light,
-    useMaterial3: true, // মডার্ন লুকের জন্য
-
+    useMaterial3: true,
     scaffoldBackgroundColor: Colors.white,
-
     // কালার স্কিম
     colorScheme: const ColorScheme.light(
       primary: Color(0xFFCC18CA),
@@ -61,7 +59,7 @@ class ThemeColor {
       fillColor: const Color(0xFFF5F5F5),
       hintStyle: TextStyle(color: Colors.grey.shade600),
       labelStyle: const TextStyle(color: Colors.black87),
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
@@ -72,7 +70,7 @@ class ThemeColor {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFCC18CA), width: 2),
+        borderSide: const BorderSide(color: Color(0xFFCC18CA), width:1),
       ),
     ),
 

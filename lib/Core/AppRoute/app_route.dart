@@ -40,7 +40,7 @@ class AppRoutes {
     codeSubmit: (context) => const CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
-    userchatScreen: (context) => const UserChatScreen(chat: {},),
+    userchatScreen: (context) =>  UserChatScreen(),
     detaisScreen: (context) => const DetailsScreen(),
   };
 }
