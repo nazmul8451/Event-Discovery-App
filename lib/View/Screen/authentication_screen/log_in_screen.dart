@@ -24,7 +24,7 @@ class _LogInScreenState extends State<LogInScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: 1.sh),
@@ -198,7 +198,7 @@ class ContinueWithContainer extends StatelessWidget {
       height: 36.h,
       width: 98.w,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.08) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark

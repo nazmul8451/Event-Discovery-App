@@ -99,7 +99,19 @@ class InterestScreen extends StatelessWidget {
                                         width: 60.h,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Color(0xFFF1F3F5),
+                                          gradient: Theme.of(context).brightness == Brightness.dark
+                                              ? LinearGradient(
+                                            colors: [
+                                              Color(0xFFB026FF), // deep purple
+                                              Color(0xFFFF006E), // darker
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          )
+                                              : null,
+                                          color: Theme.of(context).brightness == Brightness.light
+                                              ? Color(0xFFF1F3F5)
+                                              : null
                                         ),
                                         child: Center(
                                           child: Image.asset(
@@ -108,7 +120,7 @@ class InterestScreen extends StatelessWidget {
                                             width: 31.h,
                                             color: isSelected
                                                 ? Colors.black
-                                                : Color(0xFF64748B),
+                                                :Theme.of(context).brightness == Brightness.dark?Colors.white:Colors.black
                                           ),
                                         ),
                                       ),
@@ -118,7 +130,7 @@ class InterestScreen extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 16.sp,
                                           color: isSelected
-                                              ? Colors.black
+                                              ? Theme.of(context).brightness == Brightness.dark? Colors.white: Colors.grey
                                               : Color(0xFF64748B),
                                         ),
                                       ),

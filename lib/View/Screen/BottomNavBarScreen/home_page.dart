@@ -8,6 +8,7 @@ import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart'; // <-- Ei line add kor
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,8 +24,11 @@ class _HomePageState extends State<HomePage> {
 
   int selectedCategoryIndex = 0;
 
-  // এখানে ডাটা লিস্ট রাখবো (API থেকে আসবে)
+  // Refresh Controller — ei ta add korlam
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+
   List<EventCartmodel> events = [
+    // tor sob data same thakbe...
     EventCartmodel(
       id: "0",
       title: "Electric Paradise Festival",
@@ -36,8 +40,8 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "1",
-      title: "Electric",
+      id: "0",
+      title: "Electric Paradise Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -46,8 +50,17 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "2",
-      title: "Electric",
+      id: "0",
+      title: "Electric Paradise Festival",
+      image: "assets/images/home_img1.png",
+      category: "Music",
+      price: "\$50",
+      date: "Nov 15 • 8:00 PM",
+      location: "Downtown Arena • 2.3 km",
+      rating: 3.6,
+    ),    EventCartmodel(
+      id: "0",
+      title: "Electric Paradise Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -56,8 +69,26 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "3",
-      title: "Night Club",
+      id: "0",
+      title: "Electric Paradise Festival",
+      image: "assets/images/home_img1.png",
+      category: "Music",
+      price: "\$50",
+      date: "Nov 15 • 8:00 PM",
+      location: "Downtown Arena • 2.3 km",
+      rating: 3.6,
+    ),    EventCartmodel(
+      id: "0",
+      title: "Electric Paradise Festival",
+      image: "assets/images/home_img1.png",
+      category: "Music",
+      price: "\$50",
+      date: "Nov 15 • 8:00 PM",
+      location: "Downtown Arena • 2.3 km",
+      rating: 3.6,
+    ),    EventCartmodel(
+      id: "0",
+      title: "Electric Paradise Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -65,9 +96,12 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),
+
+
+
+    // baki gulo same...
   ];
 
-  // ক্যাটাগরি লিস্ট (পরে API থেকে আনবে)
   final List<Map<String, dynamic>> categories = [
     {"label": "All", "icon": Icons.auto_awesome},
     {"label": "Nightlife", "icon": Icons.nights_stay_outlined},
@@ -75,6 +109,25 @@ class _HomePageState extends State<HomePage> {
     {"label": "Concerts", "icon": Icons.mic_none_outlined},
     {"label": "Food & Drinks", "icon": Icons.local_drink_outlined},
   ];
+
+  // Pull to Refresh Function
+  Future<void> _onRefresh() async {
+    await Future.delayed(const Duration(seconds: 2));
+    // ekhane real API call → events = await getEvents();
+
+    if (mounted) {
+      setState(() {
+        // data reload hobe
+      });
+    }
+    _refreshController.refreshCompleted();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,10 +178,7 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xFFFF006E),
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(
-                      minHeight: 18,
-                      minWidth: 18,
-                    ),
+                    constraints: const BoxConstraints(minHeight: 18, minWidth: 18),
                     child: const Text(
                       '5',
                       style: TextStyle(color: Colors.white, fontSize: 10),
@@ -141,116 +191,112 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 120.0),
-          child: Column(
-            children: [
-              const SearchTextField(hintText: 'Search events, venues'),
-              // Filter Chips
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: categories.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      var category = entry.value;
-                      bool isSelected = selectedCategoryIndex == index;
+      body: SmartRefresher(
+        controller: _refreshController,
+        onRefresh: _onRefresh,
+        enablePullDown: true,
+        enablePullUp: false,
+        header: WaterDropHeader(
+          waterDropColor: const Color(0xFFB026FF), // tor brand color
+          idleIcon: const Icon(Icons.auto_awesome, color: Color(0xFFB026FF), size: 20),
+          complete: const Text(
+            "Refreshed!",
+            style: TextStyle(color: Color(0xFFB026FF)),
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 120.0),
+            child: Column(
+              children: [
+                const SearchTextField(hintText: 'Search events, venues'),
+                // Filter Chips
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categories.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        var category = entry.value;
+                        bool isSelected = selectedCategoryIndex == index;
 
-                      return Padding(
-                        padding: EdgeInsets.only(right: 8.w),
-                        child: _buildCustomFilterChip(
-                          label: category["label"],
-                          icon: category["icon"],
-                          isSelected: isSelected,
-                          onTap: () {
-                            setState(() {
-                              selectedCategoryIndex = index;
-                              // পরে এখানে API filter call করবে
-                            });
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 10.h),
-
-              // Featured Banners (দুইটা)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, DetailsScreen.name);
-                      },
-                      child: _buildFeaturedEvent(
-                        "Kickback",
-                        "TONIGHT: House Party",
-                        ["Chill", "Social"],
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, DetailsScreen.name);
-                      },
-                      child: _buildFeaturedEvent(
-                        "Kickback",
-                        "TONIGHT: House Party",
-                        ["Chill", "Social"],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20.h),
-
-              // Trending Title
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    trendName,
-                    style: TextStyle(
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.w600,
+                        return Padding(
+                          padding: EdgeInsets.only(right: 8.w),
+                          child: _buildCustomFilterChip(
+                            label: category["label"],
+                            icon: category["icon"],
+                            isSelected: isSelected,
+                            onTap: () {
+                              setState(() {
+                                selectedCategoryIndex = index;
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
-              ),
 
-              // GridView
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.all(16.w),
-                itemCount: events.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 7 / 9,
+                SizedBox(height: 10.h),
+
+                // Featured Banners
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
+                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                      ),
+                      SizedBox(height: 12.h),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
+                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                      ),
+                    ],
+                  ),
                 ),
-                itemBuilder: (context, index) {
-                  return Custom_item_container(event: events[index]);
-                },
-              ),
-            ],
+
+                SizedBox(height: 20.h),
+
+                // Trending Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      trendName,
+                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+
+                // GridView
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16.w),
+                  itemCount: events.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 7 / 9,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Custom_item_container(event: events[index]);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Featured Event Card
   Widget _buildFeaturedEvent(String title, String subtitle, List<String> tags) {
     return Container(
       height: 197.h,
@@ -308,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const Spacer(),
                     ...tags.map(
-                      (tag) => Padding(
+                          (tag) => Padding(
                         padding: EdgeInsets.only(left: 8.w),
                         child: _buildTag(tag),
                       ),

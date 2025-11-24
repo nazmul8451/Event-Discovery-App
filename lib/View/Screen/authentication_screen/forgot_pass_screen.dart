@@ -48,17 +48,7 @@ class ForgotPassScreen extends StatelessWidget {
                     Navigator.pushNamed(context, CodeSend.name);
                   },
                   child: CustomButton(buttonName: 'Reset')),
-              SizedBox(height: 50.h),
-              Consumer<ThemeProvider>(
-                builder: (context, themeProvider, child) {
-                  return Switch(
-                    value: themeProvider.isDarkMode,
-                    onChanged: (val) {
-                      themeProvider.toggleTheme();
-                    },
-                  );
-                },
-              )
+
             ],
           ),
         ),

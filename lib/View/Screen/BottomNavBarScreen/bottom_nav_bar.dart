@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/map_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -23,7 +24,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   static final List<Widget> _pages = [
     const HomePage(),
-    const Center(child: Text('Map Page')),
+    const MapPage(),
     const SavedPage(),
     ChatPage(),
     const ProfilePage()
@@ -35,10 +36,10 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-        height: 80.h + MediaQuery.of(context).padding.bottom,
+        height: 90.h + MediaQuery.of(context).padding.bottom,
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
-          height: 60.h,
+          height: 70.h,
           margin: EdgeInsets.only(
           ),
           decoration: BoxDecoration(
