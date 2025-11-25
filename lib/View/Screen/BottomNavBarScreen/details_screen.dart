@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/details_event_highlightMessage.dart';
@@ -282,7 +283,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             ),
                             padding: EdgeInsets.zero, // overflow রোধ
                           ),
-                          onPressed: () {},
+                          onPressed: () =>Navigator.push(context,MaterialPageRoute(builder: (context)=>BookingConfirmedScreen())),
                           child: Text(
                             'Confirm Booking',
                             style: TextStyle(

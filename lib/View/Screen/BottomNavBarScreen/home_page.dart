@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> {
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   List<EventCartmodel> events = [
-    // tor sob data same thakbe...
     EventCartmodel(
       id: "0",
       title: "Electric Paradise Festival",
@@ -40,8 +39,8 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
+      id: "1",
+      title: "Paradise Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -50,8 +49,8 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
+      id: "2",
+      title: "Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -59,8 +58,8 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),    EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
+      id: "3",
+      title: "Electric Paradise",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -69,8 +68,8 @@ class _HomePageState extends State<HomePage> {
       rating: 3.6,
     ),
     EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
+      id: "4",
+      title: "Roma",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -78,8 +77,8 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),    EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
+      id: "5",
+      title: "Event",
       image: "assets/images/home_img1.png",
       category: "Music",
       price: "\$50",
@@ -87,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),    EventCartmodel(
-      id: "0",
+      id: "6",
       title: "Electric Paradise Festival",
       image: "assets/images/home_img1.png",
       category: "Music",
@@ -129,11 +128,14 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,   
         surfaceTintColor: Colors.transparent,
         title: Align(
           alignment: Alignment.centerLeft,
@@ -286,7 +288,11 @@ class _HomePageState extends State<HomePage> {
                     childAspectRatio: 7 / 9,
                   ),
                   itemBuilder: (context, index) {
-                    return Custom_item_container(event: events[index]);
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.pushNamed(context, DetailsScreen.name);
+                      },
+                      child: Custom_item_container(event: events[index]));
                   },
                 ),
               ],

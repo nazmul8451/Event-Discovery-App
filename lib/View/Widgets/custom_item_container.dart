@@ -43,40 +43,48 @@ class Custom_item_container extends StatelessWidget {
                   ),
 
                   // Category Tag
-                  Positioned(
-                    top: 8.h,
-                    left: 8.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 6.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFB026FF),
-                        borderRadius: BorderRadius.circular(15.r),
-                      ),
-                      child: Text(
-                        event.category,
-                        style: TextStyle(color: Colors.white, fontSize: 12.sp),
-                      ),
-                    ),
-                  ),
-
-                  // Bookmark Button
-                  Positioned(
-                    top: 8.h,
-                    right: 8.w,
-                    child: IconButton(
-                      onPressed: () {
-                        savedProvider.toggleSave(event);
-                      },
-                      icon: Icon(
-                        isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: isSaved ? Colors.purple : Colors.white,
-                        size: 26.sp,
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+                        Positioned(
+                      top: 8.h,
+                      left: 8.w,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB026FF),
+                          borderRadius: BorderRadius.circular(15.r),
+                        ),
+                        child: Text(
+                          event.category,
+                          style: TextStyle(color: Colors.white, fontSize: 12.sp),
+                        ),
                       ),
                     ),
-                  ),
+  
+                    // Bookmark Button
+                    Positioned(
+                      top: 3.h,
+                      right: 3.w,
+                      child: IconButton(
+                        onPressed: () {
+                          savedProvider.toggleSave(event);
+                        },
+                        icon: Icon(
+                          isSaved ? Icons.bookmark : Icons.bookmark_border,
+                          color: isSaved ? Colors.purple : Colors.white,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+    ],
+  ),
+),
 
                   // Price Tag
                   if (event.price.isNotEmpty)
