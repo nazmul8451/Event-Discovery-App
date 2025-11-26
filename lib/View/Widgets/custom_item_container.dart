@@ -14,26 +14,25 @@ class Custom_item_container extends StatelessWidget {
     return Consumer<SavedEventController>(
       builder: (context, savedProvider, child) {
         final bool isSaved = savedProvider.isSaved(event);
+
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
               width: 1,
               color: Theme.of(context).brightness == Brightness.dark
-                  ?   Color(0xFFCC18CA).withOpacity(0.15)
+                  ? const Color(0xFFCC18CA).withOpacity(0.15)
                   : Colors.grey.shade300,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image + Category + Bookmark + Price
+              // Image + Tags Section
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12.r),
-                    ),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
                     child: Image.asset(
                       event.image,
                       height: 150.h,
@@ -43,48 +42,42 @@ class Custom_item_container extends StatelessWidget {
                   ),
 
                   // Category Tag
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-                        Positioned(
-                      top: 8.h,
-                      left: 8.w,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB026FF),
-                          borderRadius: BorderRadius.circular(15.r),
-                        ),
-                        child: Text(
-                          event.category,
-                          style: TextStyle(color: Colors.white, fontSize: 12.sp),
-                        ),
+               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                     Positioned(
+                    top: 8.h,
+                    left: 8.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFB026FF),
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
+                      child: Text(
+                        event.category,
+                        style: TextStyle(color: Colors.white, fontSize: 12.sp),
                       ),
                     ),
-  
-                    // Bookmark Button
-                    Positioned(
-                      top: 3.h,
-                      right: 3.w,
-                      child: IconButton(
-                        onPressed: () {
-                          savedProvider.toggleSave(event);
-                        },
-                        icon: Icon(
-                          isSaved ? Icons.bookmark : Icons.bookmark_border,
-                          color: isSaved ? Colors.purple : Colors.white,
-                          size: 20.sp,
-                        ),
+                  ),
+
+                  // Bookmark Button
+                  Positioned(
+                    top: 8.h,
+                    right: 8.w,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => savedProvider.toggleSave(event),
+                      icon: Icon(
+                        isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        color: isSaved ? Colors.purple : Colors.white,
+                        size: 24.sp,
                       ),
                     ),
-    ],
-  ),
-),
+                  ),
+                ],
+               ),
 
                   // Price Tag
                   if (event.price.isNotEmpty)
@@ -92,10 +85,7 @@ Padding(
                       bottom: 8.h,
                       right: 8.w,
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF00D9FF),
                           borderRadius: BorderRadius.circular(15.r),
@@ -122,10 +112,10 @@ Padding(
                     // Title
                     Text(
                       event.title,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14.sp.clamp(14, 15),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -134,17 +124,13 @@ Padding(
                     // Date
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/calender_icon.png',
-                          height: 16.h,
-                          width: 16.w,
-                        ),
+                        Image.asset('assets/images/calender_icon.png', height: 16.h, width: 16.w),
                         SizedBox(width: 6.w),
-                        Text(
-                          event.date,
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: Colors.grey[600],
+                        Expanded(
+                          child: Text(
+                            event.date,
+                            style: TextStyle(fontSize: 11.sp ,color: Colors.grey[600]),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -154,36 +140,23 @@ Padding(
                     // Location + Rating
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/location_icon.png',
-                          height: 16.h,
-                          width: 16.w,
-                        ),
+                        Image.asset('assets/images/location_icon.png', height: 16.h, width: 16.w),
                         SizedBox(width: 6.w),
                         Expanded(
                           child: Text(
                             event.location,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.grey[600],
-                            ),
+                            style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset(
-                              'assets/images/star_icon.png',
-                              height: 14.h,
-                              width: 14.w,
-                            ),
+                            Image.asset('assets/images/star_icon.png', height: 14.h, width: 14.w),
                             SizedBox(width: 4.w),
                             Text(
                               event.rating.toStringAsFixed(1),
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),

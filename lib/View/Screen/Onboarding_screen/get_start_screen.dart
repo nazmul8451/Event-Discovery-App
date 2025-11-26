@@ -49,55 +49,53 @@ class _GetStartScreenState extends State<GetStartScreen> {
             children: [
               SizedBox(
                 height: 200,
-                child: Expanded(
-                  child: Consumer<ThemeProvider>(
-                    builder: (context, controller, child) => PageView.builder(
-                      itemCount: getStartedContent.getStartedData.length,
-                      controller: _controller,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 20.h),
-                            Image.asset(
-                              getStartedContent.getStartedData[index].icon,
-                              color: controller.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                              height: 48.h,
+                child: Consumer<ThemeProvider>(
+                  builder: (context, controller, child) => PageView.builder(
+                    itemCount: getStartedContent.getStartedData.length,
+                    controller: _controller,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20.h),
+                          Image.asset(
+                            getStartedContent.getStartedData[index].icon,
+                            color: controller.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            height: 48.h,
+                          ),
+                          SizedBox(height: 25.h),
+                          Text(
+                            getStartedContent.getStartedData[index].title,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 10.h),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
                             ),
-                            SizedBox(height: 25.h),
-                            Text(
-                              getStartedContent.getStartedData[index].title,
-                              style: Theme.of(context).textTheme.titleMedium
+                            child: Text(
+                              getStartedContent
+                                  .getStartedData[index]
+                                  .subtitle,
+                              style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
-                                    fontSize: 20.sp,
                                     fontWeight: FontWeight.w400,
+                                    color: Color(0xFFA0A0B0),
                                   ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: 10.h),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              child: Text(
-                                getStartedContent
-                                    .getStartedData[index]
-                                    .subtitle,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFFA0A0B0),
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),

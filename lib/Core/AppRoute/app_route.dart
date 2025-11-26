@@ -1,5 +1,6 @@
 // View/app.dart
 import 'package:flutter/material.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
@@ -27,6 +28,7 @@ class AppRoutes {
   static const String notificationScreen = NotificationScreen.name;
   static const String userchatScreen = UserChatScreen.name;
   static const String detaisScreen = DetailsScreen.name;
+  static const String bookingConfirmScreen = BookingConfirmedScreen.name;
 
 
   static final routes = {
@@ -42,5 +44,6 @@ class AppRoutes {
     notificationScreen: (context) => const NotificationScreen(),
     userchatScreen: (context) =>  UserChatScreen(),
     detaisScreen: (context) => const DetailsScreen(),
+    bookingConfirmScreen:(context) => const BookingConfirmedScreen(),
   };
 }

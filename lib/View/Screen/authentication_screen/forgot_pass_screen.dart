@@ -49,6 +49,22 @@ class ForgotPassScreen extends StatelessWidget {
                   },
                   child: CustomButton(buttonName: 'Reset')),
 
+
+
+
+
+                   Consumer<ThemeProvider>(
+                     builder:(context,controller,child)=> Transform.scale(
+                                                    scale: 0.85,
+                                                    child: Switch(
+                                                      value: controller.isDarkMode,
+                                                      onChanged: (value) {
+                                                        controller.toggleTheme(); 
+                                                      },
+                                                    ),
+                                                  ),
+                   ),
+
             ],
           ),
         ),

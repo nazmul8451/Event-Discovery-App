@@ -270,31 +270,34 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       trendName,
-                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20.sp, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
 
                 // GridView
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: events.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 7 / 9,
-                  ),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.pushNamed(context, DetailsScreen.name);
-                      },
-                      child: Custom_item_container(event: events[index]));
-                  },
-                ),
+     // পুরানো GridView.builder টা মুছে এইটা দাও
+Padding(
+  padding: EdgeInsets.all(16.w),
+  child: GridView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: events.length,
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      mainAxisSpacing: 16.w,
+      crossAxisSpacing: 16.w,
+      // এই লাইনটাই ম্যাজিক — responsive + pixel perfect
+      childAspectRatio: 0.75, // 0.72 থেকে 0.78 এর মধ্যে রাখো, আমি 0.75 সবচে বেস্ট পেয়েছি
+    ),
+    itemBuilder: (context, index) {
+      return GestureDetector(
+        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
+        child: Custom_item_container(event: events[index]),
+      );
+    },
+  ),
+),
               ],
             ),
           ),

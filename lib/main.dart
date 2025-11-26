@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
                 themeMode: themeProvider.themeMode, // ei khane listen: false lagbe na
                 initialRoute: SplashScreen.name,
                 routes: AppRoutes.routes,
-                home: child, // optional, but safe
               );
             },
           );

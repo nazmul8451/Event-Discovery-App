@@ -28,9 +28,8 @@ class CustomButton extends StatelessWidget {
           height: 56.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            // ব্যাকগ্রাউন্ড কালার অটো
             color: isDark
-                ? const Color(0xFFCC18CA)           // Dark mode এ পার্পল বাটন
+                ? const Color(0xFFCC18CA)           
                 : Colors.white,                     // Light mode এ সাদা
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
