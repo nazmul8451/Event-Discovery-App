@@ -17,7 +17,7 @@ class ForgotPassScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: common_appbar(titleName: 'Forgot Password',),
+      appBar: common_appbar(titleName: 'Forgot Password'),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -44,27 +44,23 @@ class ForgotPassScreen extends StatelessWidget {
               AuthTextField(hintText: 'your@email.com', labelText: "Email"),
               SizedBox(height: 20.h),
               GestureDetector(
-                  onTap: (){
-                    Navigator.pushNamed(context, CodeSend.name);
-                  },
-                  child: CustomButton(buttonName: 'Reset')),
+                onTap: () {
+                  Navigator.pushNamed(context, CodeSend.name);
+                },
+                child: CustomButton(buttonName: 'Reset'),
+              ),
 
-
-
-
-
-                   Consumer<ThemeProvider>(
-                     builder:(context,controller,child)=> Transform.scale(
-                                                    scale: 0.85,
-                                                    child: Switch(
-                                                      value: controller.isDarkMode,
-                                                      onChanged: (value) {
-                                                        controller.toggleTheme(); 
-                                                      },
-                                                    ),
-                                                  ),
-                   ),
-
+              Consumer<ThemeProvider>(
+                builder: (context, controller, child) => Transform.scale(
+                  scale: 0.85,
+                  child: Switch(
+                    value: controller.isDarkMode,
+                    onChanged: (value) {
+                      controller.toggleTheme();
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),

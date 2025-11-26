@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/details_event_highlightMessage.dart';
+import 'package:gathering_app/View/Widgets/orgenizer_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:progress_bar/progress_bar.dart';
@@ -38,9 +40,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     void WriteCommentAlertDialogue(BuildContext context) {
-      // context নিবে
       showDialog(
-        context: context, // এখন ঠিক আছে
+        context: context,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -59,10 +60,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               "Write a Review",
@@ -75,6 +75,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
+                              textAlign: TextAlign.center,
                               "Share your experience at Electric Paradise Festival",
                               style: TextStyle(
                                 color: isDark ? Colors.white : Colors.black,
@@ -112,11 +113,71 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 24.h),
-                  AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
                   SizedBox(height: 20.h),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Rating',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      SizedBox(height: 10.h),
+                      Row(
+                        children: [
+                          Icon(Icons.star_border_outlined, size: 25.h),
+                          SizedBox(width: 5.w),
+                          Icon(Icons.star_border_outlined, size: 25.h),
+                          SizedBox(width: 5.w),
+                          Icon(Icons.star_border_outlined, size: 25.h),
+                          SizedBox(width: 5.w),
+                          Icon(Icons.star_border_outlined, size: 25.h),
+                          SizedBox(width: 5.w),
+                          Icon(Icons.star_border_outlined, size: 25.h),
+                          SizedBox(width: 10.w),
+                          Text(
+                            '5 Star',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  AuthTextField(
+                    hintText: 'Tell us about your experience...',
+                    labelText: 'Your Review',
+                  ),
+                  SizedBox(height: 5.h),
+                  Column(
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                '0/500',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 3.h),
+                          Row(
+                            children: [
+                              Text(
+                                'characters',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 15.h),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w), // দু’পাশে gap
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                    ), // দু’পাশে gap
                     child: SizedBox(
                       width: double.infinity, // full width inside dialog
                       height: 55.h,
@@ -140,18 +201,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         ),
                       ),
                     ),
-                  )
-
+                  ),
                 ],
               ),
             ),
           ),
         ),
       );
-    };
+    }
+
+    ;
 
     void GetTicketAlertDialogue(BuildContext context) {
-
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -202,7 +263,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(width: 20.w,),
+                        SizedBox(width: 20.w),
                         Consumer<ThemeProvider>(
                           builder: (context, controller, child) => GestureDetector(
                             onTap: () => Navigator.pop(context),
@@ -230,60 +291,95 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                     SizedBox(height: 24.h),
                     AuthTextField(hintText: 'Summer 25', labelText: 'Coupon'),
-                    AuthTextField(hintText: '1', labelText: 'Number of Tickets'),
-                    AuthTextField(hintText: 'Email', labelText: 'your@email.com'),
-                    AuthTextField(hintText: 'Phone Number', labelText: '+1 (555) 000-0000'),
-                    SizedBox(height: 20.h),
-                    Divider(
-                      color: Color(
-                        0xFFCC18CA,
-                      ).withOpacity(0.15),
+                    AuthTextField(
+                      hintText: '1',
+                      labelText: 'Number of Tickets',
                     ),
-                    SizedBox(height: 20.h,),
+                    AuthTextField(
+                      hintText: 'Email',
+                      labelText: 'your@email.com',
+                    ),
+                    AuthTextField(
+                      hintText: 'Phone Number',
+                      labelText: '+1 (555) 000-0000',
+                    ),
+                    SizedBox(height: 20.h),
+                    Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
+                    SizedBox(height: 20.h),
                     Column(
                       children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            
-                        children: [
-                          Text('Price per ticket',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                          Text('\$30',style: Theme.of(context).textTheme.titleSmall,),
-                        ],
-                      ),
-                        SizedBox(height: 10.h,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            Text(
+                              'Price per ticket',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: Colors.grey),
+                            ),
+                            Text(
+                              '\$30',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Quantity',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('1',style: Theme.of(context).textTheme.titleSmall,),
+                            Text(
+                              'Quantity',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: Colors.grey),
+                            ),
+                            Text(
+                              '1',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
                           ],
                         ),
-                        SizedBox(height: 10.h,),
+                        SizedBox(height: 10.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Total',style: Theme.of(context).textTheme.titleSmall),
-                            Text('\$30',style: Theme.of(context).textTheme.titleSmall?.copyWith(color:Color(0xFFCC18CA) )),
+                            Text(
+                              'Total',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            Text(
+                              '\$30',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(color: Color(0xFFCC18CA)),
+                            ),
                           ],
                         ),
-                    ],
+                      ],
                     ),
-                    SizedBox(height: 20.h,),
+                    SizedBox(height: 20.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w), // দু’পাশে gap
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                      ), // দু’পাশে gap
                       child: SizedBox(
                         width: double.infinity, // full width inside dialog
                         height: 55.h,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark ? Colors.black : Colors.white,
+                            backgroundColor: isDark
+                                ? Colors.black
+                                : Colors.white,
                             elevation: 2,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             padding: EdgeInsets.zero, // overflow রোধ
                           ),
-                          onPressed: () =>Navigator.push(context,MaterialPageRoute(builder: (context)=>BookingConfirmedScreen())),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BookingConfirmedScreen(),
+                            ),
+                          ),
                           child: Text(
                             'Confirm Booking',
                             style: TextStyle(
@@ -294,8 +390,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                         ),
                       ),
-                    )
-            
+                    ),
                   ],
                 ),
               ),
@@ -304,6 +399,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
       );
     }
+
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: false,
@@ -377,7 +473,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 16.0,right: 16.0,bottom: 10.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 10.0),
           child: Column(
             children: [
               Row(
@@ -549,30 +645,24 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
               SizedBox(height: 20.h),
               GestureDetector(
-                onTap: ()=>GetTicketAlertDialogue(context),
-                  child: CustomButton(buttonName: 'Get Ticket')),
-              SizedBox(height: 10.h),
-
-              Align(
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 20.h,
-                      child: Image.asset('assets/images/comment_icon.png'),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Contact Organizer',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                  ],
-                ),
+                onTap: () => GetTicketAlertDialogue(context),
+                child: CustomButton(buttonName: 'Get Ticket'),
               ),
+              SizedBox(height: 10.h),
+              ContactOrgenizerButton(buttonName: "Contact Orgenizer"),
 
+              // Align(
+              //   alignment: Alignment.center,
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       SizedBox(
+              //         height: 20.h,
+              //         child: Image.asset('assets/images/comment_icon.png'),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               SizedBox(height: 20.h),
               Container(
                 decoration: BoxDecoration(
@@ -905,7 +995,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     height: 40.h,
                     width: 150.w,
                     child: GestureDetector(
-                      onTap: ()=>WriteCommentAlertDialogue(context),
+                      onTap: () => WriteCommentAlertDialogue(context),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20.r),
@@ -931,7 +1021,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 20.h,),
               Consumer<ThemeProvider>(
                 builder: (context, controller, child) => SizedBox(
                   child: Container(
@@ -952,17 +1041,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               CircleAvatar(),
                               SizedBox(width: 10.w),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Alex K.',style: Theme.of(context).textTheme.titleMedium,),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        'Alex K.',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      Text(
+                                        'Oct 2025',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w200,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+
                                   SizedBox(height: 10.h),
-                                  Text('Oct 2025',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400),),
+                                  Text(
+                                    'Beautiful venue',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w400),
+                                  ),
                                 ],
                               ),
                               Spacer(),
                               RatingBarIndicator(
                                 rating: 4.5,
                                 itemBuilder: (context, index) =>
-                                    const Icon(Icons.star, color:Colors.grey),
+                                    const Icon(Icons.star, color: Colors.grey),
                                 itemCount: 5,
                                 itemSize: 20.0,
                               ),
@@ -974,7 +1090,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 10.h,),
+              SizedBox(height: 10.h),
               Consumer<ThemeProvider>(
                 builder: (context, controller, child) => SizedBox(
                   child: Container(
@@ -995,17 +1111,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               CircleAvatar(),
                               SizedBox(width: 10.w),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Alex K.',style: Theme.of(context).textTheme.titleMedium,),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        'Jessica T.',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      Text(
+                                        'Oct 2025',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w200,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+
                                   SizedBox(height: 10.h),
-                                  Text('Oct 2025',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400),),
+                                  Text(
+                                    'Beautiful venue',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w400),
+                                  ),
                                 ],
                               ),
                               Spacer(),
                               RatingBarIndicator(
                                 rating: 4.5,
                                 itemBuilder: (context, index) =>
-                                    const Icon(Icons.star, color:Colors.grey),
+                                    const Icon(Icons.star, color: Colors.grey),
                                 itemCount: 5,
                                 itemSize: 20.0,
                               ),
@@ -1017,6 +1160,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
                 ),
               ),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, ViewEventScreen.name);
+                },
+                child: CustomButton(buttonName: 'View Event'),
+              ),
+              SizedBox(height: 20.h),
+              //end
             ],
           ),
         ),

@@ -53,14 +53,6 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
             margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(24.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, -2),
-                ),
-              ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

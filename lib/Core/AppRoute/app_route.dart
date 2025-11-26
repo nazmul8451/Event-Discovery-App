@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
@@ -29,6 +31,9 @@ class AppRoutes {
   static const String userchatScreen = UserChatScreen.name;
   static const String detaisScreen = DetailsScreen.name;
   static const String bookingConfirmScreen = BookingConfirmedScreen.name;
+  static const String viewEventScreen = ViewEventScreen.name;
+  static const String liveStream = LiveStream.name;
+
 
 
   static final routes = {
@@ -45,5 +50,8 @@ class AppRoutes {
     userchatScreen: (context) =>  UserChatScreen(),
     detaisScreen: (context) => const DetailsScreen(),
     bookingConfirmScreen:(context) => const BookingConfirmedScreen(),
+    viewEventScreen:(context) => const ViewEventScreen(),
+    liveStream:(context) =>  LiveStream(),
+
   };
 }

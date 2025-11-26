@@ -27,106 +27,124 @@ class _ProfilePageState extends State<ProfilePage> {
     {"label": "Food & Drinks", "icon": Icons.local_drink_outlined},
   ];
 
+  void _showEditProfileDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-void _showEditProfileDialog(BuildContext context) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AlertDialog(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
-      contentPadding: EdgeInsets.zero,
-      content: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('Edit Profile',
-                            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black)),
-                        SizedBox(height: 4.h),
-                        Text("Update your personal information",
-                            style: TextStyle(fontSize: 15.sp, color: isDark ? Colors.white70 : Colors.black54)),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      height: 40.r,
-                      width: 40.r,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF3E043F) : const Color(0xFF686868),
-                        borderRadius: BorderRadius.circular(12.r),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28.r),
+        ),
+        contentPadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Update your personal information",
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ],
                       ),
-                      padding: EdgeInsets.all(10),
-                      child: Image.asset('assets/images/cross_icon.png'),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24.h),
-              AuthTextField(hintText: 'user name', labelText: 'Name'),
-              AuthTextField(hintText: 'your email', labelText: 'Email'),
-              AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
-              AuthTextField(hintText: 'Change Location', labelText: 'Location'),
-              AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
-              SizedBox(height: 20.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        height: 40.r,
+                        width: 40.r,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF3E043F)
+                              : const Color(0xFF686868),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Image.asset('assets/images/cross_icon.png'),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Save Change'),
                     ),
-                  ),
-                  SizedBox(width: 10.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? Colors.black : Colors.white,
-                        foregroundColor: isDark ? Colors.white : Colors.black,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                        side: BorderSide(color: Colors.grey.shade300),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                AuthTextField(hintText: 'user name', labelText: 'Name'),
+                AuthTextField(hintText: 'your email', labelText: 'Email'),
+                AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
+                AuthTextField(
+                  hintText: 'Change Location',
+                  labelText: 'Location',
+                ),
+                AuthTextField(hintText: 'Bio', labelText: 'Your bio'),
+                SizedBox(height: 20.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Save Change'),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Cancel'),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? Colors.black : Colors.white,
+                          foregroundColor: isDark ? Colors.white : Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Cancel'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Consumer<ThemeProvider>(
-        builder:(context,controller,child)=> SafeArea(
+        builder: (context, controller, child) => SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: SingleChildScrollView(
@@ -139,6 +157,7 @@ void _showEditProfileDialog(BuildContext context) {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
+                  SizedBox(height: 20.h),
                   Row(
                     children: [
                       Container(
@@ -146,7 +165,9 @@ void _showEditProfileDialog(BuildContext context) {
                         width: 100.h,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: controller.isDarkMode ? Colors.grey[500] : Colors.grey[200],
+                          color: controller.isDarkMode
+                              ? Colors.grey[500]
+                              : Colors.grey[200],
                           border: Border.all(width: 2, color: Colors.black),
                         ),
                         child: Center(
@@ -168,9 +189,8 @@ void _showEditProfileDialog(BuildContext context) {
                           ),
                           Text(
                             '@nicholasfrazier96',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleSmall!.copyWith(color: Colors.grey),
+                            style: Theme.of(context).textTheme.titleSmall!
+                                .copyWith(color: Colors.grey),
                           ),
                           Text(
                             'HTX | DTX | ∮ Good vibes only',
@@ -198,7 +218,9 @@ void _showEditProfileDialog(BuildContext context) {
                             'Events',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color:controller.isDarkMode ? Colors.grey : Colors.black,
+                                  color: controller.isDarkMode
+                                      ? Colors.grey
+                                      : Colors.black,
                                 ),
                           ),
                         ],
@@ -216,7 +238,9 @@ void _showEditProfileDialog(BuildContext context) {
                             'Followers',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color:controller.isDarkMode ? Colors.grey : Colors.black,
+                                  color: controller.isDarkMode
+                                      ? Colors.grey
+                                      : Colors.black,
                                 ),
                           ),
                         ],
@@ -234,7 +258,9 @@ void _showEditProfileDialog(BuildContext context) {
                             'Following',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color: controller.isDarkMode ? Colors.grey : Colors.black,
+                                  color: controller.isDarkMode
+                                      ? Colors.grey
+                                      : Colors.black,
                                 ),
                           ),
                         ],
@@ -260,11 +286,12 @@ void _showEditProfileDialog(BuildContext context) {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               'Edit Profile',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontSize: 15.sp,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontSize: 15.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ),
@@ -300,7 +327,7 @@ void _showEditProfileDialog(BuildContext context) {
                     ],
                   ),
                   SizedBox(height: 15.h),
-        
+
                   ///favorite spots
                   Align(
                     alignment: Alignment.centerLeft,
@@ -312,11 +339,11 @@ void _showEditProfileDialog(BuildContext context) {
                       ),
                     ),
                   ),
-        
+
                   SizedBox(height: 15.h),
                   //favorite spots list
                   SizedBox(
-                    height: 230.h, // এই লাইনটা যোগ করো
+                    height: 230.h,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: 10,
@@ -374,7 +401,7 @@ void _showEditProfileDialog(BuildContext context) {
                               int index = entry.key;
                               var category = entry.value;
                               bool isSelected = selectedCategoryIndex == index;
-        
+
                               return Padding(
                                 padding: EdgeInsets.only(right: 8.w),
                                 child: _buildCustomFilterChip(
@@ -403,7 +430,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     width: 60.h,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xFFCC18CA).withOpacity(0.15),
+                                      color: Color(
+                                        0xFFCC18CA,
+                                      ).withOpacity(0.15),
                                     ),
                                     child: Center(
                                       child: Padding(
@@ -431,7 +460,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall!
-                                        .copyWith(fontSize: 12.sp.clamp(12, 12)),
+                                        .copyWith(
+                                          fontSize: 12.sp.clamp(12, 12),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -444,7 +475,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     width: 60.h,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xFFCC18CA).withOpacity(0.15),
+                                      color: Color(
+                                        0xFFCC18CA,
+                                      ).withOpacity(0.15),
                                     ),
                                     child: Center(
                                       child: Padding(
@@ -472,7 +505,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall!
-                                        .copyWith(fontSize: 12.sp.clamp(12, 12)),
+                                        .copyWith(
+                                          fontSize: 12.sp.clamp(12, 12),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -485,7 +520,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     width: 60.h,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(0xFFCC18CA).withOpacity(0.15),
+                                      color: Color(
+                                        0xFFCC18CA,
+                                      ).withOpacity(0.15),
                                     ),
                                     child: Center(
                                       child: Padding(
@@ -513,7 +550,9 @@ void _showEditProfileDialog(BuildContext context) {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall!
-                                        .copyWith(fontSize: 12.sp.clamp(12, 12)),
+                                        .copyWith(
+                                          fontSize: 12.sp.clamp(12, 12),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -523,7 +562,7 @@ void _showEditProfileDialog(BuildContext context) {
                       ],
                     ),
                   ),
-        
+
                   Column(
                     children: [
                       AnimatedSize(
@@ -557,7 +596,7 @@ void _showEditProfileDialog(BuildContext context) {
                                             ),
                                           ),
                                           SizedBox(height: 30.h),
-        
+
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -638,12 +677,66 @@ void _showEditProfileDialog(BuildContext context) {
                                                   value: notificationSwitch,
                                                   onChanged: (newValue) {
                                                     setState(() {
-                                                      notificationSwitch = newValue;
+                                                      notificationSwitch =
+                                                          newValue;
                                                     });
                                                   },
                                                 ),
                                               ),
                                             ],
+                                          ),
+                                          SizedBox(height: 10.h),
+                                          Divider(
+                                            color: Color(
+                                              0xFFCC18CA,
+                                            ).withOpacity(0.15),
+                                          ),
+                                          SizedBox(height: 10.h),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Location Services',
+                                                    style: Theme.of(
+                                                      context,
+                                                    ).textTheme.titleMedium,
+                                                  ),
+                                                  Text(
+                                                    'Find events near you',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleMedium!
+                                                        .copyWith(
+                                                          fontSize: 16.sp,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Transform.scale(
+                                                scale: 0.78,
+                                                child: Switch(
+                                                  value: switchON,
+                                                  onChanged: (newValue) {
+                                                    setState(() {
+                                                      switchON = newValue;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10.h),
+                                          Divider(
+                                            color: Color(
+                                              0xFFCC18CA,
+                                            ).withOpacity(0.15),
                                           ),
                                           SizedBox(height: 10.h),
                                           Divider(
@@ -693,44 +786,57 @@ void _showEditProfileDialog(BuildContext context) {
                                             ],
                                           ),
                                           SizedBox(height: 20.h),
- Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        'Dark Mode',
-                                                        style: Theme.of(context).textTheme.titleMedium,
-                                                      ),
-                                                      SizedBox(height: 4.h),
-                                                      Text(
-                                                        controller.isDarkMode ? 'Currently Dark' : 'Currently Light',
-                                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                  Text(
+                                                    'Dark Mode',
+                                                    style: Theme.of(
+                                                      context,
+                                                    ).textTheme.titleMedium,
+                                                  ),
+                                                  SizedBox(height: 4.h),
+                                                  Text(
+                                                    controller.isDarkMode
+                                                        ? 'Currently Dark'
+                                                        : 'Currently Light',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
                                                           color: Colors.grey,
                                                           fontSize: 14.sp,
                                                         ),
-                                                      ),
-                                                    ],
                                                   ),
-
-                                                  //eta ehon off thakuk pore dekhteci
-
-                                                  // Transform.scale(
-                                                  //   scale: 0.85,
-                                                  //   child: Switch(
-                                                  //     value: controller.isDarkMode,
-                                                  //     onChanged: (value) {
-                                                  //       controller.toggleTheme(); 
-                                                  //     },
-                                                  //   ),
-                                                  // ),
                                                 ],
                                               ),
-                                      
-                                        
+
+                                              //eta ehon off thakuk pore dekhteci
+
+                                              Transform.scale(
+                                                scale: 0.85,
+                                                child: Switch(
+                                                  value: controller.isDarkMode,
+                                                  onChanged: (value) {
+                                                    controller.toggleTheme();
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
                                           SizedBox(height: 20.h),
-                                          Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
+                                          Divider(
+                                            color: Color(
+                                              0xFFCC18CA,
+                                            ).withOpacity(0.15),
+                                          ),
                                           SizedBox(height: 10.h),
                                         ],
                                       ),
@@ -741,89 +847,84 @@ void _showEditProfileDialog(BuildContext context) {
                             : const SizedBox.shrink(),
                       ),
                       SizedBox(height: 20.h),
-           Padding(
-                              padding: EdgeInsets.symmetric(vertical: 20.h),
-                              child: SizedBox(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(
-                                        0xFFCC18CA,
-                                      ).withOpacity(0.15),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Quick Actions',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                          ),
-                                        ),
-                                        SizedBox(height: 30.h),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.person),
-                                            SizedBox(width: 5.w),
-                                            Text(
-                                              'Edit Profile',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20.h),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.favorite_border),
-                                            SizedBox(width: 5.w),
-                              
-                                            Text(
-                                              'Saved Events',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
-                                            ),
-                                          ],
-                                        ),
-                              
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 20.h),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.logout_outlined,
-                                              color: Colors.red,
-                                            ),
-                                            SizedBox(width: 5.w),
-                                            Text(
-                                              'Sign Out',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium!
-                                                  .copyWith(color: Colors.red),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20.h),
+                        child: SizedBox(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                width: 1,
+                                color: Color(0xFFCC18CA).withOpacity(0.15),
                               ),
-                            )
-                          
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Quick Actions',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                    ),
+                                  ),
+                                  SizedBox(height: 30.h),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.person),
+                                      SizedBox(width: 5.w),
+                                      Text(
+                                        'Edit Profile',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.favorite_border),
+                                      SizedBox(width: 5.w),
+
+                                      Text(
+                                        'Saved Events',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                    ],
+                                  ),
+
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.logout_outlined,
+                                        color: Colors.red,
+                                      ),
+                                      SizedBox(width: 5.w),
+                                      Text(
+                                        'Sign Out',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium!
+                                            .copyWith(color: Colors.red),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],

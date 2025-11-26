@@ -28,7 +28,7 @@ class Custom_item_container extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image + Tags Section
+              // Image + Overlay Tags Section
               Stack(
                 children: [
                   ClipRRect(
@@ -42,10 +42,7 @@ class Custom_item_container extends StatelessWidget {
                   ),
 
                   // Category Tag
-               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                     Positioned(
+                  Positioned(
                     top: 8.h,
                     left: 8.w,
                     child: Container(
@@ -76,8 +73,6 @@ class Custom_item_container extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-               ),
 
                   // Price Tag
                   if (event.price.isNotEmpty)
@@ -103,7 +98,7 @@ class Custom_item_container extends StatelessWidget {
                 ],
               ),
 
-              // Details Section
+              // Details Section (এটা আগের মতোই আছে)
               Padding(
                 padding: EdgeInsets.all(12.w),
                 child: Column(
@@ -129,7 +124,7 @@ class Custom_item_container extends StatelessWidget {
                         Expanded(
                           child: Text(
                             event.date,
-                            style: TextStyle(fontSize: 11.sp ,color: Colors.grey[600]),
+                            style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

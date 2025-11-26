@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CustomButton extends StatelessWidget {
+class ContactOrgenizerButton extends StatelessWidget {
   final String buttonName;
   final VoidCallback? onPressed;
   final bool isLoading;
 
-  const CustomButton({
+  const ContactOrgenizerButton({
     super.key,
     required this.buttonName,
     this.onPressed,

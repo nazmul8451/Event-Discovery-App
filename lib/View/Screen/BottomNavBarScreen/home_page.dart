@@ -25,7 +25,9 @@ class _HomePageState extends State<HomePage> {
   int selectedCategoryIndex = 0;
 
   // Refresh Controller — ei ta add korlam
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   List<EventCartmodel> events = [
     EventCartmodel(
@@ -57,7 +59,8 @@ class _HomePageState extends State<HomePage> {
       date: "Nov 15 • 8:00 PM",
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
-    ),    EventCartmodel(
+    ),
+    EventCartmodel(
       id: "3",
       title: "Electric Paradise",
       image: "assets/images/home_img1.png",
@@ -76,7 +79,8 @@ class _HomePageState extends State<HomePage> {
       date: "Nov 15 • 8:00 PM",
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
-    ),    EventCartmodel(
+    ),
+    EventCartmodel(
       id: "5",
       title: "Event",
       image: "assets/images/home_img1.png",
@@ -85,7 +89,8 @@ class _HomePageState extends State<HomePage> {
       date: "Nov 15 • 8:00 PM",
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
-    ),    EventCartmodel(
+    ),
+    EventCartmodel(
       id: "6",
       title: "Electric Paradise Festival",
       image: "assets/images/home_img1.png",
@@ -95,8 +100,6 @@ class _HomePageState extends State<HomePage> {
       location: "Downtown Arena • 2.3 km",
       rating: 3.6,
     ),
-
-
 
     // baki gulo same...
   ];
@@ -128,14 +131,12 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        automaticallyImplyLeading: false,   
+        automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         title: Align(
           alignment: Alignment.centerLeft,
@@ -180,7 +181,10 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xFFFF006E),
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(minHeight: 18, minWidth: 18),
+                    constraints: const BoxConstraints(
+                      minHeight: 18,
+                      minWidth: 18,
+                    ),
                     child: const Text(
                       '5',
                       style: TextStyle(color: Colors.white, fontSize: 10),
@@ -200,7 +204,11 @@ class _HomePageState extends State<HomePage> {
         enablePullUp: false,
         header: WaterDropHeader(
           waterDropColor: const Color(0xFFB026FF), // tor brand color
-          idleIcon: const Icon(Icons.auto_awesome, color: Color(0xFFB026FF), size: 20),
+          idleIcon: const Icon(
+            Icons.auto_awesome,
+            color: Color(0xFFB026FF),
+            size: 20,
+          ),
           complete: const Text(
             "Refreshed!",
             style: TextStyle(color: Color(0xFFB026FF)),
@@ -214,7 +222,10 @@ class _HomePageState extends State<HomePage> {
                 const SearchTextField(hintText: 'Search events, venues'),
                 // Filter Chips
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
+                  ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -249,13 +260,23 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: [
                       GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
-                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                        onTap: () =>
+                            Navigator.pushNamed(context, DetailsScreen.name),
+                        child: _buildFeaturedEvent(
+                          "Kickback",
+                          "TONIGHT: House Party",
+                          ["Chill", "Social"],
+                        ),
                       ),
                       SizedBox(height: 12.h),
                       GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
-                        child: _buildFeaturedEvent("Kickback", "TONIGHT: House Party", ["Chill", "Social"]),
+                        onTap: () =>
+                            Navigator.pushNamed(context, DetailsScreen.name),
+                        child: _buildFeaturedEvent(
+                          "Kickback",
+                          "TONIGHT: House Party",
+                          ["Chill", "Social"],
+                        ),
                       ),
                     ],
                   ),
@@ -270,34 +291,35 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       trendName,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
 
-                // GridView
-     // পুরানো GridView.builder টা মুছে এইটা দাও
-Padding(
-  padding: EdgeInsets.all(16.w),
-  child: GridView.builder(
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: events.length,
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      mainAxisSpacing: 16.w,
-      crossAxisSpacing: 16.w,
-      // এই লাইনটাই ম্যাজিক — responsive + pixel perfect
-      childAspectRatio: 0.75, // 0.72 থেকে 0.78 এর মধ্যে রাখো, আমি 0.75 সবচে বেস্ট পেয়েছি
-    ),
-    itemBuilder: (context, index) {
-      return GestureDetector(
-        onTap: () => Navigator.pushNamed(context, DetailsScreen.name),
-        child: Custom_item_container(event: events[index]),
-      );
-    },
-  ),
-),
+                Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: events.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16.w,
+                      crossAxisSpacing: 16.w,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () =>
+                            Navigator.pushNamed(context, DetailsScreen.name),
+                        child: Custom_item_container(event: events[index]),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -319,6 +341,7 @@ Padding(
       ),
       child: Stack(
         children: [
+          
           Positioned(
             top: 16.h,
             right: 16.w,
@@ -363,7 +386,7 @@ Padding(
                     ),
                     const Spacer(),
                     ...tags.map(
-                          (tag) => Padding(
+                      (tag) => Padding(
                         padding: EdgeInsets.only(left: 8.w),
                         child: _buildTag(tag),
                       ),
