@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:provider/provider.dart';
 
@@ -142,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<ThemeProvider>(
         builder: (context, controller, child) => SafeArea(
           child: Padding(
@@ -271,54 +270,57 @@ class _ProfilePageState extends State<ProfilePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SizedBox(
-                        height: 55.h,
-                        width: 180.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
+                      Expanded(
+                        child: SizedBox(
+                          height: 55.h,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          onPressed: () => _showEditProfileDialog(context),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Edit Profile',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    fontSize: 15.sp,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                            onPressed: () => _showEditProfileDialog(context),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Edit Profile',
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontSize: 13.sp.clamp(13, 15),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 55.h,
-                        width: 180.w,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
+                      SizedBox(width: 5.w,),
+                      Expanded(
+                        child: SizedBox(
+                          height: 55.h,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              showSettingsCard = !showSettingsCard;
-                            });
-                          },
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Settings',
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                            onPressed: () {
+                              setState(() {
+                                showSettingsCard = !showSettingsCard;
+                              });
+                            },
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Settings',
+                                style: TextStyle(
+                                  fontSize:13.sp.clamp(13, 15),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -617,7 +619,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         .textTheme
                                                         .titleMedium!
                                                         .copyWith(
-                                                          fontSize: 16.sp,
+                                                          fontSize: 10.sp.clamp(10, 13),
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ),
@@ -664,7 +666,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         .textTheme
                                                         .titleMedium!
                                                         .copyWith(
-                                                          fontSize: 16.sp,
+                                                          fontSize: 10.sp.clamp(10, 13),
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ),
@@ -712,7 +714,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         .textTheme
                                                         .titleMedium!
                                                         .copyWith(
-                                                          fontSize: 16.sp,
+                                                          fontSize: 10.sp.clamp(10, 13),
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ),
@@ -765,7 +767,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         .textTheme
                                                         .titleMedium!
                                                         .copyWith(
-                                                          fontSize: 16.sp,
+                                                          fontSize: 10.sp.clamp(10, 13),
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ),
@@ -811,7 +813,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         .bodySmall
                                                         ?.copyWith(
                                                           color: Colors.grey,
-                                                          fontSize: 14.sp,
+                                                          fontSize: 10.sp.clamp(10, 13),
                                                         ),
                                                   ),
                                                 ],

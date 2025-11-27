@@ -27,7 +27,7 @@ class AuthTextField extends StatelessWidget {
           Text(
             labelText,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14.sp.clamp(14, 15),
               fontWeight: FontWeight.w500,
               color: isDark ? Colors.white70 : Colors.black87,
             ),
@@ -70,7 +70,7 @@ class AuthTextField extends StatelessWidget {
                 hintText: hintText,
                 hintStyle: TextStyle(
                   color: isDark ? Colors.white60 : const Color(0xFF515151),
-                  fontSize: 15.sp,
+                  fontSize: 14.sp.clamp(14, 15),
                 ),
                 suffixIcon: icon != null
                     ? Icon(

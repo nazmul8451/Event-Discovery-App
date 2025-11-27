@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart'; // এটা যোগ হবে
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -12,8 +13,14 @@ import 'View/Theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init(); // GetStorage ready
-  runApp(const MyApp());
+  await GetStorage.init();
+
+  // ডেভেলপমেন্ট মোডে Device Preview চালু থাকবে, প্রোডাকশনে বন্ধ
+  runApp(
+    DevicePreview(
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -35,11 +42,14 @@ class MyApp extends StatelessWidget {
           return Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp(
+                useInheritedMediaQuery: true, // Device Preview-এর জন্য দরকার
+                locale: DevicePreview.locale(context), // ভাষা পরিবর্তন
+                builder: DevicePreview.appBuilder, // এটা সবচেয়ে জরুরি
                 debugShowCheckedModeBanner: false,
                 title: 'Gathering App',
                 theme: ThemeColor.lightMode,
                 darkTheme: ThemeColor.darkMode,
-                themeMode: themeProvider.themeMode, // ei khane listen: false lagbe na
+                themeMode: themeProvider.themeMode,
                 initialRoute: SplashScreen.name,
                 routes: AppRoutes.routes,
               );

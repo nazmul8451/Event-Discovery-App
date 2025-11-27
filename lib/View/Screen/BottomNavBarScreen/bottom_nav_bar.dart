@@ -4,13 +4,11 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/map_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
-import 'package:provider/provider.dart';
 import 'chat_page.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   final int initialIndex;
-  const BottomNavBarScreen({Key? key, this.initialIndex = 0}) : super(key: key);
+  const BottomNavBarScreen({super.key, this.initialIndex = 0});
   static const String name = '/bottom-navbar-screen';
 
   @override
@@ -72,10 +70,10 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 return GestureDetector(
                   onTap: () => _onItemTapped(index),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 100),
                     curve: Curves.easeInOut,
                     padding: EdgeInsets.symmetric(vertical: 10.h),
-                    width: 75.w, 
+                    width: 60.w.clamp(60, 65),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFFCC18CA).withOpacity(0.15)
@@ -87,8 +85,8 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                       children: [
                         Image.asset(
                           icons[index],
-                          width: 26.w,
-                          height: 26.h,
+                          width: 24.w.clamp(24, 26),
+                          height: 24.h.clamp(24, 26),
                           color: isSelected
                               ? const Color(0xFFB026FF)
                               : (isDark ? Colors.grey.shade500 : Colors.grey.shade600),
@@ -97,7 +95,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                         Text(
                           labels[index],
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 10.sp.clamp(10, 11),
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected
                                 ? const Color(0xFFB026FF)

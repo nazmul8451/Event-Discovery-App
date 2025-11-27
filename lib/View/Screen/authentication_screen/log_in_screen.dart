@@ -196,7 +196,7 @@ class ContinueWithContainer extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(right: 12.w),
       height: 36.h,
-      width: 98.w,
+      width: 70.w,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),

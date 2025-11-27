@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
-import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/ViewModel/event_cartModel.dart';
@@ -134,7 +133,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
@@ -353,7 +352,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(
                     isSaved ? Icons.bookmark : Icons.bookmark_border,
                     color: Colors.white,
-                    size: 28.sp,
+                    size: 25.sp.clamp(25,26),
                   ),
                 );
               },
@@ -370,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                   title,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 22.sp,
+                    fontSize: 22.sp.clamp(22, 22),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -381,7 +380,7 @@ class _HomePageState extends State<HomePage> {
                       subtitle,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 16.sp,
+                        fontSize: 12.sp.clamp(12, 16),
                       ),
                     ),
                     const Spacer(),
@@ -412,7 +411,7 @@ class _HomePageState extends State<HomePage> {
         text,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 13.sp,
+          fontSize: 13.sp.clamp(13, 13),
           fontWeight: FontWeight.w600,
         ),
       ),

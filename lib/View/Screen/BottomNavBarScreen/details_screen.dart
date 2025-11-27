@@ -10,9 +10,7 @@ import 'package:gathering_app/View/Widgets/details_event_highlightMessage.dart';
 import 'package:gathering_app/View/Widgets/orgenizer_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:progress_bar/progress_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Widgets/auth_textFormField.dart';
 import '../../Widgets/custom carosel_slider.dart';
@@ -52,7 +50,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
           content: SizedBox(
             width: double.maxFinite,
             child: Padding(
-              padding: EdgeInsets.all(24.w),
+              padding: EdgeInsets.all(15.w),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -66,28 +64,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           children: [
                             Text(
                               "Write a Review",
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 25.sp,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
-                              ),
+                                fontSize: 18.sp.clamp(18, 20)),
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 4.h),
                             Text(
                               textAlign: TextAlign.center,
                               "Share your experience at Electric Paradise Festival",
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w400,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
+                      SizedBox(width: 10.w,),
                       Consumer<ThemeProvider>(
                         builder: (context, controller, child) => GestureDetector(
                           onTap: () => Navigator.pop(context),
@@ -177,7 +170,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: 20.w,
-                    ), // দু’পাশে gap
+                    ), 
                     child: SizedBox(
                       width: double.infinity, // full width inside dialog
                       height: 55.h,
@@ -194,7 +187,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         child: Text(
                           'Submit Review',
                           style: TextStyle(
-                            fontSize: 15.sp,
+                            fontSize: 15.sp.clamp(15, 15),
                             color: isDark ? Colors.white : Colors.black,
                             fontWeight: FontWeight.w600,
                           ),
@@ -210,7 +203,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
       );
     }
 
-    ;
 
     void GetTicketAlertDialogue(BuildContext context) {
       showDialog(
@@ -703,11 +695,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Date',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                               Text(
                                 'Nov 11',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                             ],
                           ),
@@ -757,11 +753,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Time',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                               Text(
                                 '9:00 PM',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                             ],
                           ),
@@ -812,15 +812,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Location',
-                                style: Theme.of(context).textTheme.titleSmall,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                               Text(
                                 'Blue Note Club',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                               Text(
                                 '789 Jazz Ave, Midtown',
-                                style: Theme.of(context).textTheme.titleMedium,
+                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                             ],
                           ),
@@ -873,18 +879,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Organized by',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(16, 17),
+                                ),
                               ),
                               Text(
                                 'Blue Note Productions',
-                                style: Theme.of(context).textTheme.titleMedium,
+                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 16.sp.clamp(10, 13),
+                                ),
                               ),
                             ],
                           ),
                           Spacer(),
                           Container(
                             height: 40.h,
-                            width: 100.w,
+                            width: 80.w,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
@@ -1021,6 +1031,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
                 ],
               ),
+            SizedBox(height: 20.h,),
               Consumer<ThemeProvider>(
                 builder: (context, controller, child) => SizedBox(
                   child: Container(
