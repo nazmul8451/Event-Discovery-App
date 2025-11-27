@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -127,21 +128,21 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Cancel'),
+                        child: Text('Cancel',style: Theme.of(context).textTheme.bodySmall,),
                       ),
                     ),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? Colors.black : Colors.white,
+                          backgroundColor:isDark?  Colors.black: Colors.white,
                           // foregroundColor: isDark ? Colors.white : Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Save Change'),
+                        child: Text('Save Change',style: Theme.of(context).textTheme.bodySmall?.copyWith(color: isDark?Colors.white: Colors.black)),
                       ),
                     ),
                   ],
@@ -299,48 +300,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   // SizedBox(height: 55.h,child: ElevatedButton(onPressed: (){}, child: Text('Edit Profile')),),
                   Row(
                     children: [
-                      // Expanded(
-                      //   child: GestureDetector(
-                      //     onTap: ()=>_showEditProfileDialog(context),
-                      //     child: SizedBox(
-                      //       height: 55.h,
-                      //       child: Container(
-                      //         decoration: BoxDecoration(
-                      //           borderRadius: BorderRadius.circular(12.r),
-                      //           color: Color(0xFFCC18CA),
-                      //         ),
-                      //         child: Center(
-                      //           child: Text(
-                      //             'Edit Profile',
-                      //             style: Theme.of(context).textTheme.bodySmall,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
+
                       Expanded(child: GestureDetector(
                         onTap: ()=>_showEditProfileDialog(context),
                         child: CustomButton(buttonName: 'Edit Profile'))),
 
                       SizedBox(width: 10.w),
-                      //  Expanded(
-                      //   child: SizedBox(
-                      //     height: 55.h,
-                      //     child: Container(
-                      //       decoration: BoxDecoration(
-                      //         borderRadius: BorderRadius.circular(12.r),
-                      //         color:isDark? Color(0xFF0A0015) :Colors.white,
-                      //       ),
-                      //       child: Center(
-                      //         child: Text(
-                      //           'Settings',
-                      //           style: Theme.of(context).textTheme.bodySmall,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
+
                       Expanded(child: CustomButton(buttonName: 'Settings')),
                     ],
                   ),

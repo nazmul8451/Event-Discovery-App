@@ -15,11 +15,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-  // ডেভেলপমেন্ট মোডে Device Preview চালু থাকবে, প্রোডাকশনে বন্ধ
   runApp(
-    DevicePreview(
-      builder: (context) => const MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -42,9 +39,7 @@ class MyApp extends StatelessWidget {
           return Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp(
-                useInheritedMediaQuery: true, // Device Preview-এর জন্য দরকার
-                locale: DevicePreview.locale(context), // ভাষা পরিবর্তন
-                builder: DevicePreview.appBuilder, // এটা সবচেয়ে জরুরি
+                locale: DevicePreview.locale(context),
                 debugShowCheckedModeBanner: false,
                 title: 'Gathering App',
                 theme: ThemeColor.lightMode,
