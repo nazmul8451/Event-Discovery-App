@@ -24,7 +24,7 @@ class InterestScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -75,7 +75,7 @@ class InterestScreen extends StatelessWidget {
                           child: Container(
                             // height: 187.h,width: 150.w,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.background,
+                              color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(15),
                               border: isSelected
                                   ? null

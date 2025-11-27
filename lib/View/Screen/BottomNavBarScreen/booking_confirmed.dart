@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart' show BottomNavBarScreen;
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 
 class BookingConfirmedScreen extends StatefulWidget {
@@ -44,7 +43,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
             ),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: SingleChildScrollView(
         //start this body

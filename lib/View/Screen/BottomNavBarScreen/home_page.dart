@@ -135,6 +135,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         title: Align(
@@ -340,7 +342,6 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Stack(
         children: [
-          
           Positioned(
             top: 16.h,
             right: 16.w,
@@ -352,7 +353,7 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(
                     isSaved ? Icons.bookmark : Icons.bookmark_border,
                     color: Colors.white,
-                    size: 25.sp.clamp(25,26),
+                    size: 25.sp.clamp(25, 26),
                   ),
                 );
               },

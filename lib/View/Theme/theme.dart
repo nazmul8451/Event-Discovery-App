@@ -10,20 +10,23 @@ class ThemeColor {
       primary: Color(0xFFCC18CA),
       onPrimary: Colors.white,
       secondary: Color(0xFFCC18CA),
-      background: Colors.white,
-      onBackground: Colors.black87,
       surface: Colors.white,
       onSurface: Colors.black87,
-      surfaceVariant: Color(0xFFF5F5F5),
+      surfaceContainerHighest: Color(0xFFF5F5F5),
       outline: Colors.grey,
     ),
 
-    // টেক্সট থিম (সব Text অটো সুন্দর হবে)
+    // ?Text Theme
     textTheme: const TextTheme(
-      displayLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+      displayLarge: TextStyle(
+        color: Colors.black87,
+        fontWeight: FontWeight.bold,
+      ),
       displayMedium: TextStyle(color: Colors.black87),
-      bodyLarge: TextStyle(color: Colors.black87),
-      bodyMedium: TextStyle(color: Colors.black54),
+      bodySmall: TextStyle(
+        fontSize: 13,
+        color: Colors.white,
+      ),
       titleLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
       labelLarge: TextStyle(color: Colors.white), // Button text
       labelMedium: TextStyle(color: Color(0xFFCC18CA)), // TextButton
@@ -70,7 +73,7 @@ class ThemeColor {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: Color(0xFFCC18CA), width:1),
+        borderSide: const BorderSide(color: Color(0xFFCC18CA), width: 1),
       ),
     ),
 
@@ -80,7 +83,11 @@ class ThemeColor {
       foregroundColor: Colors.black87,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w600),
+      titleTextStyle: TextStyle(
+        color: Colors.black87,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   );
 
@@ -94,12 +101,10 @@ class ThemeColor {
       primary: Color(0xFFCC18CA),
       onPrimary: Colors.white,
       secondary: Color(0xFFCC18CA),
-      background: Color(0xFF140C22),
-      onBackground: Colors.white,
-      surface: Color(0xFF1E1530),
+      surface: Color(0xFF140C22),
       onSurface: Colors.white,
-      onSurfaceVariant: Colors.grey,    // ← এটাই তোমার গ্রে হিন্ট
-      surfaceVariant: Color(0xFF2A1E3F),
+      onSurfaceVariant: Colors.grey, // ← এটাই তোমার গ্রে হিন্ট
+      surfaceContainerHighest: Color(0xFF2A1E3F),
     ),
 
     textTheme: const TextTheme(
@@ -126,9 +131,7 @@ class ThemeColor {
     ),
 
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: const Color(0xFFCC18CA),
-      ),
+      style: TextButton.styleFrom(foregroundColor: const Color(0xFFCC18CA)),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
@@ -156,7 +159,11 @@ class ThemeColor {
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
     ),
   );
 }

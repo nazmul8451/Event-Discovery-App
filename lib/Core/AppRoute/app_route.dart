@@ -1,5 +1,4 @@
 // View/app.dart
-import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';

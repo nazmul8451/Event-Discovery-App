@@ -6,6 +6,10 @@ class AuthTextField extends StatelessWidget {
   final String hintText;
   final IconData? icon;
   final bool obscureText;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final TextInputType? keyboardType;
 
   const AuthTextField({
     super.key,
@@ -13,6 +17,10 @@ class AuthTextField extends StatelessWidget {
     required this.hintText,
     required this.labelText,
     this.obscureText = false,
+    this.controller,
+    this.keyboardType,
+    this.onChanged,
+    this.validator,
   });
 
   @override
@@ -27,7 +35,7 @@ class AuthTextField extends StatelessWidget {
           Text(
             labelText,
             style: TextStyle(
-              fontSize: 14.sp.clamp(14, 15),
+              fontSize: 14.sp,                    // ← clamp মুছে দিলাম
               fontWeight: FontWeight.w500,
               color: isDark ? Colors.white70 : Colors.black87,
             ),
@@ -38,21 +46,11 @@ class AuthTextField extends StatelessWidget {
           Container(
             height: 56.h,
             decoration: BoxDecoration(
-              color: isDark
-                  ? Color(0xFF250143)
-                  : Colors.white,
+              color: isDark ? Color(0xFF250143) : Colors.white,
               borderRadius: BorderRadius.circular(16.r),
-              // border: Border.all(
-              //   color: isDark
-              //       ? Colors.white.withOpacity(0.2)
-              //       : Colors.grey.shade300,
-              //   width: 1.2,
-              // ),
               boxShadow: [
                 BoxShadow(
-                  color: isDark
-                      ? Colors.black.withOpacity(0.2)
-                      : Colors.black.withOpacity(0.2),
+                  color: Colors.black.withOpacity(0.2),
                   blurRadius: 15,
                   offset: const Offset(0, 6),
                   spreadRadius: 0,
@@ -60,24 +58,28 @@ class AuthTextField extends StatelessWidget {
               ],
             ),
             child: TextFormField(
+              controller: controller,
               obscureText: obscureText,
+              keyboardType: keyboardType,
+              onChanged: onChanged,
+              validator: validator,
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black87,
-                fontSize: 16.sp,
+                fontSize: 16.sp,                 // ← আগে থেকেই ঠিক ছিল
               ),
               cursorColor: const Color(0xFFCC18CA),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: TextStyle(
                   color: isDark ? Colors.white60 : const Color(0xFF515151),
-                  fontSize: 14.sp.clamp(14, 15),
+                  fontSize: 14.sp,               // ← clamp মুছে দিলাম
                 ),
                 suffixIcon: icon != null
                     ? Icon(
-                  icon,
-                  color: isDark ? Colors.white60 : const Color(0xFF515151),
-                  size: 22.w,
-                )
+                        icon,
+                        color: isDark ? Colors.white60 : const Color(0xFF515151),
+                        size: 22.w,
+                      )
                     : null,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 20.w,

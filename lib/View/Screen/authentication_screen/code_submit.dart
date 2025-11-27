@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-import '../../Theme/theme_provider.dart';
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
-import 'forgot_pass_screen.dart';
 
 class CodeSubmit extends StatefulWidget {
   const CodeSubmit({super.key});
@@ -22,7 +20,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
   Widget build(BuildContext context) {
     final TextEditingController OtpTEController = TextEditingController();
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: common_appbar(titleName: 'Forgot Password'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

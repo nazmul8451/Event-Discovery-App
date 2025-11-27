@@ -44,13 +44,13 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+      color: Theme.of(context).colorScheme.surface,
         child: SafeArea(
           child: Container(
             height: 72.h,
             margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              // color: Theme.of(context).scaffoldBackgroundColor,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -73,7 +73,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     duration: const Duration(milliseconds: 100),
                     curve: Curves.easeInOut,
                     padding: EdgeInsets.symmetric(vertical: 10.h),
-                    width: 60.w.clamp(60, 65),
+                    width: 65.w.clamp(60, 65),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFFCC18CA).withOpacity(0.15)

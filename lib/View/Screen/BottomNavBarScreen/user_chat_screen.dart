@@ -18,11 +18,14 @@ class _UserChatScreenState extends State<UserChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80.h),
         child: AppBar(
-          automaticallyImplyLeading: false,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+
+        automaticallyImplyLeading: false,
+        surfaceTintColor: Colors.transparent,
           centerTitle: false,
           titleSpacing: 0,
           title: Row(
@@ -110,7 +113,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
           ],
         ),
       ),
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(

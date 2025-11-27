@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Consumer<ThemeProvider>(
       builder: (context, controller, child) {
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: Center(
             child: Image.asset(
              controller.isDarkMode?'assets/images/splash2.png' :'assets/images/splash_img.png',

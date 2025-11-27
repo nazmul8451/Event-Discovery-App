@@ -54,10 +54,14 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
 
       // AppBar (Messages + Search)
       appBar: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+
+        automaticallyImplyLeading: false,
+        surfaceTintColor: Colors.transparent,
         title: Align(
           alignment: Alignment.centerLeft,
           child: Column(

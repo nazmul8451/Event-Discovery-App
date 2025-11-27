@@ -10,7 +10,7 @@ class common_appbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       centerTitle: true,
       leading: IconButton(onPressed: (){
         Navigator.pop(context);

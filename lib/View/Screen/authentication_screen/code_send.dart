@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 
-import '../../Theme/theme_provider.dart';
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
 class CodeSend extends StatelessWidget {
@@ -12,7 +11,7 @@ class CodeSend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: common_appbar(titleName: 'Forgot Password',),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

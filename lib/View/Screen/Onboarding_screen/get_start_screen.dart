@@ -40,7 +40,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),

@@ -31,7 +31,7 @@ class NotificationContainer extends StatelessWidget {
               ),
             ),
             title: Text(
-              '${notificationMessage}',
+              notificationMessage,
               style: TextStyle(
                 color: controller.isDarkMode
                     ? Color(0xFFF0F0F5)

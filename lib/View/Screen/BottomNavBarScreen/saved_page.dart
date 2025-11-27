@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
-import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:provider/provider.dart';
 
 class SavedPage extends StatefulWidget {
@@ -18,7 +17,7 @@ class _SavedPageState extends State<SavedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),

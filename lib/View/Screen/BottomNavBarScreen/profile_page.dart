@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +28,10 @@ class _ProfilePageState extends State<ProfilePage> {
   ];
 
   void _showEditProfileDialog(BuildContext context) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController emialController = TextEditingController();
+    TextEditingController phoneController = TextEditingController();
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
@@ -89,9 +94,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 SizedBox(height: 24.h),
-                AuthTextField(hintText: 'user name', labelText: 'Name'),
-                AuthTextField(hintText: 'your email', labelText: 'Email'),
-                AuthTextField(hintText: '+43 04324', labelText: 'Phone'),
+                AuthTextField(
+                  hintText: 'user name',
+                  labelText: 'Name',
+                  controller: nameController,
+                ),
+                AuthTextField(
+                  hintText: 'your email',
+                  labelText: 'Email',
+                  controller: emialController,
+                ),
+                AuthTextField(
+                  hintText: '+43 04324',
+                  labelText: 'Phone',
+                  controller: phoneController,
+                ),
                 AuthTextField(
                   hintText: 'Change Location',
                   labelText: 'Location',
@@ -110,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Save Change'),
+                        child: Text('Cancel'),
                       ),
                     ),
                     SizedBox(width: 10.w),
@@ -118,14 +135,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isDark ? Colors.black : Colors.white,
-                          foregroundColor: isDark ? Colors.white : Colors.black,
+                          // foregroundColor: isDark ? Colors.white : Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                          side: BorderSide(color: Colors.grey.shade300),
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Cancel'),
+                        child: Text('Save Change'),
                       ),
                     ),
                   ],
@@ -140,6 +156,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<ThemeProvider>(
@@ -156,6 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
+
                   SizedBox(height: 20.h),
                   Row(
                     children: [
@@ -164,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: 100.h,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: controller.isDarkMode
+                          color: Provider.of<ThemeProvider>(context).isDarkMode
                               ? Colors.grey[500]
                               : Colors.grey[200],
                           border: Border.all(width: 2, color: Colors.black),
@@ -217,7 +236,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Events',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color: controller.isDarkMode
+                                  color:
+                                      Provider.of<ThemeProvider>(
+                                        context,
+                                      ).isDarkMode
                                       ? Colors.grey
                                       : Colors.black,
                                 ),
@@ -237,7 +259,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Followers',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color: controller.isDarkMode
+                                  color:
+                                      Provider.of<ThemeProvider>(
+                                        context,
+                                      ).isDarkMode
                                       ? Colors.grey
                                       : Colors.black,
                                 ),
@@ -257,7 +282,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Following',
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(
-                                  color: controller.isDarkMode
+                                  color:
+                                      Provider.of<ThemeProvider>(
+                                        context,
+                                      ).isDarkMode
                                       ? Colors.grey
                                       : Colors.black,
                                 ),
@@ -267,68 +295,57 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   SizedBox(height: 15.h),
+
+                  // SizedBox(height: 55.h,child: ElevatedButton(onPressed: (){}, child: Text('Edit Profile')),),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 55.h,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            ),
-                            onPressed: () => _showEditProfileDialog(context),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                'Edit Profile',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      fontSize: 13.sp.clamp(13, 15),
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 5.w,),
-                      Expanded(
-                        child: SizedBox(
-                          height: 55.h,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                showSettingsCard = !showSettingsCard;
-                              });
-                            },
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                'Settings',
-                                style: TextStyle(
-                                  fontSize:13.sp.clamp(13, 15),
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Expanded(
+                      //   child: GestureDetector(
+                      //     onTap: ()=>_showEditProfileDialog(context),
+                      //     child: SizedBox(
+                      //       height: 55.h,
+                      //       child: Container(
+                      //         decoration: BoxDecoration(
+                      //           borderRadius: BorderRadius.circular(12.r),
+                      //           color: Color(0xFFCC18CA),
+                      //         ),
+                      //         child: Center(
+                      //           child: Text(
+                      //             'Edit Profile',
+                      //             style: Theme.of(context).textTheme.bodySmall,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      Expanded(child: GestureDetector(
+                        onTap: ()=>_showEditProfileDialog(context),
+                        child: CustomButton(buttonName: 'Edit Profile'))),
+
+                      SizedBox(width: 10.w),
+                      //  Expanded(
+                      //   child: SizedBox(
+                      //     height: 55.h,
+                      //     child: Container(
+                      //       decoration: BoxDecoration(
+                      //         borderRadius: BorderRadius.circular(12.r),
+                      //         color:isDark? Color(0xFF0A0015) :Colors.white,
+                      //       ),
+                      //       child: Center(
+                      //         child: Text(
+                      //           'Settings',
+                      //           style: Theme.of(context).textTheme.bodySmall,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      Expanded(child: CustomButton(buttonName: 'Settings')),
                     ],
                   ),
-                  SizedBox(height: 15.h),
+
+                  SizedBox(height: 20.h),
 
                   ///favorite spots
                   Align(
@@ -389,7 +406,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Interests',
                             style: Theme.of(context).textTheme.titleSmall!
                                 .copyWith(
-                                  color: Colors.black,
+                                  // color: Colors.black,
                                   fontWeight: FontWeight.w500,
                                 ),
                           ),
@@ -567,287 +584,269 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   Column(
                     children: [
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        child: showSettingsCard
-                            ? Padding(
-                                padding: EdgeInsets.symmetric(vertical: 20.h),
-                                child: SizedBox(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        width: 1,
-                                        color: Color(
-                                          0xFFCC18CA,
-                                        ).withOpacity(0.15),
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              'Settings',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
-                                            ),
-                                          ),
-                                          SizedBox(height: 30.h),
-
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Push Notification',
-                                                    style: Theme.of(
-                                                      context,
-                                                    ).textTheme.titleMedium,
-                                                  ),
-                                                  Text(
-                                                    'Get notified about events',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium!
-                                                        .copyWith(
-                                                          fontSize: 10.sp.clamp(10, 13),
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Transform.scale(
-                                                scale: 0.78,
-                                                child: Switch(
-                                                  value: switchON,
-                                                  onChanged: (newValue) {
-                                                    setState(() {
-                                                      switchON = newValue;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Divider(
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Email Notifications',
-                                                    style: Theme.of(
-                                                      context,
-                                                    ).textTheme.titleMedium,
-                                                  ),
-                                                  Text(
-                                                    'Receive event updates via email',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium!
-                                                        .copyWith(
-                                                          fontSize: 10.sp.clamp(10, 13),
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Transform.scale(
-                                                scale: 0.78,
-                                                child: Switch(
-                                                  value: notificationSwitch,
-                                                  onChanged: (newValue) {
-                                                    setState(() {
-                                                      notificationSwitch =
-                                                          newValue;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Divider(
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Location Services',
-                                                    style: Theme.of(
-                                                      context,
-                                                    ).textTheme.titleMedium,
-                                                  ),
-                                                  Text(
-                                                    'Find events near you',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium!
-                                                        .copyWith(
-                                                          fontSize: 10.sp.clamp(10, 13),
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Transform.scale(
-                                                scale: 0.78,
-                                                child: Switch(
-                                                  value: switchON,
-                                                  onChanged: (newValue) {
-                                                    setState(() {
-                                                      switchON = newValue;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Divider(
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Divider(
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Profile Status',
-                                                    style: Theme.of(
-                                                      context,
-                                                    ).textTheme.titleMedium,
-                                                  ),
-                                                  Text(
-                                                    'Profile Public Or Private',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleMedium!
-                                                        .copyWith(
-                                                          fontSize: 10.sp.clamp(10, 13),
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Transform.scale(
-                                                scale: 0.78,
-                                                child: Switch(
-                                                  value: switchON,
-                                                  onChanged: (newValue) {
-                                                    setState(() {
-                                                      switchON = newValue;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 20.h),
-
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Dark Mode',
-                                                    style: Theme.of(
-                                                      context,
-                                                    ).textTheme.titleMedium,
-                                                  ),
-                                                  SizedBox(height: 4.h),
-                                                  Text(
-                                                    controller.isDarkMode
-                                                        ? 'Currently Dark'
-                                                        : 'Currently Light',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodySmall
-                                                        ?.copyWith(
-                                                          color: Colors.grey,
-                                                          fontSize: 10.sp.clamp(10, 13),
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-
-                                              //eta ehon off thakuk pore dekhteci
-
-                                              Transform.scale(
-                                                scale: 0.85,
-                                                child: Switch(
-                                                  value: controller.isDarkMode,
-                                                  onChanged: (value) {
-                                                    controller.toggleTheme();
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-
-                                          SizedBox(height: 20.h),
-                                          Divider(
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                        ],
-                                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20.h),
+                        child: SizedBox(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                width: 1,
+                                color: Color(0xFFCC18CA).withOpacity(0.15),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Settings',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
                                     ),
                                   ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
+                                  SizedBox(height: 30.h),
+
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Push Notification',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          Text(
+                                            'Get notified about events',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                  fontSize: 10.sp.clamp(10, 13),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.78,
+                                        child: Switch(
+                                          value: switchON,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              switchON = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Email Notifications',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          Text(
+                                            'Receive event updates via email',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                  fontSize: 10.sp.clamp(10, 13),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.78,
+                                        child: Switch(
+                                          value: notificationSwitch,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              notificationSwitch = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Location Services',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          Text(
+                                            'Find events near you',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                  fontSize: 10.sp.clamp(10, 13),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.78,
+                                        child: Switch(
+                                          value: switchON,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              switchON = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Profile Status',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          Text(
+                                            'Profile Public Or Private',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                  fontSize: 10.sp.clamp(10, 13),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.78,
+                                        child: Switch(
+                                          value: switchON,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              switchON = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20.h),
+
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Dark Mode',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Text(
+                                            Provider.of<ThemeProvider>(
+                                                  context,
+                                                ).isDarkMode
+                                                ? 'Currently Dark'
+                                                : 'Currently Light',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: Colors.grey,
+                                                  fontSize: 10.sp.clamp(10, 13),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Transform.scale(
+                                        scale: 0.85,
+                                        child: Switch(
+                                          value: Provider.of<ThemeProvider>(
+                                            context,
+                                          ).isDarkMode,
+                                          onChanged: (value) {
+                                            Provider.of<ThemeProvider>(
+                                              context,
+                                              listen: false,
+                                            ).toggleTheme();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(height: 20.h),
+                                  Divider(
+                                    color: Color(0xFFCC18CA).withOpacity(0.15),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
+
                       SizedBox(height: 20.h),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 20.h),

@@ -47,155 +47,157 @@ class _DetailsScreenState extends State<DetailsScreen> {
             borderRadius: BorderRadius.circular(28),
           ),
           contentPadding: EdgeInsets.zero,
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Padding(
-              padding: EdgeInsets.all(15.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Write a Review",
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18.sp.clamp(18, 20)),
-                              overflow: TextOverflow.ellipsis,
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: double.maxFinite,
+              child: Padding(
+                padding: EdgeInsets.all(15.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Write a Review",
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18.sp.clamp(18, 20)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                textAlign: TextAlign.center,
+                                "Share your experience at Electric Paradise Festival",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 10.w,),
+                        Consumer<ThemeProvider>(
+                          builder: (context, controller, child) => GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10),
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: controller.isDarkMode
+                                    ? Color(0xFF3E043F)
+                                    : Color(0xFF686868),
+                                // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Image.asset(
+                                  'assets/images/cross_icon.png',
+                                ),
+                              ),
                             ),
-                            SizedBox(height: 4.h),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Rating',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        SizedBox(height: 10.h),
+                        Row(
+                          children: [
+                            Icon(Icons.star_border_outlined, size: 25.h),
+                            SizedBox(width: 5.w),
+                            Icon(Icons.star_border_outlined, size: 25.h),
+                            SizedBox(width: 5.w),
+                            Icon(Icons.star_border_outlined, size: 25.h),
+                            SizedBox(width: 5.w),
+                            Icon(Icons.star_border_outlined, size: 25.h),
+                            SizedBox(width: 5.w),
+                            Icon(Icons.star_border_outlined, size: 25.h),
+                            SizedBox(width: 10.w),
                             Text(
-                              textAlign: TextAlign.center,
-                              "Share your experience at Electric Paradise Festival",
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              '5 Star',
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(width: 10.w,),
-                      Consumer<ThemeProvider>(
-                        builder: (context, controller, child) => GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            margin: EdgeInsets.only(right: 10),
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: controller.isDarkMode
-                                  ? Color(0xFF3E043F)
-                                  : Color(0xFF686868),
-                              // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    AuthTextField(
+                      hintText: 'Tell us about your experience...',
+                      labelText: 'Your Review',
+                    ),
+                    SizedBox(height: 5.h),
+                    Column(
+                      children: [
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '0/500',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Image.asset(
-                                'assets/images/cross_icon.png',
-                              ),
+                            SizedBox(height: 3.h),
+                            Row(
+                              children: [
+                                Text(
+                                  'characters',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Rating',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      SizedBox(height: 10.h),
-                      Row(
-                        children: [
-                          Icon(Icons.star_border_outlined, size: 25.h),
-                          SizedBox(width: 5.w),
-                          Icon(Icons.star_border_outlined, size: 25.h),
-                          SizedBox(width: 5.w),
-                          Icon(Icons.star_border_outlined, size: 25.h),
-                          SizedBox(width: 5.w),
-                          Icon(Icons.star_border_outlined, size: 25.h),
-                          SizedBox(width: 5.w),
-                          Icon(Icons.star_border_outlined, size: 25.h),
-                          SizedBox(width: 10.w),
-                          Text(
-                            '5 Star',
-                            style: Theme.of(context).textTheme.titleSmall,
+                      ],
+                    ),
+                    SizedBox(height: 15.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                      ), 
+                      child: SizedBox(
+                        width: double.infinity, // full width inside dialog
+                        height: 55.h,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDark ? Colors.black : Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            padding: EdgeInsets.zero, // overflow রোধ
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  AuthTextField(
-                    hintText: 'Tell us about your experience...',
-                    labelText: 'Your Review',
-                  ),
-                  SizedBox(height: 5.h),
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                '0/500',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 3.h),
-                          Row(
-                            children: [
-                              Text(
-                                'characters',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 15.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                    ), 
-                    child: SizedBox(
-                      width: double.infinity, // full width inside dialog
-                      height: 55.h,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? Colors.black : Colors.white,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          padding: EdgeInsets.zero, // overflow রোধ
-                        ),
-                        onPressed: () {},
-                        child: Text(
-                          'Submit Review',
-                          style: TextStyle(
-                            fontSize: 15.sp.clamp(15, 15),
-                            color: isDark ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.w600,
+                          onPressed: () {},
+                          child: Text(
+                            'Submit Review',
+                            style: TextStyle(
+                              fontSize: 15.sp.clamp(15, 15),
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
