@@ -127,10 +127,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('Cancel',style: Theme.of(context).textTheme.bodySmall,),
-                      ),
-                    ),
+                                                onPressed: () => Navigator.pop(context),
+                                                child: Text('Cancel',style: Theme.of(context).textTheme.bodySmall,),
+                                              ),
+                                            ),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: ElevatedButton(
