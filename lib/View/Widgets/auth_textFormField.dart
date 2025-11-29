@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AuthTextField extends StatelessWidget {
+class AuthTextField extends StatefulWidget {
   final String labelText;
   final String hintText;
   final IconData? icon;
   final bool obscureText;
+  final bool isPassword;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
@@ -21,8 +22,21 @@ class AuthTextField extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.validator,
+this.isPassword = false
   });
 
+  @override
+  State<AuthTextField> createState() => _AuthTextFieldState();
+}
+
+class _AuthTextFieldState extends State<AuthTextField> {
+  late bool _obscureText;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _obscureText = widget.obscureText || widget.isPassword;
+  }
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -33,7 +47,7 @@ class AuthTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            labelText,
+            widget.labelText,
             style: TextStyle(
               fontSize: 14.sp,                    // ← clamp মুছে দিলাম
               fontWeight: FontWeight.w500,
@@ -58,29 +72,42 @@ class AuthTextField extends StatelessWidget {
               ],
             ),
             child: TextFormField(
-              controller: controller,
-              obscureText: obscureText,
-              keyboardType: keyboardType,
-              onChanged: onChanged,
-              validator: validator,
+              textInputAction: TextInputAction.next,
+              controller: widget.controller,
+              obscureText: widget.isPassword ? _obscureText : widget.obscureText,
+              keyboardType: widget.keyboardType,
+              onChanged: widget.onChanged,
+              validator: widget.validator,
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black87,
                 fontSize: 16.sp,                 // ← আগে থেকেই ঠিক ছিল
               ),
               cursorColor: const Color(0xFFCC18CA),
               decoration: InputDecoration(
-                hintText: hintText,
+                hintText: widget.hintText,
                 hintStyle: TextStyle(
                   color: isDark ? Colors.white60 : const Color(0xFF515151),
                   fontSize: 14.sp,               // ← clamp মুছে দিলাম
                 ),
-                suffixIcon: icon != null
+                suffixIcon: widget.isPassword
+                    ? IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                    color: isDark ? Colors.white60 : const Color(0xFF515151),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                )
+                    : (widget.icon != null
                     ? Icon(
-                        icon,
-                        color: isDark ? Colors.white60 : const Color(0xFF515151),
-                        size: 22.w,
-                      )
-                    : null,
+                  widget.icon,
+                  color: isDark ? Colors.white60 : const Color(0xFF515151),
+                  size: 22.w,
+                )
+                    : null),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 20.w,
                   vertical: 18.h,

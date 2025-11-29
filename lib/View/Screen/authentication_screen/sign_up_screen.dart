@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
@@ -119,9 +119,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           AuthTextField(
                             controller: passController,
-                            icon: Icons.remove_red_eye,
                             hintText: '••••••••',
                             labelText: 'Password',
+                            isPassword: true,
                             validator: (String? value) {
                               if ((value?.length ?? 0) <= 6) {
                                 return 'Enter a valid pasword';
@@ -150,15 +150,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          Visibility(
-                            visible: _signUpIn_Progress == false,
-                            replacement: CircularProgressIndicator(),
-                            child: InkWell(
-                              onTap: () {
-                                onTapSignUp_button();
-                              },
-                              child: CustomButton(buttonName: 'Sign up'),
-                            ),
+                          Consumer2<SignUpController, ThemeProvider>(
+                            builder: (context, signUpCtrl, themeCtrl, child) {
+                              final progressColor = themeCtrl.isDarkMode
+                                  ? Color(0xFFCC18CA)
+                                  : const Color(0xFF6A7282);
+
+                              return signUpCtrl.inProgress
+                                  ? Center(
+                                child: CircularProgressIndicator(
+                                  color: progressColor,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                                  : GestureDetector(
+                                onTap: onTapSignUp_button,
+                                child: CustomButton(buttonName: 'Sign up'),
+                              );
+                            },
                           ),
                           SizedBox(height: 20.h),
                           Text(
@@ -214,13 +223,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-
-  void onTapSignUp_button() {
-    //TODO: validate user
-    //right now navigate log in screen..
-    Navigator.pushReplacementNamed(context, LogInScreen.name);
+  void onTapSignUp_button() async {
+    if (_formKey.currentState!.validate()) {
+      await _signUp();
+    }
   }
-
   //sign up api calling
 Future<void> _signUp() async {
   final signUpController = Provider.of<SignUpController>(context, listen: false);
@@ -233,10 +240,10 @@ Future<void> _signUp() async {
 
   if (isSuccess) {
     _clearTextField();
-    Show_SnacBarMessage(context, "Registration successful! Please login");
+    showCustomSnackBar(context: context, message:"Registration successful! Please login" );
     Navigator.pushReplacementNamed(context, LogInScreen.name);
   } else {
-    Show_SnacBarMessage(context, signUpController.errorMessage ?? "Registration failed");
+    showCustomSnackBar(context: context, message: signUpController.errorMessage ?? "Registration failed");
   }
 }
   void _clearTextField() {

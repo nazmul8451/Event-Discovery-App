@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart'; // এটা যোগ হবে
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),
+        ChangeNotifierProvider(create: (_) => SignUpController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),
