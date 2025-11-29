@@ -136,7 +136,6 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
-
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         title: Align(
