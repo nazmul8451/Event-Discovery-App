@@ -75,11 +75,14 @@ class NetworkCaller {
   }) async {
     try {
       Uri uri = Uri.parse(url);
-      _logRequest(url, body, null);
-      Map<String,String> headers = {
-        'content-type' : 'application/json',
-      };
-      Response response = await post(uri, body: jsonEncode(body),headers: headers);
+
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      _logRequest(url, body, headers);      
+      Response response = await post(
+        uri,
+        body: jsonEncode(body),
+        headers: headers,
+      );
       _logResponse(url, response);
       if (response.statusCode == 200) {
         final decodedJson = jsonDecode(response.body);
@@ -112,13 +115,6 @@ class NetworkCaller {
       );
     }
   }
-
-  
-
-
-
-
-
 
   //all request and response
 

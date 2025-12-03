@@ -39,7 +39,7 @@ class AppRoutes {
     splash: (context) => const SplashScreen(),
     getStart: (context) => const GetStartScreen(),
     interest: (context) => InterestScreen(),
-    login: (context) => const LogInScreen(),
+    login: (context) =>  LogInScreen(),
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
     codeSend: (context) => const CodeSend(),

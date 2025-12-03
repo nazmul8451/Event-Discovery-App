@@ -1,24 +1,37 @@
+import 'dart:math';
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({super.key});
+  LogInScreen({super.key});
 
   static const String name = '/log-in';
+  bool _signinIn_Progress = false;
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  //textfromField controller
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -32,7 +45,6 @@ class _LogInScreenState extends State<LogInScreen> {
             child: Column(
               children: [
                 const Spacer(),
-
                 // Logo
                 Consumer<ThemeProvider>(
                   builder: (context, controller, child) {
@@ -72,17 +84,40 @@ class _LogInScreenState extends State<LogInScreen> {
                       SizedBox(height: 30.h),
 
                       // TextFields
-                      const AuthTextField(
-                        icon: Icons.check,
-                        hintText: 'your@email.com',
-                        labelText: 'Email',
-                      ),
-                      SizedBox(height: 16.h),
-                      const AuthTextField(
-                        icon: Icons.visibility_off,
-                        hintText: '••••••••',
-                        labelText: 'Password',
-                        obscureText: true,
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            AuthTextField(
+                              controller: emailController,
+                              icon: Icons.check,
+                              hintText: 'your@email.com',
+                              labelText: 'Email',
+                              validator: (String? value) {
+                                String email = value ?? '';
+                                if (EmailValidator.validate(email) == false) {
+                                  return 'Enter a valid email';
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                            SizedBox(height: 16.h),
+                            AuthTextField(
+                              controller: passController,
+                              icon: Icons.visibility_off,
+                              hintText: '••••••••',
+                              labelText: 'Password',
+                              obscureText: true,
+                              validator: (String? value) {
+                                if ((value?.length ?? 0) <= 6) {
+                                  return 'Enter a valid pasword';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
                       ),
 
                       // Forgot Password
@@ -105,12 +140,24 @@ class _LogInScreenState extends State<LogInScreen> {
                       SizedBox(height: 10.h),
 
                       // Login Button
-                      CustomButton(
-                        onPressed: (){
-                          //TODO: Navigate to NabButton after validation and api calling
-                          Navigator.pushNamedAndRemoveUntil(context,BottomNavBarScreen.name , (predicate)=>false);
+                      Consumer2<LogInController, ThemeProvider>(
+                        builder: (context, signUpCtrl, themeCtrl, child) {
+                          final progressColor = themeCtrl.isDarkMode
+                              ? Color(0xFFCC18CA)
+                              : const Color(0xFF6A7282);
+                          return signUpCtrl.inProgress
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    color: progressColor,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: onTapLoginButton,
+                                  child: CustomButton(buttonName: 'Log in'),
+                                );
                         },
-                          buttonName: 'Login'),
+                      ),
 
                       SizedBox(height: 30.h),
 
@@ -174,6 +221,33 @@ class _LogInScreenState extends State<LogInScreen> {
         ),
       ),
     );
+  }
+
+  void onTapLoginButton() async {
+    //validate and call api -> go to home screen
+    if (_formKey.currentState!.validate()) {
+      await _Login();
+    }
+  }
+
+  Future<void> _Login() async {
+    final logInController = Provider.of<LogInController>(
+      context,
+      listen: false,
+    );
+    bool isSuccess = await logInController.login(
+      emailController.text.trim(),
+      passController.text,
+    );
+    if (isSuccess) {
+      showCustomSnackBar(context: context, message: "Log in success");
+      Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
+    } else {
+      showCustomSnackBar(
+        context: context,
+        message: logInController.errorMessage ?? "Login failed",
+      );
+    }
   }
 
   void onTapSignUp_button() {

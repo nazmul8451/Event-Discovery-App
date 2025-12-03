@@ -1,7 +1,10 @@
 import 'package:device_preview/device_preview.dart'; // এটা যোগ হবে
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
+import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
@@ -16,9 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-  runApp(
-    const MyApp(),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),
         ChangeNotifierProvider(create: (_) => SignUpController()),
+        ChangeNotifierProvider(create: (_) => LogInController()),
+        ChangeNotifierProvider(create: (_) => ForgotPasswordController()),
+
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

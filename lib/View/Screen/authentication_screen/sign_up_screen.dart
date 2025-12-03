@@ -240,7 +240,7 @@ Future<void> _signUp() async {
 
   if (isSuccess) {
     _clearTextField();
-    showCustomSnackBar(context: context, message:"Registration successful! Please login" );
+    showCustomSnackBar(context: context, message:"Registration successful! Please login");
     Navigator.pushReplacementNamed(context, LogInScreen.name);
   } else {
     showCustomSnackBar(context: context, message: signUpController.errorMessage ?? "Registration failed");
