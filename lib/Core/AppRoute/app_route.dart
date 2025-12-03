@@ -8,13 +8,13 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.da
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
 import '../../View/Screen/Onboarding_screen/interest_screen.dart';
 import '../../View/Screen/Onboarding_screen/splash_screen.dart';
 import '../../View/Screen/authentication_screen/forgot_pass_screen.dart';
 import '../../View/Screen/authentication_screen/log_in_screen.dart';
 import '../../View/Screen/authentication_screen/sign_up_screen.dart';
-
 
 class AppRoutes {
   static const String splash = SplashScreen.name;
@@ -32,25 +32,24 @@ class AppRoutes {
   static const String bookingConfirmScreen = BookingConfirmedScreen.name;
   static const String viewEventScreen = ViewEventScreen.name;
   static const String liveStream = LiveStream.name;
-
-
+  static const String newPassScreen = NewPasswordScreen.name;
 
   static final routes = {
     splash: (context) => const SplashScreen(),
     getStart: (context) => const GetStartScreen(),
     interest: (context) => InterestScreen(),
-    login: (context) =>  LogInScreen(),
+    login: (context) => LogInScreen(),
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
     codeSend: (context) => const CodeSend(),
     codeSubmit: (context) => const CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
-    userchatScreen: (context) =>  UserChatScreen(),
+    userchatScreen: (context) => UserChatScreen(),
     detaisScreen: (context) => const DetailsScreen(),
-    bookingConfirmScreen:(context) => const BookingConfirmedScreen(),
-    viewEventScreen:(context) => const ViewEventScreen(),
-    liveStream:(context) =>  LiveStream(),
-
+    bookingConfirmScreen: (context) => const BookingConfirmedScreen(),
+    viewEventScreen: (context) => const ViewEventScreen(),
+    liveStream: (context) => LiveStream(),
+    newPassScreen: (context) => NewPasswordScreen(),
   };
 }

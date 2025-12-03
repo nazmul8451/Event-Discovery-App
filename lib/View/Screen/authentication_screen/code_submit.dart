@@ -1,7 +1,12 @@
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
 
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
@@ -16,9 +21,14 @@ class CodeSubmit extends StatefulWidget {
 }
 
 class _CodeSubmitState extends State<CodeSubmit> {
+  final TextEditingController otpController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController OtpTEController = TextEditingController();
+    final forgotPassController = Provider.of<ForgotPasswordController>(
+      context,
+      listen: false,
+    );
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: common_appbar(titleName: 'Forgot Password'),
@@ -37,7 +47,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
             ),
             SizedBox(height: 20.h),
             Text(
-              'Enter the 4-Digit code sent to you at\nevent@gmail.com',
+              'Enter the 4-Digit code sent to you at\n${forgotPassController.savedEmail}',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w400,
@@ -46,12 +56,11 @@ class _CodeSubmitState extends State<CodeSubmit> {
             SizedBox(height: 20.h),
             PinCodeTextField(
               backgroundColor: Colors.transparent,
-              length: 4,
+              length: 6,
               obscureText: false,
               animationType: AnimationType.none,
               keyboardType: TextInputType.number,
               cursorColor: const Color(0xFFCC18CA),
-
               textStyle: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
@@ -80,20 +89,32 @@ class _CodeSubmitState extends State<CodeSubmit> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
               animationDuration: const Duration(milliseconds: 200),
-              controller: OtpTEController,
+              controller: otpController,
               appContext: context,
-
               onChanged: (value) {},
               onCompleted: (value) {
                 print("OTP: $value");
               },
             ),
             SizedBox(height: 20.h),
-            GestureDetector(
-              onTap: () {
-                // Navigator.pushNamed(context, CodeSend.name);
+            Consumer2<ForgotPasswordController, ThemeProvider>(
+              builder: (context, forgotController, themeCtrl, child) {
+                final progressColor = themeCtrl.isDarkMode
+                    ? Color(0xFFCC18CA)
+                    : const Color(0xFF6A7282);
+
+                return forgotController.inProgress
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: progressColor,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: onTapSubmit,
+                        child: CustomButton(buttonName: 'Submit'),
+                      );
               },
-              child: CustomButton(buttonName: 'Submit'),
             ),
             SizedBox(height: 10.h),
             Align(
@@ -107,7 +128,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
                       text: 'Resend Again',
                       style: TextStyle(color: Color(0xFF9810FA)),
                       recognizer: TapGestureRecognizer()
-                        ..onTap =ontapResendCode,
+                        ..onTap = ontapResendCode,
                     ),
                   ],
                 ),
@@ -118,10 +139,39 @@ class _CodeSubmitState extends State<CodeSubmit> {
       ),
     );
   }
-  void ontapResendCode()
-  {
-    Navigator.pop(context);
+
+  void ontapResendCode() {
+    //! wait kro abr api call hobe
+  }
+
+  void onTapSubmit() async {
+    await forgotPassword_otp();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      NewPasswordScreen.name,
+      (predicate) => false,
+    );
+  }
+
+  Future<void> forgotPassword_otp() async {
+    final forgotPassController = Provider.of<ForgotPasswordController>(
+      context,
+      listen: false,
+    );
+
+    bool isSuccess = await forgotPassController.verifyOTP(
+      otpController.text.trim(),
+    );
+
+    print('Your Current Saved Email-${otpController}');
+
+    if (isSuccess) {
+      showCustomSnackBar(
+        context: context,
+        message: 'Wow nice! Create your new password',
+      );
+    } else {
+      showCustomSnackBar(context: context, message: 'Something went wrong!');
+    }
   }
 }
-
-

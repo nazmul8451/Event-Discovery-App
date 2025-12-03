@@ -108,6 +108,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               icon: Icons.visibility_off,
                               hintText: '••••••••',
                               labelText: 'Password',
+                              isPassword: true,
                               obscureText: true,
                               validator: (String? value) {
                                 if ((value?.length ?? 0) <= 6) {

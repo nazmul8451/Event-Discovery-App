@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
@@ -85,8 +86,8 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                           ),
                         )
                       : GestureDetector(
-                          onTap: onTapResetButton,
-                          child: CustomButton(buttonName: 'Reset password'),
+                          onTap: onTapSendCodeButton,
+                          child: CustomButton(buttonName: 'Send code'),
                         );
                 },
               ),
@@ -97,13 +98,14 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
     );
   }
 
-  void onTapResetButton()async {
+  void onTapSendCodeButton() async {
     if (_formKey.currentState!.validate()) {
-      await forgotPassword();
+      await forgotPassword_otp();
+      Navigator.pushNamed(context, CodeSubmit.name);
     }
   }
 
-  Future<void> forgotPassword() async {
+  Future<void> forgotPassword_otp() async {
     final forgotPassController = Provider.of<ForgotPasswordController>(
       context,
       listen: false,
@@ -113,9 +115,11 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
       emailController.text.trim(),
     );
 
+    print('Your Current Saved Email-${forgotPassController.savedEmail}');
+
     if (isSuccess) {
       showCustomSnackBar(context: context, message: 'OTP code send your email');
-    }else{
+    } else {
       showCustomSnackBar(context: context, message: 'Something went wrong!');
     }
   }

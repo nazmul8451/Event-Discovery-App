@@ -59,7 +59,6 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
           // main container
           TextFormField(
-            
             textInputAction: TextInputAction.next,
             controller: widget.controller,
             obscureText: widget.isPassword
@@ -70,16 +69,16 @@ class _AuthTextFieldState extends State<AuthTextField> {
             validator: widget.validator,
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black87,
-              fontSize: 16.sp, // ← আগে থেকেই ঠিক ছিল
+              fontSize: 16.sp, 
             ),
             cursorColor: const Color(0xFFCC18CA),
             decoration: InputDecoration(
-              fillColor: isDark? Color(0xFF250143): Colors.white,
+              fillColor: isDark? Color(0xFF250143): Colors.grey[30],
               filled: true,
               hintText: widget.hintText,
               hintStyle: TextStyle(
                 color: isDark ? Colors.white60 : const Color(0xFF515151),
-                fontSize: 14.sp, // ← clamp মুছে দিলাম
+                fontSize: 14.sp, 
               ),
               suffixIcon: widget.isPassword
                   ? IconButton(
