@@ -7,9 +7,11 @@ class ForgotPasswordController extends ChangeNotifier {
   String? _errorMessage;
 
   String savedEmail = '';
+  String? _passwordResetToken;
 
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
+  String? get passwrodResetToken => _passwordResetToken;
 
   //saved emial function
   void setEmail(String email) {
@@ -59,20 +61,30 @@ class ForgotPasswordController extends ChangeNotifier {
     bool isSuccess = false;
 
     final Map<String, String> requestBody = {
-      "email": savedEmail, //save email auto asbe
-      "oneTimeCode": code, //user input code
+      "email": savedEmail,
+      "oneTimeCode": code,
     };
     print('Your Current Email-$savedEmail');
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.verifyOtpUrl,
         body: requestBody,
+
       );
 
-      if (response.isSuccess) {
+      if (response.isSuccess && response.body != null) {
         isSuccess = true;
+        // ekhane token ta save korbo
+        final token = response.body?['data']?['token'] as String?;
+        if (token != null && token.isNotEmpty) {
+          _passwordResetToken = token;
+          print("Token saved: $_passwordResetToken");
+          isSuccess = true;
+        } else {
+          _errorMessage = "Token not found in response!";
+        }
       } else {
-        _errorMessage = response.errorMessage;
+        _errorMessage = response.errorMessage ?? "Invalid OTP";
       }
     } catch (e) {
       _errorMessage = "Failed to verify code!";
@@ -83,36 +95,50 @@ class ForgotPasswordController extends ChangeNotifier {
     return isSuccess;
   }
 
-  Future<bool> forgotNewPassword(String newPass,String confirmPass) async {
+  Future<bool> forgotNewPassword(String newPass, String confirmPass) async {
+
+    if (_passwordResetToken == null || _passwordResetToken!.isEmpty) {
+      _errorMessage = "Session expired! Please try again from beginning.";
+      _inProgress = false;
+      notifyListeners();
+      return false;
+    }
+
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
 
-        bool isSuccess = false;
+    bool isSuccess = false;
+
     final Map<String, String> requestBody = {
-      "newPassword": newPass, 
+      "newPassword": newPass,
       "confirmPassword": confirmPass,
     };
-        print('Your Current new pass-$newPass');
 
-           try {
+    // এখানে Authorization header-এ টোকেন পাঠানো হচ্ছে
+
+    try {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.resetPassUrl,
         body: requestBody,
-      );
+        // headers: 
+        );
 
       if (response.isSuccess) {
         isSuccess = true;
+        _passwordResetToken = null;
+        print("Password reset successful!");
       } else {
-        _errorMessage = response.errorMessage;
+        _errorMessage = response.errorMessage ?? "Failed to reset password";
       }
     } catch (e) {
-      _errorMessage = "Failed";
+      _errorMessage = "Password reset failed! Try again.";
+      debugPrint("Reset Password Error: $e");
     } finally {
       _inProgress = false;
       notifyListeners();
     }
-    return isSuccess;
 
+    return isSuccess;
   }
 }

@@ -240,7 +240,7 @@ Future<void> _signUp() async {
 
   if (isSuccess) {
     _clearTextField();
-    showCustomSnackBar(context: context, message:"Registration successful! Please login");
+    showCustomSnackBar(context: context, message:"Registration successful! Please verify your email");
     Navigator.pushReplacementNamed(context, LogInScreen.name);
   } else {
     showCustomSnackBar(context: context, message: signUpController.errorMessage ?? "Registration failed");
@@ -267,9 +267,9 @@ Future<void> _signUp() async {
     super.dispose();
   }
 }
-
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
+
   const ContinueWithContainer({super.key, required this.iconImg});
 
   @override
@@ -279,9 +279,9 @@ class ContinueWithContainer extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(right: 12.w),
       height: 36.h,
-      width: 98.w,
+      width: 70.w,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.08) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark

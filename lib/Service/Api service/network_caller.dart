@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
+// I AM THE REAL NETWORK CALLER - MOHOSIN 5001 WAS HERE
 class NetworkResponse {
   final String? errorMessage;
   final bool isSuccess;
@@ -70,41 +71,46 @@ class NetworkCaller {
 
   static Future<NetworkResponse> postRequest({
     required String url,
+    Map<String, String>? extraHeaders,
     Map<String, String>? body,
     bool isFromLogin = false,
   }) async {
     try {
       Uri uri = Uri.parse(url);
 
-      Map<String, String> headers = {'Content-Type': 'application/json'};
-      _logRequest(url, body, headers);      
+      Map<String, String> finalHeaders = {'Content-Type': 'application/json'};
+      if (extraHeaders != null) {
+        finalHeaders.addAll(extraHeaders);
+      }
+
+      _logRequest(url, body, finalHeaders);
+
       Response response = await post(
         uri,
-        body: jsonEncode(body),
-        headers: headers,
+        headers: finalHeaders,
+        body: body != null ? jsonEncode(body) : null,
       );
+
       _logResponse(url, response);
-      if (response.statusCode == 200) {
-        final decodedJson = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
-          body: decodedJson,
+          body: jsonDecode(response.body),
         );
       } else if (response.statusCode == 401) {
-        final decodedJson = jsonDecode(response.body);
-
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
           errorMessage: _unAuthorizeMessage,
         );
       } else {
-        final decodedJson = jsonDecode(response.body);
+        final decoded = jsonDecode(response.body);
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
-          errorMessage: decodedJson['message'] ?? _unAuthorizeMessage,
+          errorMessage: decoded['message'] ?? 'Unknown error',
         );
       }
     } catch (e) {

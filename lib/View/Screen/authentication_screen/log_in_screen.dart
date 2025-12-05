@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,7 @@ import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -31,6 +33,35 @@ class _LogInScreenState extends State<LogInScreen> {
   //textfromField controller
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
+
+  Future<User?> _signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        print("Cancelld User");
+        return null;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential result = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+      print("লগইন সফল: ${result.user?.displayName}");
+      return result.user;
+    } catch (e) {
+      print("Google Sign In Error: $e");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,8 +212,33 @@ class _LogInScreenState extends State<LogInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ContinueWithContainer(
-                            iconImg: 'assets/images/gmail_icon.png',
+                          GestureDetector(
+                            onTap: () async {
+                              User? user =
+                                  await _signInWithGoogle(); // নিচের ফাংশনটা কল করবে
+
+                              if (user != null) {
+                                // লগইন সফল — এখানে যা করতে চাও করো
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Welcome ${user.displayName}!",
+                                    ),
+                                  ),
+                                );
+                                // উদাহরণ: Navigator.pushReplacement(...) দিয়ে হোম পেজে নিয়ে যাও
+                              } else {
+                                // ইউজার ক্যান্সেল করেছে বা এরর
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Login Failed"),
+                                  ),
+                                );
+                              }
+                            },
+                            child: ContinueWithContainer(
+                              iconImg: 'assets/images/gmail_icon.png',
+                            ),
                           ),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',

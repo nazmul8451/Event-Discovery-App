@@ -101,7 +101,6 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
   void onTapSendCodeButton() async {
     if (_formKey.currentState!.validate()) {
       await forgotPassword_otp();
-      Navigator.pushNamed(context, CodeSubmit.name);
     }
   }
 
@@ -119,8 +118,10 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
 
     if (isSuccess) {
       showCustomSnackBar(context: context, message: 'OTP code send your email');
+      Navigator.pushNamed(context, CodeSubmit.name);
+
     } else {
-      showCustomSnackBar(context: context, message: 'Something went wrong!');
+      showCustomSnackBar(context: context, message: 'Something went wrong.please try again');
     }
   }
 }
