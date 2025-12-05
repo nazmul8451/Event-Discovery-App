@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
+import 'package:gathering_app/Service/auth/google_auth.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
@@ -21,52 +22,21 @@ class LogInScreen extends StatefulWidget {
   LogInScreen({super.key});
 
   static const String name = '/log-in';
-  bool _signinIn_Progress = false;
-
   @override
   State<LogInScreen> createState() => _LogInScreenState();
 }
 
 class _LogInScreenState extends State<LogInScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _signinIn_Progress = false;
 
   //textfromField controller
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
 
-  Future<User?> _signInWithGoogle() async {
-    try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      await googleSignIn.signOut();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        print("Cancelld User");
-        return null;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential result = await FirebaseAuth.instance
-          .signInWithCredential(credential);
-      print("লগইন সফল: ${result.user?.displayName}");
-      return result.user;
-    } catch (e) {
-      print("Google Sign In Error: $e");
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
@@ -214,31 +184,62 @@ class _LogInScreenState extends State<LogInScreen> {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              User? user =
-                                  await _signInWithGoogle(); // নিচের ফাংশনটা কল করবে
+                              // লোডিং দেখানোর জন্য (অপশনাল, তুমি চাইলে রাখো)
+                              setState(() {
+                                _signinIn_Progress =
+                                    true; // ← তোমার State ক্লাসে bool _signinIn_Progress = false; রাখো
+                              });
 
-                              if (user != null) {
-                                // লগইন সফল — এখানে যা করতে চাও করো
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Welcome ${user.displayName}!",
-                                    ),
-                                  ),
-                                );
-                                // উদাহরণ: Navigator.pushReplacement(...) দিয়ে হোম পেজে নিয়ে যাও
-                              } else {
-                                // ইউজার ক্যান্সেল করেছে বা এরর
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Login Failed"),
-                                  ),
-                                );
+                              try {
+                                final UserCredential? result =
+                                    await GoogleSignInService.signInWithGoogle();
+
+                                ();
+
+                                if (result != null && mounted) {
+                                  // সাকসেস → হোমে নিয়ে যাও
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message:
+                                        "Welcome ${result.user?.displayName ?? "User"}!",
+                                    isError: false,
+                                  );
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    BottomNavBarScreen.name,
+                                  );
+                                } else {
+                                  // ইউজার ক্যান্সেল করেছে
+                                  if (mounted) {
+                                    showCustomSnackBar(
+                                      context: context,
+                                      message: "Google Sign-In cancelled",
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                // কোনো এরর হলে
+                                if (mounted) {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "Login failed: $e",
+                                  );
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    _signinIn_Progress = false;
+                                  });
+                                }
                               }
                             },
-                            child: ContinueWithContainer(
-                              iconImg: 'assets/images/gmail_icon.png',
-                            ),
+                            child: _signinIn_Progress
+                                ? const CircularProgressIndicator(
+                                    color: Color(0xFFCC18CA),
+                                  )
+                                : ContinueWithContainer(
+                                    iconImg: 'assets/images/gmail_icon.png',
+                                  ),
                           ),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',
