@@ -184,10 +184,8 @@ class _LogInScreenState extends State<LogInScreen> {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              // লোডিং দেখানোর জন্য (অপশনাল, তুমি চাইলে রাখো)
                               setState(() {
-                                _signinIn_Progress =
-                                    true; // ← তোমার State ক্লাসে bool _signinIn_Progress = false; রাখো
+                                _signinIn_Progress = true;
                               });
 
                               try {
@@ -197,7 +195,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 ();
 
                                 if (result != null && mounted) {
-                                  // সাকসেস → হোমে নিয়ে যাও
+                               // if success is log in -> going to home
                                   showCustomSnackBar(
                                     context: context,
                                     message:
@@ -209,7 +207,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                     BottomNavBarScreen.name,
                                   );
                                 } else {
-                                  // ইউজার ক্যান্সেল করেছে
+                                  // if user cancel
                                   if (mounted) {
                                     showCustomSnackBar(
                                       context: context,
@@ -218,7 +216,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                   }
                                 }
                               } catch (e) {
-                                // কোনো এরর হলে
+                                // If any error
                                 if (mounted) {
                                   showCustomSnackBar(
                                     context: context,
