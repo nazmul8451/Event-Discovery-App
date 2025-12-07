@@ -1,6 +1,7 @@
-import 'package:device_preview/device_preview.dart'; // এটা যোগ হবে
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
@@ -19,7 +20,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // ⚡ Device Preview ON
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -35,7 +41,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SignUpController()),
         ChangeNotifierProvider(create: (_) => LogInController()),
         ChangeNotifierProvider(create: (_) => ForgotPasswordController()),
-
+        ChangeNotifierProvider(create: (_) => EmailVerifyController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),
@@ -45,7 +51,10 @@ class MyApp extends StatelessWidget {
           return Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp(
+                useInheritedMediaQuery: true, // <-- Must for DevicePreview
                 locale: DevicePreview.locale(context),
+                builder: DevicePreview.appBuilder, // <-- Must for UI preview
+
                 debugShowCheckedModeBanner: false,
                 title: 'Gathering App',
                 theme: ThemeColor.lightMode,

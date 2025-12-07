@@ -11,14 +11,16 @@ import 'package:provider/provider.dart';
 import '../../Widgets/CustomButton.dart';
 import '../../Widgets/appbar.dart';
 
-class CodeSubmit extends StatefulWidget {
-  const CodeSubmit({super.key});
 
+class CodeSubmit extends StatefulWidget {
+
+   CodeSubmit({super.key,});
   static const String name = '/code-submit';
 
   @override
   State<CodeSubmit> createState() => _CodeSubmitState();
 }
+
 
 class _CodeSubmitState extends State<CodeSubmit> {
   final TextEditingController otpController = TextEditingController();

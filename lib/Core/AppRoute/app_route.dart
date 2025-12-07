@@ -42,7 +42,7 @@ class AppRoutes {
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
     codeSend: (context) => const CodeSend(),
-    codeSubmit: (context) => const CodeSubmit(),
+    codeSubmit: (context) =>  CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
     userchatScreen: (context) => UserChatScreen(),

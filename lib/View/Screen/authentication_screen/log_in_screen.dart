@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,8 +13,6 @@ import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -155,7 +152,10 @@ class _LogInScreenState extends State<LogInScreen> {
                                   ),
                                 )
                               : GestureDetector(
-                                  onTap: onTapLoginButton,
+                                  onTap: (){
+                                        Navigator.pushNamed(context, BottomNavBarScreen.name);
+
+                                  },
                                   child: CustomButton(buttonName: 'Log in'),
                                 );
                         },
@@ -182,63 +182,45 @@ class _LogInScreenState extends State<LogInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          GestureDetector(
-                            onTap: () async {
-                              setState(() {
-                                _signinIn_Progress = true;
-                              });
+                       GestureDetector(
+  onTap: () async {
+    setState(() => _signinIn_Progress = true);
 
-                              try {
-                                final UserCredential? result =
-                                    await GoogleSignInService.signInWithGoogle();
+    try {
+      final UserCredential? result = await GoogleSignInService.signInWithGoogle();
 
-                                ();
+      if (!mounted) return;
 
-                                if (result != null && mounted) {
-                               // if success is log in -> going to home
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message:
-                                        "Welcome ${result.user?.displayName ?? "User"}!",
-                                    isError: false,
-                                  );
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    BottomNavBarScreen.name,
-                                  );
-                                } else {
-                                  // if user cancel
-                                  if (mounted) {
-                                    showCustomSnackBar(
-                                      context: context,
-                                      message: "Google Sign-In cancelled",
-                                    );
-                                  }
-                                }
-                              } catch (e) {
-                                // If any error
-                                if (mounted) {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: "Login failed: $e",
-                                  );
-                                }
-                              } finally {
-                                if (mounted) {
-                                  setState(() {
-                                    _signinIn_Progress = false;
-                                  });
-                                }
-                              }
-                            },
-                            child: _signinIn_Progress
-                                ? const CircularProgressIndicator(
-                                    color: Color(0xFFCC18CA),
-                                  )
-                                : ContinueWithContainer(
-                                    iconImg: 'assets/images/gmail_icon.png',
-                                  ),
-                          ),
+      if (result != null) {
+        showCustomSnackBar(
+          context: context,
+          message: "Welcome ${result.user?.displayName ?? "User"}!",
+          isError: false,
+        );
+        Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
+      } else {
+        showCustomSnackBar(context: context, message: "Google Sign-In cancelled");
+      }
+    } catch (e) {
+      if (mounted) {
+        showCustomSnackBar(context: context, message: "Login failed: $e");
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _signinIn_Progress = false);
+      }
+    }
+  },
+  child: _signinIn_Progress
+      ? const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircularProgressIndicator(
+            color: Color(0xFFCC18CA),
+            strokeWidth: 2,
+          ),
+        )
+      : ContinueWithContainer(iconImg: 'assets/images/gmail_icon.png'),
+),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',
                           ),
@@ -280,31 +262,33 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void onTapLoginButton() async {
+    Navigator.pushNamed(context, BottomNavBarScreen.name);
     //validate and call api -> go to home screen
     if (_formKey.currentState!.validate()) {
-      await _Login();
+      // await _Login();
     }
   }
 
-  Future<void> _Login() async {
-    final logInController = Provider.of<LogInController>(
-      context,
-      listen: false,
-    );
-    bool isSuccess = await logInController.login(
-      emailController.text.trim(),
-      passController.text,
-    );
-    if (isSuccess) {
-      showCustomSnackBar(context: context, message: "Log in success");
-      Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
-    } else {
-      showCustomSnackBar(
-        context: context,
-        message: logInController.errorMessage ?? "Login failed",
-      );
-    }
-  }
+  // Future<void> _Login() async {
+  //   final logInController = Provider.of<LogInController>(
+  //     context,
+  //     listen: false,
+  //   );
+  //   bool isSuccess = await logInController.login(
+  //     emailController.text.trim(),
+  //     passController.text,
+  //   );
+  //   if (isSuccess) {
+  //     showCustomSnackBar(context: context, message: "Log in success");
+  //     print("Ami log in success hoici kintu verify na howate samne agate parcina");
+  //     Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
+  //   } else {
+  //     showCustomSnackBar(
+  //       context: context,
+  //       message: logInController.errorMessage ?? "Login failed",
+  //     );
+  //   }
+  // }
 
   void onTapSignUp_button() {
     //TODO: validate user

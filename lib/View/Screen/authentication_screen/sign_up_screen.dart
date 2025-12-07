@@ -5,7 +5,6 @@ import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
-import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
 import '../../Theme/theme_provider.dart';
 import 'forgot_pass_screen.dart';
@@ -21,7 +20,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   //? my textFieldController
@@ -158,15 +156,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                               return signUpCtrl.inProgress
                                   ? Center(
-                                child: CircularProgressIndicator(
-                                  color: progressColor,
-                                  strokeWidth: 2,
-                                ),
-                              )
+                                      child: CircularProgressIndicator(
+                                        color: progressColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
                                   : GestureDetector(
-                                onTap: onTapSignUp_button,
-                                child: CustomButton(buttonName: 'Sign up'),
-                              );
+                                      onTap: onTapSignUp_button,
+                                      child: CustomButton(
+                                        buttonName: 'Sign up',
+                                      ),
+                                    );
                             },
                           ),
                           SizedBox(height: 20.h),
@@ -212,9 +212,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(), // নিচের স্পেস
-                  ),
+                  Expanded(child: SizedBox()),
                 ],
               ),
             ),
@@ -223,36 +221,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-  void onTapSignUp_button() async {
-    if (_formKey.currentState!.validate()) {
-      await _signUp();
-    }
-  }
-  //sign up api calling
-Future<void> _signUp() async {
-  final signUpController = Provider.of<SignUpController>(context, listen: false);
 
-  bool isSuccess = await signUpController.signUp(
-    emialController.text.trim(),
-    nameController.text.trim(),
-    passController.text.trim(),
-  );
+void onTapSignUp_button() async {
+  Navigator.pushNamed(context,LogInScreen.name);
+  if (!_formKey.currentState!.validate()) return;
 
-  if (isSuccess) {
-    _clearTextField();
-    showCustomSnackBar(context: context, message:"Registration successful! Please verify your email");
-    Navigator.pushReplacementNamed(context, LogInScreen.name);
-  } else {
-    showCustomSnackBar(context: context, message: signUpController.errorMessage ?? "Registration failed");
-  }
+
 }
+  //sign up api calling
+  // Future<void> _signUp() async {
+  //   final signUpController = Provider.of<SignUpController>(
+  //     context,
+  //     listen: false,
+  //   );
+
+  //   bool isSuccess = await signUpController.signUp(
+  //     emialController.text.trim(), 
+  //     nameController.text.trim(), 
+  //     passController.text.trim()
+  //     );
+
+  //   if (isSuccess) {
+  //     _clearTextField();
+  //     showCustomSnackBar(
+  //       context: context,
+  //       message: "Registration successful! Please verify your email",
+  //     );
+  //   } else {
+  //     showCustomSnackBar(
+  //       context: context,
+  //       message: signUpController.errorMessage ?? "Registration failed",
+  //     );
+  //   }
+  // }
+
   void _clearTextField() {
     nameController.clear();
     emialController.clear();
     passController.clear();
   }
-
-
 
   void onTapLogIn_button() {
     Navigator.pushReplacementNamed(context, LogInScreen.name);
@@ -267,6 +274,7 @@ Future<void> _signUp() async {
     super.dispose();
   }
 }
+
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
 

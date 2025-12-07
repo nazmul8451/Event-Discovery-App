@@ -13,11 +13,6 @@ class ForgotPasswordController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get passwrodResetToken => _passwordResetToken;
 
-  //saved emial function
-  void setEmail(String email) {
-    savedEmail = email.trim();
-    notifyListeners();
-  }
 
   //forgot password API funtion
   Future<bool> forgotPassword(String email) async {
@@ -53,23 +48,24 @@ class ForgotPasswordController extends ChangeNotifier {
   }
 
   //Code Submit Api Function
-  Future<bool> verifyOTP(String code) async {
+  Future<bool> verifyOTP(String code,) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
 
     bool isSuccess = false;
+    // final controller = Provider.of<SignUpController>(context, listen: false);
+
 
     final Map<String, String> requestBody = {
-      "email": savedEmail,
-      "oneTimeCode": code,
+      "email": savedEmail, 
+      "oneTimeCode": code, 
     };
     print('Your Current Email-$savedEmail');
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.verifyOtpUrl,
         body: requestBody,
-
       );
 
       if (response.isSuccess && response.body != null) {
@@ -96,7 +92,6 @@ class ForgotPasswordController extends ChangeNotifier {
   }
 
   Future<bool> forgotNewPassword(String newPass, String confirmPass) async {
-
     if (_passwordResetToken == null || _passwordResetToken!.isEmpty) {
       _errorMessage = "Session expired! Please try again from beginning.";
       _inProgress = false;
@@ -121,8 +116,8 @@ class ForgotPasswordController extends ChangeNotifier {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.resetPassUrl,
         body: requestBody,
-        // headers: 
-        );
+        extraHeaders: {"Authorization": "Bearer $_passwordResetToken"},
+      );
 
       if (response.isSuccess) {
         isSuccess = true;

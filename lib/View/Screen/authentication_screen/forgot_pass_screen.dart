@@ -2,15 +2,12 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
-
 import '../../Widgets/appbar.dart';
 
 class ForgotPassScreen extends StatefulWidget {

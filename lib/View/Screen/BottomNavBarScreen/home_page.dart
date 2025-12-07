@@ -446,8 +446,8 @@ class _HomePageState extends State<HomePage> {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey.shade700,
-                fontSize: 14.sp,
+                color: isSelected ? Colors.white : Colors.grey.shade600,
+                fontSize: 13.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),

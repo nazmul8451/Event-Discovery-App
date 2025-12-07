@@ -106,7 +106,7 @@ class ChatPage extends StatelessWidget {
                     children: [
                       Text(
                         userChat.name as String,
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15.sp),
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
                       ),
                       // if (userChatchat["isOrganizer"] == true) ...[
                       //   SizedBox(width: 6.w),

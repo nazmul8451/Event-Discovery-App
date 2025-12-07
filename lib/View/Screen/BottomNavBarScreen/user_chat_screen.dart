@@ -81,7 +81,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     Text(
                       "${widget.chat?.name}",
                       style: TextStyle(
-                        fontSize: 16.sp.clamp(16, 18),
+                        fontSize: 14.sp.clamp(14, 16),
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
