@@ -1,4 +1,3 @@
-
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -130,7 +129,7 @@ class _LogInScreenState extends State<LogInScreen> {
                             'Forgot Password?',
                             style: TextStyle(
                               fontSize: 14.sp,
-                              color: const Color(0xFFCC18CA),
+                              color: const Color(0xFF9810FA),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -138,28 +137,76 @@ class _LogInScreenState extends State<LogInScreen> {
                       ),
                       SizedBox(height: 10.h),
 
-                      // Login Button
-                      Consumer2<LogInController, ThemeProvider>(
-                        builder: (context, signUpCtrl, themeCtrl, child) {
-                          final progressColor = themeCtrl.isDarkMode
-                              ? Color(0xFFCC18CA)
-                              : const Color(0xFF6A7282);
-                          return signUpCtrl.inProgress
-                              ? Center(
-                                  child: CircularProgressIndicator(
-                                    color: progressColor,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : GestureDetector(
-                                  onTap: (){
-                                        Navigator.pushNamed(context, BottomNavBarScreen.name);
+                      // SizedBox(
+                      //   height: 56.h,
+                      //   width: double.infinity,
+                      //   child: Container(
+                      //     decoration: BoxDecoration(
+                      //       gradient: const LinearGradient(
+                      //         colors: [
+                      //           Color(0xFFB290FF),
+                      //           Color(0xFF8063F4),
+                      //         ], // Define your gradient colors
+                      //         begin: Alignment.topLeft,
+                      //         end: Alignment.bottomRight,
+                      //       ),
+                      //     ),
+                      //     child: ElevatedButton(
+                      //       style: ElevatedButton.styleFrom(
+                      //         backgroundColor:Colors.transparent
+                      //       ),
+                      //       onPressed: () {},
+                      //       child: Text('Log in'),
+                      //     ),
+                      //   ),
+                      // ),
 
-                                  },
-                                  child: CustomButton(buttonName: 'Log in'),
-                                );
+                      // Login Button
+                      GestureDetector(
+                        onTap: (){
+                           Navigator.pushNamed(
+                                      context,
+                                      BottomNavBarScreen.name,
+                                    );
                         },
+                        child: Container(
+                          height: 56.h,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16.r),
+                            gradient: LinearGradient(colors:[
+                              Color(0xFFB290FF),Color(0xFF8063F4)
+                            ])
+                          ),
+                          child: Center(child: Text('Log in',style: TextStyle(
+                                        fontSize: 14.sp.clamp(14, 16),
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white 
+                                      ),),),
+                        ),
                       ),
+                      // Consumer2<LogInController, ThemeProvider>(
+                      //   builder: (context, signUpCtrl, themeCtrl, child) {
+                      //     // final progressColor = themeCtrl.isDarkMode
+                      //     //     ? Color(0xFFCC18CA)
+                      //     //     : const Color(0xFF6A7282);
+                      //     return signUpCtrl.inProgress
+                      //         ? Center(
+                      //             child: CircularProgressIndicator(
+                      //               strokeWidth: 2,
+                      //             ),
+                      //           )
+                      //         : GestureDetector(
+                      //             onTap: () {
+                      //               Navigator.pushNamed(
+                      //                 context,
+                      //                 BottomNavBarScreen.name,
+                      //               );
+                      //             },
+                      //             child: CustomButton(buttonName: 'Log in'),
+                      //           );
+                      //   },
+                      // ),
 
                       SizedBox(height: 30.h),
 
@@ -182,45 +229,58 @@ class _LogInScreenState extends State<LogInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                       GestureDetector(
-  onTap: () async {
-    setState(() => _signinIn_Progress = true);
+                          GestureDetector(
+                            onTap: () async {
+                              setState(() => _signinIn_Progress = true);
 
-    try {
-      final UserCredential? result = await GoogleSignInService.signInWithGoogle();
+                              try {
+                                final UserCredential? result =
+                                    await GoogleSignInService.signInWithGoogle();
 
-      if (!mounted) return;
+                                if (!mounted) return;
 
-      if (result != null) {
-        showCustomSnackBar(
-          context: context,
-          message: "Welcome ${result.user?.displayName ?? "User"}!",
-          isError: false,
-        );
-        Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
-      } else {
-        showCustomSnackBar(context: context, message: "Google Sign-In cancelled");
-      }
-    } catch (e) {
-      if (mounted) {
-        showCustomSnackBar(context: context, message: "Login failed: $e");
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _signinIn_Progress = false);
-      }
-    }
-  },
-  child: _signinIn_Progress
-      ? const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircularProgressIndicator(
-            color: Color(0xFFCC18CA),
-            strokeWidth: 2,
-          ),
-        )
-      : ContinueWithContainer(iconImg: 'assets/images/gmail_icon.png'),
-),
+                                if (result != null) {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message:
+                                        "Welcome ${result.user?.displayName ?? "User"}!",
+                                    isError: false,
+                                  );
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    BottomNavBarScreen.name,
+                                  );
+                                } else {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "Google Sign-In cancelled",
+                                  );
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "Login failed: $e",
+                                  );
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() => _signinIn_Progress = false);
+                                }
+                              }
+                            },
+                            child: _signinIn_Progress
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFFCC18CA),
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : ContinueWithContainer(
+                                    iconImg: 'assets/images/gmail_icon.png',
+                                  ),
+                          ),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',
                           ),
@@ -312,7 +372,7 @@ class ContinueWithContainer extends StatelessWidget {
       height: 36.h,
       width: 70.w,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:isDark? Colors.black.withOpacity(0.06): Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark
@@ -331,7 +391,7 @@ class ContinueWithContainer extends StatelessWidget {
               ],
       ),
       child: Center(
-        child: Image.asset(iconImg, height: 15.h, width: 15.h),
+        child: Image.asset(iconImg, height: 15.h, width: 15.h,color: isDark? Colors.white: Colors.black,),
       ),
     );
   }

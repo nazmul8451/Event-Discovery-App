@@ -141,34 +141,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 'Forgot Password?',
                                 style: TextStyle(
                                   fontSize: 14.sp,
-                                  color: const Color(0xFFCC18CA),
+                                  color: const Color(0xFF9810FA),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          Consumer2<SignUpController, ThemeProvider>(
-                            builder: (context, signUpCtrl, themeCtrl, child) {
-                              final progressColor = themeCtrl.isDarkMode
-                                  ? Color(0xFFCC18CA)
-                                  : const Color(0xFF6A7282);
-
-                              return signUpCtrl.inProgress
-                                  ? Center(
-                                      child: CircularProgressIndicator(
-                                        color: progressColor,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : GestureDetector(
-                                      onTap: onTapSignUp_button,
-                                      child: CustomButton(
-                                        buttonName: 'Sign up',
-                                      ),
-                                    );
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, LogInScreen.name);
                             },
+                            child: Consumer<ThemeProvider>(
+                              builder: (context, controller, child) =>
+                                  Container(
+                                    height: 56.h,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16.r),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFFB290FF),
+                                          Color(0xFF8063F4),
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Sign up',
+                                        style: TextStyle(
+                                          fontSize: 14.sp.clamp(14, 16),
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            ),
                           ),
+                          // Consumer2<SignUpController, ThemeProvider>(
+                          //   builder: (context, signUpCtrl, themeCtrl, child) {
+                          //     final progressColor = themeCtrl.isDarkMode
+                          //         ? Color(0xFFCC18CA)
+                          //         : const Color(0xFF6A7282);
+
+                          //     return signUpCtrl.inProgress
+                          //         ? Center(
+                          //             child: CircularProgressIndicator(
+                          //               color: progressColor,
+                          //               strokeWidth: 2,
+                          //             ),
+                          //           )
+                          //         : GestureDetector(
+                          //             onTap: onTapSignUp_button,
+                          //             child: CustomButton(
+                          //               buttonName: 'Sign up',
+                          //             ),
+                          //           );
+                          //   },
+                          // ),
                           SizedBox(height: 20.h),
                           Text(
                             'OR CONTINUE WITH',
@@ -222,12 +253,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-void onTapSignUp_button() async {
-  Navigator.pushNamed(context,LogInScreen.name);
-  if (!_formKey.currentState!.validate()) return;
-
-
-}
+  void onTapSignUp_button() async {
+    Navigator.pushNamed(context, LogInScreen.name);
+    if (!_formKey.currentState!.validate()) return;
+  }
   //sign up api calling
   // Future<void> _signUp() async {
   //   final signUpController = Provider.of<SignUpController>(
@@ -236,8 +265,8 @@ void onTapSignUp_button() async {
   //   );
 
   //   bool isSuccess = await signUpController.signUp(
-  //     emialController.text.trim(), 
-  //     nameController.text.trim(), 
+  //     emialController.text.trim(),
+  //     nameController.text.trim(),
   //     passController.text.trim()
   //     );
 
@@ -274,7 +303,7 @@ void onTapSignUp_button() async {
     super.dispose();
   }
 }
-
+// Social Login Container – Dark Mode Ready
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
 
@@ -289,7 +318,7 @@ class ContinueWithContainer extends StatelessWidget {
       height: 36.h,
       width: 70.w,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:isDark? Colors.black.withOpacity(0.06): Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark
@@ -308,8 +337,9 @@ class ContinueWithContainer extends StatelessWidget {
               ],
       ),
       child: Center(
-        child: Image.asset(iconImg, height: 15.h, width: 15.h),
+        child: Image.asset(iconImg, height: 15.h, width: 15.h,color: isDark? Colors.white: Colors.black,),
       ),
     );
   }
 }
+

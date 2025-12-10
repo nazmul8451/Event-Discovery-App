@@ -63,16 +63,16 @@ class _LiveStreamState extends State<LiveStream> {
             children: [
               _buildFeaturedEvent('Kickback', 'TONIGHT.House Party', [
                 '4.7',
-                'Hip-Hop',
+                'Party',
               ]),
-        
+
               SizedBox(height: 20.h),
-        
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Live chat'),
-        
+
                   SizedBox(height: 10.h),
                   Column(
                     children: [
@@ -113,7 +113,7 @@ class _LiveStreamState extends State<LiveStream> {
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Color(0xFFFF006E)),
                           ),
-        
+
                           SizedBox(width: 3.w),
                           Text(
                             'section by the bar looks lit',
@@ -125,52 +125,46 @@ class _LiveStreamState extends State<LiveStream> {
                   ),
                 ],
               ),
-              SizedBox(height: 20.h,),
-               Row(
-                    children: [
-              
-                      Expanded(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width - 70,
-                          decoration: BoxDecoration(
-                            /////
-                            ////
+              SizedBox(height: 20.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 70,
+                      decoration: BoxDecoration(),
+                      child: TextFormField(
+                        maxLines: 5,
+                        minLines: 1,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
                           ),
-                          child: TextFormField(
-                            maxLines: 5,
-                            minLines: 1,
-                            textAlignVertical: TextAlignVertical.center,     // হিন্ট + টেক্সট মাঝে থাকবে
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10.w,
-                                vertical: 10.h
-                              ),
-                              hintText: 'Type a message...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  50.r,
-                                ), 
-                              ),
-                            ),
+                          hintText: 'Type a message...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50.r),
                           ),
                         ),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(right: 10, left: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
-                          ),
-                        ),
-                        height: 45,
-                        width: 45,
-                        child: Icon(Icons.send),
-                      ),
-                    ],
+                    ),
                   ),
+                  Container(
+                    margin: const EdgeInsets.only(right: 10, left: 5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
+                      ),
+                    ),
+                    height: 45,
+                    width: 45,
+                    child: Icon(Icons.send),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -265,6 +259,7 @@ class _LiveStreamState extends State<LiveStream> {
                 ),
                 SizedBox(height: 6.h),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Text(
                       subtitle,
@@ -273,7 +268,6 @@ class _LiveStreamState extends State<LiveStream> {
                         fontSize: 16.sp,
                       ),
                     ),
-                    const Spacer(),
                     ...tags.map(
                       (tag) => Padding(
                         padding: EdgeInsets.only(left: 8.w),
@@ -301,7 +295,7 @@ class _LiveStreamState extends State<LiveStream> {
         text,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 13.sp,
+          fontSize: 10.sp,
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -58,14 +58,14 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 final bool isSelected = _selectedIndex == index;
 
                 final List<String> icons = [
-                  'assets/images/home_icon.png',
-                  'assets/images/map_icon.png',
-                  'assets/images/saved_icon.png',
-                  'assets/images/chat_icon.png',
+                  'assets/images/home.png',
+                  'assets/images/location.png',
+                  'assets/images/plus.png',
+                  'assets/images/chat.png',
                   'assets/images/profile_icon.png',
                 ];
 
-                final List<String> labels = ['Home', 'Map', 'Saved', 'Chat', 'Profile'];
+                final List<String> labels = ['Home', 'Map', 'Create', 'Chat', 'Profile'];
 
                 return GestureDetector(
                   onTap: () => _onItemTapped(index),

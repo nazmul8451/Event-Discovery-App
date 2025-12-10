@@ -11,14 +11,20 @@ class InterestScreen extends StatelessWidget {
   static const String name = 'interest-screen';
 
   final List<Map<String, dynamic>> interestItems = [
-    {'icon': "assets/images/music_icon.png", 'name': 'Live Music'},
-    {'icon': "assets/images/nightlife_icon.png", 'name': 'Nightlife'},
-    {'icon': "assets/images/concerts_icon.png", 'name': 'Concerts'},
-    {'icon': "assets/images/foodandDrinks_icon.png", 'name': 'Food & Drinks'},
-    {'icon': "assets/images/comedy_icon.png", 'name': 'Comedy'},
-    {'icon': "assets/images/art_culture_icon.png", 'name': 'Art & Culture'},
-    {'icon': "assets/images/wellness_icon.png", 'name': 'Wellness'},
-    {'icon': "assets/images/networking_icon.png", 'name': 'Networking'},
+    {'icon': "assets/images/music_icon.png", 'name': 'Bars & Lounges'},
+    {'icon': "assets/images/nightlife_icon.png", 'name': 'Party Spots'},
+    {'icon': "assets/images/concerts_icon.png", 'name': 'Live DJs / Music'},
+    {
+      'icon': "assets/images/foodandDrinks_icon.png",
+      'name': 'Rooftops & Views',
+    },
+    {'icon': "assets/images/comedy_icon.png", 'name': 'Happy Hour'},
+    {'icon': "assets/images/art_culture_icon.png", 'name': 'Day Parties'},
+    {'icon': "assets/images/wellness_icon.png", 'name': 'Sports Bars'},
+    {'icon': "assets/images/networking_icon.png", 'name': 'Hookah Lounges'},
+    {'icon': "assets/images/networking_icon.png", 'name': 'Upscale / VIP'},
+        {'icon': "assets/images/networking_icon.png", 'name': 'Late-Night Food & Drinks'},
+
   ];
   @override
   Widget build(BuildContext context) {
@@ -80,11 +86,17 @@ class InterestScreen extends StatelessWidget {
                               border: isSelected
                                   ? null
                                   : Border.all(
-                                color: Theme.of(context).brightness == Brightness.dark
-                                    ? const  Color(0xFFCC18CA).withOpacity(0.25)// Dark mode border
-                                    : const Color(0xFFE2E8F0), // Light mode border
-                                width: 1,
-                              ),
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFFCC18CA).withOpacity(
+                                              0.25,
+                                            ) // Dark mode border
+                                          : const Color(
+                                              0xFFE2E8F0,
+                                            ), // Light mode border
+                                      width: 1,
+                                    ),
                             ),
                             child: Stack(
                               children: [
@@ -99,19 +111,25 @@ class InterestScreen extends StatelessWidget {
                                         width: 60.h,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          gradient: Theme.of(context).brightness == Brightness.dark
+                                          gradient:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
                                               ? LinearGradient(
-                                            colors: [
-                                              Color(0xFFB026FF), // deep purple
-                                              Color(0xFFFF006E), // darker
-                                            ],
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                          )
+                                                  colors: [
+                                                    Color(
+                                                      0xFFB026FF,
+                                                    ), // deep purple
+                                                    Color(0xFFFF006E), // darker
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                )
                                               : null,
-                                          color: Theme.of(context).brightness == Brightness.light
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.light
                                               ? Color(0xFFF1F3F5)
-                                              : null
+                                              : null,
                                         ),
                                         child: Center(
                                           child: Image.asset(
@@ -120,22 +138,34 @@ class InterestScreen extends StatelessWidget {
                                             width: 31.h,
                                             color: isSelected
                                                 ? Colors.black
-                                                :Theme.of(context).brightness == Brightness.dark?Colors.white:Colors.black
+                                                : Theme.of(
+                                                        context,
+                                                      ).brightness ==
+                                                      Brightness.dark
+                                                ? Colors.white
+                                                : Colors.black,
                                           ),
                                         ),
                                       ),
                                       SizedBox(height: 5.h),
-                                      Text(
-                                        item['name'],
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          color: isSelected
-                                              ? Theme.of(context).brightness == Brightness.dark? Colors.white: Colors.grey
-                                              : Color(0xFF64748B),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          item['name'],
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 13.sp,
+                                            color: isSelected
+                                                ? Theme.of(context).brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.white
+                                                      : Colors.grey
+                                                : Color(0xFF64748B),
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  ),
+                                ),
                                 ),
                                 if (isSelected)
                                   Positioned(
@@ -169,14 +199,15 @@ class InterestScreen extends StatelessWidget {
                     );
                   } else {
                     return GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         //TODO: NAVIGATE LOG IN SCREEN
                         Navigator.pushNamed(context, LogInScreen.name);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: CustomButton(
-                          buttonName: 'Continue (${controller.selectedItemCount} selected)',
+                          buttonName:
+                              'Continue (${controller.selectedItemCount} selected)',
                         ),
                       ),
                     );

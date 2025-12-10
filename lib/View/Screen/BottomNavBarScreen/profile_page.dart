@@ -19,7 +19,6 @@ class _ProfilePageState extends State<ProfilePage> {
   bool switchON = false;
   bool notificationSwitch = false;
 
-  // ক্যাটাগরি লিস্ট (পরে API থেকে আনবে)
   final List<Map<String, dynamic>> categories = [
     {"label": "All", "icon": Icons.auto_awesome},
     {"label": "Nightlife", "icon": Icons.nights_stay_outlined},
@@ -69,6 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(height: 4.h),
                           Text(
                             "Update your personal information",
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15.sp,
                               color: isDark ? Colors.white70 : Colors.black54,
@@ -77,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
+                    SizedBox(width: 10.w,),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
@@ -158,8 +159,20 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+      leading: IconButton(onPressed: (){}, icon:Icon(Icons.add)),
+      actions: [
+        TextButton(onPressed: (){}, child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Image(image: AssetImage('assets/images/instagram.png')),
+        )),
+                IconButton(onPressed: (){}, icon: Icon(Icons.notifications_none)),
+
+
+      ],
+      ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<ThemeProvider>(
         builder: (context, controller, child) => SafeArea(
@@ -168,15 +181,6 @@ class _ProfilePageState extends State<ProfilePage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Profile',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-
-                  SizedBox(height: 20.h),
                   Row(
                     children: [
                       Container(
@@ -204,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             'Rimon Islam',
                             style: Theme.of(
                               context,
-                            ).textTheme.titleMedium!.copyWith(),
+                            ).textTheme.titleLarge!.copyWith(),
                           ),
                           Text(
                             '@nicholasfrazier96',
@@ -301,13 +305,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   Row(
                     children: [
 
-                      Expanded(child: GestureDetector(
-                        onTap: ()=>_showEditProfileDialog(context),
-                        child: CustomButton(buttonName: 'Edit Profile'))),
+                      // Expanded(child: GestureDetector(
+                      //   onTap: ()=>_showEditProfileDialog(context),
+                      //   child: CustomButton(buttonName: 'Edit Profile'))),
+                      Expanded(child: SizedBox(
+                        height: 56.h,
+                        child: ElevatedButton(
+                        
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:Colors.deepPurpleAccent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))
+                          ),
+                          onPressed:()=>_showEditProfileDialog(context), child: Text('Edit Profile')),
+                      )),
 
                       SizedBox(width: 10.w),
 
-                      Expanded(child: CustomButton(buttonName: 'Settings')),
+                       Expanded(child: SizedBox(
+                        height: 56.h,
+                        child: ElevatedButton(
+                        
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:Colors.black,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r))
+                          ),
+                          onPressed:(){}, child: Text('Settings')),
+                      )),
                     ],
                   ),
 

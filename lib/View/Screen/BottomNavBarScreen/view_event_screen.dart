@@ -94,7 +94,7 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                 ),
               ],
             ),
-        
+
             SizedBox(height: 20.h),
             CircularPercentIndicator(
               radius: 80.r,
@@ -107,16 +107,16 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                   Text(
                     "HOT",
                     style: TextStyle(
-                      fontSize: 23.sp,
+                      fontSize: 23.sp.clamp(23, 25),
                       fontWeight: FontWeight.w800,
                       color: Color(0xFFE77534),
                     ),
                   ),
                   Text(
                     "82",
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge?.copyWith(fontSize: 40.sp),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontSize: 40.sp.clamp(40, 50),
+                    ),
                   ),
                   Text(
                     "Steady crowd",
@@ -125,7 +125,11 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                 ],
               ),
               linearGradient: LinearGradient(
-                colors: [Color(0xFF201841), Color(0xFF9E3C3C), Color(0xFFE77534)],
+                colors: [
+                  Color(0xFF201841),
+                  Color(0xFF9E3C3C),
+                  Color(0xFFE77534),
+                ],
               ),
               backgroundColor: Colors.grey.shade200,
               circularStrokeCap: CircularStrokeCap.round,
@@ -135,7 +139,7 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
               animation: true,
               animationDuration: 1000,
             ),
-        
+
             SizedBox(height: 20.h),
             Consumer<ThemeProvider>(
               builder: (context, controller, child) => Row(
@@ -174,7 +178,7 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                       ],
                     ),
                   ),
-        
+
                   Expanded(
                     child: Column(
                       children: [
@@ -195,32 +199,79 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                 ],
               ),
             ),
-        
+
             SizedBox(height: 20.h),
 
             Container(
-              height: 200.h,width: double.infinity,
+              height: 200.h,
+              width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
                 color: Colors.grey[300],
               ),
-              child: Center(
-                child: Icon(Icons.play_arrow),
-              ),
-
+              child: Center(child: Icon(Icons.play_arrow)),
             ),
             SizedBox(height: 20.h),
 
             Row(
               children: [
-                TextButton(onPressed: (){
-                  Navigator.pushNamed(context, LiveStream.name);
-                }, child: Text('Check in')),
-                IconButton(onPressed: (){}, icon: Icon(Icons.thumb_up_alt_outlined)),
-                IconButton(onPressed: (){}, icon: Icon(Icons.thumb_down_alt_outlined)),
+                // TextButton(onPressed: (){
+                //   Navigator.pushNamed(context, LiveStream.name);
+                // }, child: Text('Check in')),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pushNamed(context,LiveStream.name );
+                  },
+                  child: Container(
+                    height: 50.h,
+                    width: 120.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50.r),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.deepPurpleAccent,
+                          const Color.fromARGB(255, 66, 42, 107),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Check in',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20.w),
+                Container(
+                  width: 60.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(width: 1, color: Colors.grey),
+                  ),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.thumb_up_alt_outlined),
+                  ),
+                ),
+                SizedBox(width: 10.w),
 
+                Container(
+                  width: 60.w,
+
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(width: 1, color: Colors.grey),
+                  ),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.thumb_down_alt_outlined),
+                  ),
+                ),
               ],
-            )
+            ),
 
             //end column body
           ],
