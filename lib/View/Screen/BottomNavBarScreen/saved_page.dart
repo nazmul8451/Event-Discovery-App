@@ -34,31 +34,32 @@ class _SavedPageState extends State<SavedPage> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               SizedBox(height: 10.h),
-              Expanded(
-                child: Consumer<SavedEventController>(
-                  builder:(context,controller,child) {
-                  return  GridView.builder(
-                      itemCount:controller.savedEvents.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 7 / 9,
-                      ),
-                      itemBuilder: (context, index) {
-                        return Consumer<SavedEventController>(
-                          builder: (context, controller, child) {
-                            final saveEventList = controller.savedEvents;
-                            return Custom_item_container(
-                              event: saveEventList[index],
-                            );
-                          },
-                        );
-                      },
-                    );
-                  }
-                ),
-              ),
+              // Expanded(
+              //   child: Consumer<SavedEventController>(
+              //     builder:(context,controller,child) {
+              //     return  GridView.builder(
+              //         itemCount:controller.savedEvents.length,
+              //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //           crossAxisCount: 2,
+              //           mainAxisSpacing: 10,
+              //           crossAxisSpacing: 10,
+              //           childAspectRatio: 7 / 9,
+              //         ),
+              //         itemBuilder: (context, index) {
+              //           return Consumer<SavedEventController>(
+              //             builder: (context, controller, child) {
+              //               final saveEventList = controller.savedEvents;
+              //               return Custom_item_container(
+              //                 event: ,
+              //                 // event: saveEventList[index],
+              //               );
+              //             },
+              //           );
+              //         },
+              //       );
+              //     }
+              //   ),
+              // ),
             ],
           ),
         ),

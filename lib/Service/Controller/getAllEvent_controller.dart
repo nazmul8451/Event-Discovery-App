@@ -39,7 +39,6 @@ class GetAllEventController extends ChangeNotifier {
 
       print('Token: $token');
       print('STATUS CODE: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         // Handle response body type safely
         Map<String, dynamic> body;
@@ -58,7 +57,7 @@ class GetAllEventController extends ChangeNotifier {
 
         // Debugging print for readable output
         for (var e in _allEvents) {
-          print('Event Description: ${e.description}, Category: ${e.category}');
+          print('Event Description: ${e.description}, Category: ${e.category}, Images : ${e.images}');
         }
 
         // Extract categories

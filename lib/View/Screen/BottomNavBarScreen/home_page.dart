@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   final String appBarTitle = 'Discover';
   final String appBarSubTitle = 'Find your next adventure';
   final String trendName = 'Trending Now';
+  late final EventData event;
 
   int selectedCategoryIndex = 0;
 
@@ -225,37 +227,8 @@ class _HomePageState extends State<HomePage> {
 
                       // SizedBox(height: 10.h,),
                       const SearchTextField(hintText: 'Search events, venues'),
-                      // Filter Chips
-                      // Padding(
-                      //   padding: EdgeInsets.symmetric(
-                      //     horizontal: 16.w,
-                      //     vertical: 12.h,
-                      //   ),
-                      //   child: SingleChildScrollView(
-                      //     scrollDirection: Axis.horizontal,
-                      //     child: Row(
-                      //       children: categories.asMap().entries.map((entry) {
-                      //         int index = entry.key;
-                      //         var category = entry.value;
-                      //         bool isSelected = selectedCategoryIndex == index;
 
-                      //         return Padding(
-                      //           padding: EdgeInsets.only(right: 8.w),
-                      //           child: _buildCustomFilterChip(
-                      //             label: category["label"],
-                      //             icon: category["icon"],
-                      //             isSelected: isSelected,
-                      //             onTap: () {
-                      //               setState(() {
-                      //                 selectedCategoryIndex = index;
-                      //               });
-                      //             },
-                      //           ),
-                      //         );
-                      //       }).toList(),
-                      //     ),
-                      //   ),
-                      // ),
+                      // ?Filter Chips
                       Consumer<GetAllEventController>(
                         builder: (context, controller, _) {
                           return SingleChildScrollView(
@@ -339,31 +312,67 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      Padding(
-                        padding: EdgeInsets.all(16.w),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: events.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 16.w,
-                                crossAxisSpacing: 16.w,
-                                childAspectRatio: 0.75,
-                              ),
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                DetailsScreen.name,
-                              ),
-                              child: Custom_item_container(
-                                event: events[index],
-                              ),
-                            );
-                          },
-                        ),
+                      // Padding(
+                      //   padding: EdgeInsets.all(16.w),
+                      //   child: GridView.builder(
+                      //     shrinkWrap: true,
+                      //     physics: const NeverScrollableScrollPhysics(),
+                      //     itemCount: events.length,
+                      //     gridDelegate:
+                      //         SliverGridDelegateWithFixedCrossAxisCount(
+                      //           crossAxisCount: 2,
+                      //           mainAxisSpacing: 16.w,
+                      //           crossAxisSpacing: 16.w,
+                      //           childAspectRatio: 0.75,
+                      //         ),
+                      //     itemBuilder: (context, index) {
+                      //       return GestureDetector(
+                      //         onTap: () => Navigator.pushNamed(
+                      //           context,
+                      //           DetailsScreen.name,
+                      //         ),
+                      //         child: Custom_item_container(
+                      //           event: events[index],
+                      //         ),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
+SizedBox(height: 20.h,),
+                      //? Gridview Event
+                      Consumer<GetAllEventController>(
+                        builder: (context, controller, _) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: controller.events.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 16.w,
+                                    crossAxisSpacing: 16.w,
+                                    childAspectRatio: 0.75,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final event = controller.events[index];
+                                print('All Event -${event.address}');
+                                return GestureDetector(
+                                  onTap: () => Navigator.pushNamed(
+                                    context,
+                                    DetailsScreen.name,
+                                    arguments:
+                                        event, // event details pathate parba
+                                  ),
+                                  child: Custom_item_container(
+                                    event: controller.events[index+2],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

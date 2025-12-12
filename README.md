@@ -12,7 +12,7 @@ Live on Android & iOS (soon on Play Store & App Store)
 |--------------------------|--------|-------------------------------------------|
 | Event Discovery          | Done   | Trending, Nearby, Category Filter         |
 | Interactive Map View     | Done   | Real-time event locations with clustering |
-| Save & Bookmark Events   | ONGOING   | Persistent saved events                   |
+| Save & Bookmark Events   | Done   | Persistent saved events                   |
 | In-App Chat              | ONGOING   | 1-on-1 + Group chat with media support   |
 | Voice & Video Calling   | ONGOING   | Powered by Agora/WebRTC                   |
 | Live Event Streaming     | ONGOING   | Host & watch live streams                 |
@@ -23,23 +23,6 @@ Live on Android & iOS (soon on Play Store & App Store)
 | Profile & Social Feed    | Done   | Followers, Events Attended, Reviews       |
 | Onboarding + Auth        | Done   | Phone + Email + Social Login              |
 
-## Screenshots
-
-<div align="center">
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/home_dark.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/map.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/chat.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/live_stream.jpg?raw=true" width="24%" />
-</div>
-
-<br/>
-
-<div align="center">
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/profile.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/saved.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/payment.jpg?raw=true" width="24%" />
-  <img src="https://github.com/your-username/Gathering/blob/main/screenshots/event_detail.jpg?raw=true" width="24%" />
-</div>
 
 ## Tech Stack
 
