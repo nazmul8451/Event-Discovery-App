@@ -44,7 +44,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
-      color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surface,
         child: SafeArea(
           child: Container(
             height: 72.h,
@@ -65,45 +65,56 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                   'assets/images/profile_icon.png',
                 ];
 
-                final List<String> labels = ['Home', 'Map', 'Create', 'Chat', 'Profile'];
+                final List<String> labels = [
+                  'Home',
+                  'Map',
+                  'Create',
+                  'Chat',
+                  'Profile',
+                ];
 
                 return GestureDetector(
                   onTap: () => _onItemTapped(index),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    curve: Curves.easeInOut,
-                    padding: EdgeInsets.symmetric(vertical: 10.h),
-                    width: 65.w.clamp(60, 65),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFCC18CA).withOpacity(0.15)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          icons[index],
-                          width: 24.w.clamp(24, 26),
-                          height: 24.h.clamp(24, 26),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        icons[index],
+                        width: 24.w.clamp(24, 26),
+                        height: 24.h.clamp(24, 26),
+
+                        // ⭐ Icon Color Logic
+                        color: isSelected
+                            ? (isDark
+                                  ? Colors.white
+                                  : Colors
+                                        .black) // Selected → Dark = White, Light = Black
+                            : (isDark
+                                  ? Colors.grey.shade500
+                                  : Colors.grey.shade600), // Unselected → Grey
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      Text(
+                        labels[index],
+                        style: TextStyle(
+                          fontSize: 10.sp.clamp(10, 11),
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+
+                          // ⭐ Text Color Logic (same as icon for consistency)
                           color: isSelected
-                              ? const Color(0xFFB026FF)
-                              : (isDark ? Colors.grey.shade500 : Colors.grey.shade600),
+                              ? (isDark
+                                    ? Colors.white
+                                    : Colors.black) // Selected
+                              : (isDark
+                                    ? Colors.grey.shade500
+                                    : Colors.grey.shade600), // Unselected
                         ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          labels[index],
-                          style: TextStyle(
-                            fontSize: 10.sp.clamp(10, 11),
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? const Color(0xFFB026FF)
-                                : (isDark ? Colors.grey.shade500 : Colors.grey.shade600),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               }),

@@ -25,7 +25,7 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _signinIn_Progress = false;
-
+  bool isPressed = false;
   //textfromField controller
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
@@ -163,28 +163,68 @@ class _LogInScreenState extends State<LogInScreen> {
 
                       // Login Button
                       GestureDetector(
-                        onTap: (){
-                           Navigator.pushNamed(
-                                      context,
-                                      BottomNavBarScreen.name,
-                                    );
+                        onTapDown: (_) {
+                          isPressed = true;
                         },
-                        child: Container(
-                          height: 56.h,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16.r),
-                            gradient: LinearGradient(colors:[
-                              Color(0xFFB290FF),Color(0xFF8063F4)
-                            ])
-                          ),
-                          child: Center(child: Text('Log in',style: TextStyle(
-                                        fontSize: 14.sp.clamp(14, 16),
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white 
-                                      ),),),
+                        onTapUp: (_) {
+                          isPressed = false;
+                          Navigator.pushNamed(context, BottomNavBarScreen.name);
+                        },
+                        onTapCancel: () {
+                          isPressed = false;
+                        },
+                        child: Consumer<ThemeProvider>(
+                          builder: (context, controller, child) {
+                            bool isDark = controller.isDarkMode;
+
+                            return AnimatedContainer(
+                              duration: Duration(milliseconds: 120),
+                              height: 56.h,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16.r),
+
+                                // Border Color — Client Requirement 
+                                border: Border.all(
+                                  color: isDark ? Colors.grey : Colors.grey,
+                                  width: 1.5,
+                                ),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFB290FF),
+                                    Color(0xFF8063F4),
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.2)
+                                        : Colors.black.withOpacity(0.15),
+                                    offset: Offset(4, 4),
+                                    blurRadius: 10,
+                                  ),
+                                ],
+                              ),
+
+                              child: Center(
+                                child: Text(
+                                  'Log in',
+                                  style: TextStyle(
+                                    fontSize: 14.sp.clamp(14, 16),
+                                    fontWeight: isPressed
+                                        ? FontWeight.bold
+                                        : FontWeight.w600,
+
+                                    // 👉 Light Mode → Black text, Dark Mode → White text
+                                    color: isDark ? Colors.black : Colors.white,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
+
                       // Consumer2<LogInController, ThemeProvider>(
                       //   builder: (context, signUpCtrl, themeCtrl, child) {
                       //     // final progressColor = themeCtrl.isDarkMode
@@ -207,7 +247,6 @@ class _LogInScreenState extends State<LogInScreen> {
                       //           );
                       //   },
                       // ),
-
                       SizedBox(height: 30.h),
 
                       // OR Continue With
@@ -372,7 +411,7 @@ class ContinueWithContainer extends StatelessWidget {
       height: 36.h,
       width: 70.w,
       decoration: BoxDecoration(
-        color:isDark? Colors.black.withOpacity(0.06): Colors.white,
+        color: isDark ? Colors.black.withOpacity(0.06) : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark
@@ -391,7 +430,12 @@ class ContinueWithContainer extends StatelessWidget {
               ],
       ),
       child: Center(
-        child: Image.asset(iconImg, height: 15.h, width: 15.h,color: isDark? Colors.white: Colors.black,),
+        child: Image.asset(
+          iconImg,
+          height: 15.h,
+          width: 15.h,
+          color: isDark ? Colors.white : Colors.black,
+        ),
       ),
     );
   }
