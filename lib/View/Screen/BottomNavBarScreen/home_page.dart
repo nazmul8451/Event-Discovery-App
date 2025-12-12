@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
+
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -23,6 +25,14 @@ class _HomePageState extends State<HomePage> {
   final String trendName = 'Trending Now';
 
   int selectedCategoryIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetAllEventController>(context, listen: false).getAllEvents();
+    });
+  }
 
   // Refresh Controller — ei ta add korlam
   final RefreshController _refreshController = RefreshController(
@@ -104,14 +114,6 @@ class _HomePageState extends State<HomePage> {
     // baki gulo same...
   ];
 
-  final List<Map<String, dynamic>> categories = [
-    {"label": "All", "icon": Icons.auto_awesome},
-    {"label": "Nightlife", "icon": Icons.nights_stay_outlined},
-    {"label": "Music", "icon": Icons.music_note_outlined},
-    {"label": "Concerts", "icon": Icons.mic_none_outlined},
-    {"label": "Food & Drinks", "icon": Icons.local_drink_outlined},
-  ];
-
   // Pull to Refresh Function
   Future<void> _onRefresh() async {
     await Future.delayed(const Duration(seconds: 2));
@@ -135,133 +137,168 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-
       body: SafeArea(
         child: Column(
           children: [
-Row(
-  children: [
-    const Spacer(),
-    Consumer<ThemeProvider>(
-      builder: (context, controller, child) => Text(
-        'Gathering',
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 35.sp,
-          color: controller.isDarkMode ? Colors.white : Colors.black,
-        ),
-      ),
-    ),
+            Row(
+              children: [
+                const Spacer(),
+                Consumer<ThemeProvider>(
+                  builder: (context, controller, child) => Text(
+                    'Gathering',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 35.sp,
+                      color: controller.isDarkMode
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
+                ),
 
-    const Spacer(),
+                const Spacer(),
 
-    Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, NotificationScreen.name);
-            },
-            icon: const Icon(Icons.notifications_none),
-            // color: controller.isDarkMode ? Colors.white : Colors.black,
-          ),
-          const Positioned(
-            right: 4,
-            top: 4,
-            child: CircleAvatar(
-              radius: 9,
-              backgroundColor: Color(0xFFFF006E),
-              child: Text(
-                '5',
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, NotificationScreen.name);
+                        },
+                        icon: const Icon(Icons.notifications_none),
+                        // color: controller.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      const Positioned(
+                        right: 4,
+                        top: 4,
+                        child: CircleAvatar(
+                          radius: 9,
+                          backgroundColor: Color(0xFFFF006E),
+                          child: Text(
+                            '5',
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    ),
-  ],
-),
-       
-  SizedBox(height: 5.h,),
+
+            SizedBox(height: 5.h),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 120.0),
                   child: Column(
                     children: [
-                           Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      appBarTitle,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      appBarSubTitle,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),  
-            // SizedBox(height: 10.h,),
-
-                      const SearchTextField(hintText: 'Search events, venues'),
-                      // Filter Chips
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: categories.asMap().entries.map((entry) {
-                              int index = entry.key;
-                              var category = entry.value;
-                              bool isSelected = selectedCategoryIndex == index;
-              
-                              return Padding(
-                                padding: EdgeInsets.only(right: 8.w),
-                                child: _buildCustomFilterChip(
-                                  label: category["label"],
-                                  icon: category["icon"],
-                                  isSelected: isSelected,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedCategoryIndex = index;
-                                    });
-                                  },
-                                ),
-                              );
-                            }).toList(),
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appBarTitle,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      fontSize: 22.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              Text(
+                                appBarSubTitle,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      color: Colors.grey,
+                                      fontSize: 14.sp,
+                                    ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-              
+
+                      // SizedBox(height: 10.h,),
+                      const SearchTextField(hintText: 'Search events, venues'),
+                      // Filter Chips
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 16.w,
+                      //     vertical: 12.h,
+                      //   ),
+                      //   child: SingleChildScrollView(
+                      //     scrollDirection: Axis.horizontal,
+                      //     child: Row(
+                      //       children: categories.asMap().entries.map((entry) {
+                      //         int index = entry.key;
+                      //         var category = entry.value;
+                      //         bool isSelected = selectedCategoryIndex == index;
+
+                      //         return Padding(
+                      //           padding: EdgeInsets.only(right: 8.w),
+                      //           child: _buildCustomFilterChip(
+                      //             label: category["label"],
+                      //             icon: category["icon"],
+                      //             isSelected: isSelected,
+                      //             onTap: () {
+                      //               setState(() {
+                      //                 selectedCategoryIndex = index;
+                      //               });
+                      //             },
+                      //           ),
+                      //         );
+                      //       }).toList(),
+                      //     ),
+                      //   ),
+                      // ),
+                      Consumer<GetAllEventController>(
+                        builder: (context, controller, _) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                              width: MediaQuery.of(
+                                context,
+                              ).size.width, // full screen width
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: controller.categories.map((cat) {
+                                  bool isSelected =
+                                      controller.selectedCategory == cat;
+                                  return Padding(
+                                    padding: EdgeInsets.only(left: 16.0.w),
+                                    child: _buildCustomFilterChip(
+                                      label: cat,
+                                      icon: Icons.category,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        controller.applyCategoryFilter(cat);
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
                       SizedBox(height: 10.h),
-              
+
                       // Featured Banners
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Column(
                           children: [
                             GestureDetector(
-                              onTap: () =>
-                                  Navigator.pushNamed(context, DetailsScreen.name),
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                DetailsScreen.name,
+                              ),
                               child: _buildFeaturedEvent(
                                 "Kickback",
                                 "TONIGHT: House Party",
@@ -270,8 +307,10 @@ Row(
                             ),
                             SizedBox(height: 12.h),
                             GestureDetector(
-                              onTap: () =>
-                                  Navigator.pushNamed(context, DetailsScreen.name),
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                DetailsScreen.name,
+                              ),
                               child: _buildFeaturedEvent(
                                 "Kickback",
                                 "TONIGHT: House Party",
@@ -281,9 +320,9 @@ Row(
                           ],
                         ),
                       ),
-              
+
                       SizedBox(height: 20.h),
-              
+
                       // Trending Title
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -291,31 +330,37 @@ Row(
                           alignment: Alignment.centerLeft,
                           child: Text(
                             trendName,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ),
                       ),
-              
+
                       Padding(
                         padding: EdgeInsets.all(16.w),
                         child: GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: events.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 16.w,
-                            crossAxisSpacing: 16.w,
-                            childAspectRatio: 0.75,
-                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 16.w,
+                                crossAxisSpacing: 16.w,
+                                childAspectRatio: 0.75,
+                              ),
                           itemBuilder: (context, index) {
                             return GestureDetector(
-                              onTap: () =>
-                                  Navigator.pushNamed(context, DetailsScreen.name),
-                              child: Custom_item_container(event: events[index]),
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                DetailsScreen.name,
+                              ),
+                              child: Custom_item_container(
+                                event: events[index],
+                              ),
                             );
                           },
                         ),
@@ -423,7 +468,7 @@ Row(
 
   Widget _buildCustomFilterChip({
     required String label,
-    required IconData icon,
+    required IconData? icon,
     required bool isSelected,
     required VoidCallback onTap,
   }) {

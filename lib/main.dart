@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
+import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LogInController()),
         ChangeNotifierProvider(create: (_) => ForgotPasswordController()),
         ChangeNotifierProvider(create: (_) => EmailVerifyController()),
+        ChangeNotifierProvider(create: (_) => GetAllEventController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

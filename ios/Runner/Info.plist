@@ -11,7 +11,7 @@
 	<key>GIDClientID</key>
 <!-- TODO Replace this value: -->
 <!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
-<string>844611876388-iupnq1g5meql74s4n5jjejj6pihabftp.apps.googleusercontent.com</string>
+<string>844611876388-a16bec6gr9cc6u5iu25ntlau5eprd7co.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 <array>
     <dict>

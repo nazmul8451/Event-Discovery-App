@@ -32,6 +32,11 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+build/
+android/app/build/
+ios/Pods/
+*.so
+*.bin
 
 # Symbolication related
 app.*.symbols

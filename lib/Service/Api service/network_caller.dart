@@ -21,7 +21,7 @@ class NetworkCaller {
   static const String _unAuthorizeMessage = 'Un-authorized token';
 
   //!Get Request
-  static Future<NetworkResponse> getRequest({required String url}) async {
+  static Future<NetworkResponse> getRequest({required String url,String ?token}) async {
     try {
       Uri uri = Uri.parse(url);
       // final Map<String, String> headers = {'token': ''};
@@ -30,7 +30,10 @@ class NetworkCaller {
       _logRequest(url, null, null);
       Response response = await get(
         uri,
-        headers: {'accept': 'application/json'},
+        headers: {
+          'accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       //? print my Response
@@ -71,7 +74,7 @@ class NetworkCaller {
 
   static Future<NetworkResponse> postRequest({
     required String url,
-    Map<String, String>? extraHeaders,
+    Map<String, String> ? extraHeaders,
     Map<String, String>? body,
     bool isFromLogin = false,
   }) async {
@@ -121,7 +124,6 @@ class NetworkCaller {
       );
     }
   }
-
   //all request and response
 
   static void _logRequest(
