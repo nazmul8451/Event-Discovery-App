@@ -14,18 +14,41 @@ class GetAllEventController extends ChangeNotifier {
   List<String> _categories = ["All"];
   String _selectedCategory = "All";
 
-  // Getters
+  // =========================
+  // ✅ Getters (UI safe)
+  // =========================
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
+
+  /// Filtered events (based on category)
   List<EventData> get events => _filteredEvents;
+
+  /// First 2 events → ListView
+  
+  List<EventData> get topTwoEvents {
+    return _allEvents.take(2).toList(); // প্রথম ২টা
+  }
+
+  List<EventData> get remainingEvents {
+    if (_allEvents.length <= 2) return [];
+    return _allEvents.skip(2).toList(); // ২টার পরে বাকি
+  }
+// List<EventData> get remainingEvents {            
+//   if (_filteredEvents.length <= 2) {
+//     return [];
+//   }
+//   return _filteredEvents.take(_filteredEvents.length - 2).toList();
+// }
+
   List<String> get categories => _categories;
   String get selectedCategory => _selectedCategory;
 
-  /// =========================
-  /// 🔥 Fetch All Events + Categories
-  /// =========================
+  // =========================
+  // 🔥 Fetch All Events
+  // =========================
   Future<bool> getAllEvents() async {
     _inProgress = true;
+    _errorMessage = null;
     notifyListeners();
 
     final token =
@@ -37,53 +60,43 @@ class GetAllEventController extends ChangeNotifier {
         token: token,
       );
 
-      print('Token: $token');
-      print('STATUS CODE: ${response.statusCode}');
       if (response.statusCode == 200) {
-        // Handle response body type safely
+        // Safe body handling
         Map<String, dynamic> body;
         if (response.body is String) {
           body = jsonDecode(response.body as String);
-        } else if (response.body is Map<String, dynamic>) {
-          body = response.body!;
         } else {
-          throw Exception("Invalid response body type");
+          body = response.body as Map<String, dynamic>;
         }
 
-        List rawEvents = body["data"]["data"];
+        final List rawEvents = body["data"]["data"];
 
-        // All events
-        _allEvents = rawEvents.map((e) => EventData.fromJson(e)).toList();
-        notifyListeners();
-        // Debugging print for readable output
-        for (var e in _allEvents) {
-          print('Event Description: ${e.description}, Category: ${e.category}, Images : ${e.images}');
-        }
+        // JSON → Model
+        _allEvents =
+            rawEvents.map((e) => EventData.fromJson(e)).toList();
 
+        // =========================
         // Extract categories
+        // =========================
         _categories = ["All"];
-        for (var e in _allEvents) {
+        for (final e in _allEvents) {
           if (e.category != null && e.category!.trim().isNotEmpty) {
             _categories.add(e.category!.trim().capitalize());
           }
         }
 
-        // Remove duplicates and sort
-        _categories = _categories.toSet().toList();
-        _categories.sort();
+        _categories = _categories.toSet().toList()..sort();
 
-        // Apply default filter
+        // Default filter
         applyCategoryFilter("All");
 
         _inProgress = false;
         notifyListeners();
         return true;
       } else {
-        print('Failed API Call');
         _errorMessage = "Failed to fetch events";
       }
     } catch (e) {
-      print('Error fetching events: $e');
       _errorMessage = e.toString();
     }
 
@@ -92,14 +105,14 @@ class GetAllEventController extends ChangeNotifier {
     return false;
   }
 
-  /// =========================
-  /// 🔥 Apply Filter
-  /// =========================
+  // =========================
+  // 🔥 Category Filter
+  // =========================
   void applyCategoryFilter(String category) {
     _selectedCategory = category;
 
     if (category == "All") {
-      _filteredEvents = [..._allEvents];
+      _filteredEvents = List.from(_allEvents);
     } else {
       _filteredEvents = _allEvents
           .where(
@@ -114,7 +127,9 @@ class GetAllEventController extends ChangeNotifier {
   }
 }
 
-/// Simple extension for capitalizing category name
+// =========================
+// String Extension
+// =========================
 extension StringExt on String {
   String capitalize() {
     if (isEmpty) return this;

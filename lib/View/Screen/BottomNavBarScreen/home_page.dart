@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
+import 'package:gathering_app/Service/urls.dart';
 
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
@@ -40,7 +43,6 @@ class _HomePageState extends State<HomePage> {
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );
-
 
   // Pull to Refresh Function
   Future<void> _onRefresh() async {
@@ -191,32 +193,27 @@ class _HomePageState extends State<HomePage> {
                       // Featured Banners
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                DetailsScreen.name,
+                        child: Consumer<GetAllEventController>(
+                          builder: (context, controller, child) =>
+                              ListView.builder(
+                                itemCount: controller.topTwoEvents.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  final event = controller.topTwoEvents[index];
+                                  return Column(
+                                    children: [
+                                      _buildFeaturedEvent(
+                                        event.title ?? " ",
+                                        event.description ?? " ",
+                                        event.tags,
+                                        event.images,
+                                      ),
+                                      SizedBox(height: 15.h),
+                                    ],
+                                  );
+                                },
                               ),
-                              child: _buildFeaturedEvent(
-                                "Kickback",
-                                "TONIGHT: House Party",
-                                ["Chill", "Social"],
-                              ),
-                            ),
-                            SizedBox(height: 12.h),
-                            GestureDetector(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                DetailsScreen.name,
-                              ),
-                              child: _buildFeaturedEvent(
-                                "Kickback",
-                                "TONIGHT: House Party",
-                                ["Chill", "Social"],
-                              ),
-                            ),
-                          ],
                         ),
                       ),
 
@@ -249,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                             child: GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: controller.events.length,
+                              itemCount: controller.remainingEvents.length,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
@@ -287,74 +284,133 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFeaturedEvent(String title, String subtitle, List<String> tags) {
-    return Container(
-      height: 197.h,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/home_img1.png'),
-          fit: BoxFit.cover,
+  Widget _buildFeaturedEvent(
+    String title,
+    String subtitle,
+    List<String>? tags,
+    List<String>? imgURL,
+  ) {
+    final String imageUrl = (imgURL != null && imgURL.isNotEmpty)
+        ? "${Urls.baseUrl}${imgURL.first}"
+        : "assets/images/wellness_icon.png";
+
+    return Consumer<ThemeProvider>(
+      builder: (context, controller, child) => Container(
+        height: 197.h,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color:  Colors.grey[300],
+          borderRadius: BorderRadius.circular(20.r),
+          image: DecorationImage(image: NetworkImage("${imgURL}")),
         ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 16.h,
-            right: 16.w,
-            child: Consumer<SavedEventController>(
-              builder: (context, provider, child) {
-                final isSaved = false; // পরে API থেকে চেক করবে
-                return IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    isSaved ? Icons.bookmark : Icons.bookmark_border,
-                    color: Colors.white,
-                    size: 25.sp.clamp(25, 26),
-                  ),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            bottom: 20.h,
-            left: 20.w,
-            right: 20.w,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22.sp.clamp(22, 22),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 6.h),
-                Row(
-                  children: [
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 12.sp.clamp(12, 16),
-                      ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 16.h,
+              right: 16.w,
+              child: Consumer<SavedEventController>(
+                builder: (context, provider, child) {
+                  final isSaved = false;
+                  return IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      isSaved ? Icons.bookmark : Icons.bookmark_border,
+                      color: controller.isDarkMode
+                          ? Colors.white
+                          : Colors.black,
+                      size: 25.sp.clamp(25, 26),
                     ),
-                    const Spacer(),
-                    ...tags.map(
-                      (tag) => Padding(
-                        padding: EdgeInsets.only(left: 8.w),
-                        child: _buildTag(tag),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 20.h,
+              left: 20.w,
+              right: 20.w,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: controller.isDarkMode
+                          ? Colors.white
+                          : Colors.black,
+                      fontSize: 22.sp.clamp(22, 22),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: controller.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            fontSize: 12.sp.clamp(12, 16),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(30.r),
+                            ),
+                            child: Text(
+                              'Hip-Hop',
+                              style: TextStyle(
+                                color:controller.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                                fontSize: 13.sp.clamp(13, 13),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.w,),
+                               Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(30.r),
+                            ),
+                            child: Text(
+                              'Social',
+                              style: TextStyle(
+                                color:controller.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                                fontSize: 13.sp.clamp(13, 13),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -363,7 +419,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(30.r),
       ),
       child: Text(
