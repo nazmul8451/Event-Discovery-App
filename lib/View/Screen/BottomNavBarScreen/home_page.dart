@@ -41,80 +41,6 @@ class _HomePageState extends State<HomePage> {
     initialRefresh: false,
   );
 
-  List<EventCartmodel> events = [
-    EventCartmodel(
-      id: "0",
-      title: "Electric Paradise Festival",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "1",
-      title: "Paradise Festival",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "2",
-      title: "Festival",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "3",
-      title: "Electric Paradise",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "4",
-      title: "Roma",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "5",
-      title: "Event",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-    EventCartmodel(
-      id: "6",
-      title: "Electric Paradise Festival",
-      image: "assets/images/home_img1.png",
-      category: "Music",
-      price: "\$50",
-      date: "Nov 15 • 8:00 PM",
-      location: "Downtown Arena • 2.3 km",
-      rating: 3.6,
-    ),
-
-    // baki gulo same...
-  ];
 
   // Pull to Refresh Function
   Future<void> _onRefresh() async {
@@ -312,38 +238,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      // Padding(
-                      //   padding: EdgeInsets.all(16.w),
-                      //   child: GridView.builder(
-                      //     shrinkWrap: true,
-                      //     physics: const NeverScrollableScrollPhysics(),
-                      //     itemCount: events.length,
-                      //     gridDelegate:
-                      //         SliverGridDelegateWithFixedCrossAxisCount(
-                      //           crossAxisCount: 2,
-                      //           mainAxisSpacing: 16.w,
-                      //           crossAxisSpacing: 16.w,
-                      //           childAspectRatio: 0.75,
-                      //         ),
-                      //     itemBuilder: (context, index) {
-                      //       return GestureDetector(
-                      //         onTap: () => Navigator.pushNamed(
-                      //           context,
-                      //           DetailsScreen.name,
-                      //         ),
-                      //         child: Custom_item_container(
-                      //           event: events[index],
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                      // ),
-SizedBox(height: 20.h,),
+                      SizedBox(height: 20.h),
                       //? Gridview Event
                       Consumer<GetAllEventController>(
                         builder: (context, controller, _) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -366,7 +268,7 @@ SizedBox(height: 20.h,),
                                         event, // event details pathate parba
                                   ),
                                   child: Custom_item_container(
-                                    event: controller.events[index+2],
+                                    event: controller.events[index],
                                   ),
                                 );
                               },

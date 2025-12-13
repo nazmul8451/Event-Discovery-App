@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -10,6 +11,8 @@ class Custom_item_container extends StatelessWidget {
   final EventData? event; // nullable korlam, data nai tahole shimmer
 
   Custom_item_container({super.key, this.event});
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,110 +34,105 @@ class Custom_item_container extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image + Overlay Tags Section
-              Expanded(
-                flex: 2,
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(12.r),
-                      ),
-                      child: isLoading
-                          ? Shimmer.fromColors(
-                              baseColor: Colors.grey.shade300,
-                              highlightColor: Colors.grey.shade100,
-                              child: Container(
-                                height: 150.h,
-                                width: double.infinity,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Image.network(
-                              (event?.images != null &&
-                                      event!.images!.isNotEmpty)
-                                  ? "${Urls.baseUrl}${event!.images!.first}"
-                                  : "assets/images/personLocation.jpg",
-                              height: 150.h,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.network(
-                                  "assets/images/personLocation.jpg",
+              Consumer<ThemeProvider>(
+                builder:(context,controller,child)=> Expanded(
+                  flex: 2,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12.r),
+                        ),
+                        child: isLoading
+                            ? Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
                                   height: 150.h,
                                   width: double.infinity,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
-                    ),
-
-                    // Category Tag
-                    Positioned(
-                      top: 8.h,
-                      left: 8.w,
-                      child: isLoading
-                          ? Shimmer.fromColors(
-                              baseColor: Colors.grey.shade300,
-                              highlightColor: Colors.grey.shade100,
-                              child: Container(
-                                height: 20.h,
-                                width: 60.w,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 6.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFB026FF),
-                                borderRadius: BorderRadius.circular(15.r),
-                              ),
-                              child: Text(
-                                "${event!.category}",
-                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10.sp.clamp(10, 12),
                                 ),
-                              ),
-                            ),
-                    ),
+                              )
+                            : Image.network(
+                                (event?.images != null &&
+                                        event!.images!.isNotEmpty)
+                                    ? "${Urls.baseUrl}${event!.images!.first}"
+                                    : "assets/images/personLocation.jpg",
+                                height: 150.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
 
-                    // Price Tag
-                    Positioned(
-                      bottom: 8.h,
-                      right: 8.w,
-                      child: isLoading
-                          ? Shimmer.fromColors(
-                              baseColor: Colors.grey.shade300,
-                              highlightColor: Colors.grey.shade100,
-                              child: Container(
-                                height: 20.h,
-                                width: 40.w,
-                                color: Colors.white,
                               ),
-                            )
-                          : Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 6.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF00D9FF),
-                                borderRadius: BorderRadius.circular(15.r),
-                              ),
-                              child: Text(
-                                '${event!.ticketPrice}',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10.sp.clamp(10, 12),
+                      ),
+                
+                      // Category Tag
+                      Positioned(
+                        top: 8.h,
+                        left: 8.w,
+                        child: isLoading
+                            ? Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
+                                  height: 20.h,
+                                  width: 60.w,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 6.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFB026FF),
+                                  borderRadius: BorderRadius.circular(15.r),
+                                ),
+                                child: Text(
+                                  "${event!.category}",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.sp.clamp(10, 12),
+                                  ),
                                 ),
                               ),
-                            ),
-                    ),
-                  ],
+                      ),
+                
+                      // Price Tag
+                      Positioned(
+                        bottom: 8.h,
+                        right: 8.w,
+                        child: isLoading
+                            ? Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
+                                  height: 20.h,
+                                  width: 40.w,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 6.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF00D9FF),
+                                  borderRadius: BorderRadius.circular(15.r),
+                                ),
+                                child: Text(
+                                  '${event!.ticketPrice}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10.sp.clamp(10, 12),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

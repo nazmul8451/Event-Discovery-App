@@ -54,7 +54,7 @@ class GetAllEventController extends ChangeNotifier {
 
         // All events
         _allEvents = rawEvents.map((e) => EventData.fromJson(e)).toList();
-
+        notifyListeners();
         // Debugging print for readable output
         for (var e in _allEvents) {
           print('Event Description: ${e.description}, Category: ${e.category}, Images : ${e.images}');
