@@ -10,6 +10,7 @@ class GetAllEventController extends ChangeNotifier {
 
   List<EventData> _allEvents = [];
   List<EventData> _filteredEvents = [];
+  String _searchQuery = "";
 
   List<String> _categories = ["All"];
   String _selectedCategory = "All";
@@ -23,23 +24,61 @@ class GetAllEventController extends ChangeNotifier {
   /// Filtered events (based on category)
   List<EventData> get events => _filteredEvents;
 
+  //getting search query
+  String get searchQuery => _searchQuery;
+
+  //coocing search query function for user search experience;
+  void updateSearchQuery(String query) {
+    _searchQuery = query.trim();
+    _applySearchAndFilter();
+    notifyListeners();
+  }
+  //clear search field
+  void clearSearch() {
+  _searchQuery = "";
+  _applySearchAndFilter();
+  notifyListeners();
+}
+
+  //coocing search query function for user search experience;
+  void _applySearchAndFilter() {
+    List<EventData> temp = List.from(_allEvents);
+
+    // firs category filter
+    if (_selectedCategory != "All") {
+      temp = temp
+          .where(
+            (e) =>
+                e.category?.toLowerCase().trim() ==
+                _selectedCategory.toLowerCase().trim(),
+          )
+          .toList();
+    }
+
+    //second search category filter
+    if (_searchQuery.isNotEmpty) {
+      temp = temp.where((event) {
+        final query = _searchQuery.toLowerCase();
+        return (event.title?.toLowerCase().contains(query) ?? false) ||
+            (event.address?.toLowerCase().contains(query) ?? false) ||
+            (event.category?.toLowerCase().contains(query) ?? false) ||
+            (event.description?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    _filteredEvents = temp;
+  }
+
   /// First 2 events → ListView
-  
-  List<EventData> get topTwoEvents {
-    return _allEvents.take(2).toList(); // প্রথম ২টা
-  }
+List<EventData> get topTwoEvents {
+  return _filteredEvents.take(_filteredEvents.length >= 2 ? 2 : _filteredEvents.length).toList();
+}
 
-  List<EventData> get remainingEvents {
-    if (_allEvents.length <= 2) return [];
-    return _allEvents.skip(2).toList(); // ২টার পরে বাকি
-  }
-// List<EventData> get remainingEvents {            
-//   if (_filteredEvents.length <= 2) {
-//     return [];
-//   }
-//   return _filteredEvents.take(_filteredEvents.length - 2).toList();
-// }
-
+/// Remaining events after removing top 2 → GridView
+List<EventData> get remainingEvents {
+  if (_filteredEvents.length <= 2) return [];
+  return _filteredEvents.skip(2).toList();
+}
   List<String> get categories => _categories;
   String get selectedCategory => _selectedCategory;
 
@@ -72,8 +111,7 @@ class GetAllEventController extends ChangeNotifier {
         final List rawEvents = body["data"]["data"];
 
         // JSON → Model
-        _allEvents =
-            rawEvents.map((e) => EventData.fromJson(e)).toList();
+        _allEvents = rawEvents.map((e) => EventData.fromJson(e)).toList();
 
         // =========================
         // Extract categories
@@ -122,7 +160,7 @@ class GetAllEventController extends ChangeNotifier {
           )
           .toList();
     }
-
+    _applySearchAndFilter();
     notifyListeners();
   }
 }

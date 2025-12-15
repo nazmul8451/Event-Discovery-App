@@ -14,7 +14,7 @@ import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart'; // <-- Ei line add kor
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   final String appBarSubTitle = 'Find your next adventure';
   final String trendName = 'Trending Now';
   late final EventData event;
-
+  TextEditingController searchController = TextEditingController();
   int selectedCategoryIndex = 0;
 
   @override
@@ -39,22 +39,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Refresh Controller — ei ta add korlam
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );
 
-  // Pull to Refresh Function
   Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(seconds: 2));
-    // ekhane real API call → events = await getEvents();
-
-    if (mounted) {
-      setState(() {
-        // data reload hobe
-      });
+    final success = await Provider.of<GetAllEventController>(
+      context,
+      listen: false,
+    ).getAllEvents();
+    if (success) {
+      _refreshController.refreshCompleted();
+    } else {
+      _refreshController.refreshFailed();
     }
-    _refreshController.refreshCompleted();
   }
 
   @override
@@ -85,9 +83,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-
                 const Spacer(),
-
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Stack(
@@ -98,7 +94,6 @@ class _HomePageState extends State<HomePage> {
                           Navigator.pushNamed(context, NotificationScreen.name);
                         },
                         icon: const Icon(Icons.notifications_none),
-                        // color: controller.isDarkMode ? Colors.white : Colors.black,
                       ),
                       const Positioned(
                         right: 4,
@@ -119,171 +114,204 @@ class _HomePageState extends State<HomePage> {
             ),
 
             SizedBox(height: 5.h),
+
+            // শুধু এই অংশটা চেঞ্জ করা হয়েছে → SmartRefresher যোগ করা
             Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 120.0),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                appBarTitle,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(
-                                      fontSize: 22.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                              Text(
-                                appBarSubTitle,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      color: Colors.grey,
-                                      fontSize: 14.sp,
-                                    ),
-                              ),
-                            ],
+              child: SmartRefresher(
+                enablePullDown: true,
+                enablePullUp: false,
+                controller: _refreshController,
+                onRefresh: _onRefresh,
+                header: CustomHeader(
+                  builder: (context, mode) {
+                    Widget body;
+                    if (mode == RefreshStatus.idle) {
+                      body = Text("Pull down to refresh");
+                    } else if (mode == RefreshStatus.refreshing) {
+                      body = CircularProgressIndicator(
+                        color: Color(0xFFB026FF),
+                      );
+                    } else if (mode == RefreshStatus.completed) {
+                      body = Icon(Icons.done, color: Colors.green);
+                    } else if (mode == RefreshStatus.failed) {
+                      body = Icon(Icons.error, color: Colors.red);
+                    } else {
+                      body = Text("Release to refresh");
+                    }
+                    return SizedBox(height: 60.0, child: Center(child: body));
+                  },
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 120.0),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  appBarTitle,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                Text(
+                                  appBarSubTitle,
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(
+                                        color: Colors.grey,
+                                        fontSize: 14.sp,
+                                      ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
 
-                      // SizedBox(height: 10.h,),
-                      const SearchTextField(hintText: 'Search events, venues'),
-
-                      // ?Filter Chips
-                      Consumer<GetAllEventController>(
-                        builder: (context, controller, _) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Container(
-                              width: MediaQuery.of(
-                                context,
-                              ).size.width, // full screen width
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: controller.categories.map((cat) {
-                                  bool isSelected =
-                                      controller.selectedCategory == cat;
-                                  return Padding(
-                                    padding: EdgeInsets.only(left: 16.0.w),
-                                    child: _buildCustomFilterChip(
-                                      label: cat,
-                                      icon: Icons.category,
-                                      isSelected: isSelected,
-                                      onTap: () {
-                                        controller.applyCategoryFilter(cat);
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 10.h),
-
-                      // Featured Banners
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Consumer<GetAllEventController>(
+                        Consumer<GetAllEventController>(
                           builder: (context, controller, child) =>
-                              ListView.builder(
-                                itemCount: controller.topTwoEvents.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  final event = controller.topTwoEvents[index];
-                                  return Column(
-                                    children: [
-                                      _buildFeaturedEvent(
-                                        event.title ?? " ",
-                                        event.description ?? " ",
-                                        event.tags,
-                                        event.images,
-                                      ),
-                                      SizedBox(height: 15.h),
-                                    ],
-                                  );
+                              SearchTextField(
+                                controller: searchController,
+                                onChanged: (query) {
+                                  controller.updateSearchQuery(query);
                                 },
+                                hintText: 'Search events, venues',
                               ),
                         ),
-                      ),
 
-                      SizedBox(height: 20.h),
+                        Consumer<GetAllEventController>(
+                          builder: (context, controller, _) {
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: controller.categories.map((cat) {
+                                    bool isSelected =
+                                        controller.selectedCategory == cat;
+                                    return Padding(
+                                      padding: EdgeInsets.only(left: 16.0.w),
+                                      child: _buildCustomFilterChip(
+                                        label: cat,
+                                        icon: Icons.category,
+                                        isSelected: isSelected,
+                                        onTap: () {
+                                          controller.applyCategoryFilter(cat);
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
 
-                      // Trending Title
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            trendName,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.w600,
+                        SizedBox(height: 10.h),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Consumer<GetAllEventController>(
+                            builder: (context, controller, child) =>
+                                ListView.builder(
+                                  itemCount: controller.topTwoEvents.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final event =
+                                        controller.topTwoEvents[index];
+                                    return Column(
+                                      children: [
+                                        _buildFeaturedEvent(
+                                          event.title ?? " ",
+                                          event.description ?? " ",
+                                          event.tags,
+                                          event.images,
+                                        ),
+                                        SizedBox(height: 15.h),
+                                      ],
+                                    );
+                                  },
                                 ),
                           ),
                         ),
-                      ),
 
-                      SizedBox(height: 20.h),
-                      //? Gridview Event
-                      Consumer<GetAllEventController>(
-                        builder: (context, controller, _) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
+                        SizedBox(height: 20.h),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              trendName,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: controller.remainingEvents.length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 16.w,
-                                    crossAxisSpacing: 16.w,
-                                    childAspectRatio: 0.75,
-                                  ),
-                              itemBuilder: (context, index) {
-                                final event = controller.events[index];
-                                print('All Event -${event.address}');
-                                return GestureDetector(
-                                  onTap: () => Navigator.pushNamed(
-                                    context,
-                                    DetailsScreen.name,
-                                    arguments:
-                                        event, // event details pathate parba
-                                  ),
-                                  child: Custom_item_container(
-                                    event: controller.events[index],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20.h),
+
+                        Consumer<GetAllEventController>(
+                          builder: (context, controller, _) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: controller.remainingEvents.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 16.w,
+                                      crossAxisSpacing: 16.w,
+                                      childAspectRatio: 0.75,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  final event =
+                                      controller.remainingEvents[index];
+                                  print('All Event -${event.address}');
+                                  return GestureDetector(
+                                    onTap: () => Navigator.pushNamed(
+                                      context,
+                                      DetailsScreen.name,
+                                      arguments: event,
+                                    ),
+                                    child: Custom_item_container(
+                                      event: controller.events[index],
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
+            // এখানে SmartRefresher শেষ
           ],
         ),
       ),
     );
   }
 
+  // বাকি সব উইজেট (_buildFeaturedEvent, _buildTag, _buildCustomFilterChip) একদম আগের মতোই আছে
   Widget _buildFeaturedEvent(
     String title,
     String subtitle,
@@ -299,7 +327,7 @@ class _HomePageState extends State<HomePage> {
         height: 197.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color:  Colors.grey[300],
+          color: Colors.grey[300],
           borderRadius: BorderRadius.circular(20.r),
           image: DecorationImage(image: NetworkImage("${imgURL}")),
         ),
@@ -373,16 +401,16 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               'Hip-Hop',
                               style: TextStyle(
-                                color:controller.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                                color: controller.isDarkMode
+                                    ? Colors.white
+                                    : Colors.black,
                                 fontSize: 13.sp.clamp(13, 13),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          SizedBox(width: 10.w,),
-                               Container(
+                          SizedBox(width: 10.w),
+                          Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 14.w,
                               vertical: 6.h,
@@ -394,9 +422,9 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               'Social',
                               style: TextStyle(
-                                color:controller.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                                color: controller.isDarkMode
+                                    ? Colors.white
+                                    : Colors.black,
                                 fontSize: 13.sp.clamp(13, 13),
                                 fontWeight: FontWeight.w600,
                               ),

@@ -122,7 +122,7 @@ class Custom_item_container extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15.r),
                                 ),
                                 child: Text(
-                                  '${event!.ticketPrice}',
+                                  '\$${event!.ticketPrice}',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class Custom_item_container extends StatelessWidget {
                               ),
                             )
                           : Text(
-                              "${event!.title}",
+                              "${event!.title?? "Untitled Event.."}",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -220,7 +220,7 @@ class Custom_item_container extends StatelessWidget {
                                 SizedBox(width: 6.w),
                                 Expanded(
                                   child: Text(
-                                    "${event!.location}",
+                                    "${event!.location?? "Location TBA"}",
                                     style: TextStyle(
                                       fontSize: 9.sp.clamp(9, 10),
                                       color: Colors.grey[600],

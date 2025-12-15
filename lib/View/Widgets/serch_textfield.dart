@@ -5,12 +5,22 @@ class SearchTextField extends StatelessWidget {
   final String hintText;
   final IconData? icon;
   final bool obscureText;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onClear ;
+  final TextEditingController? controller;
+  final bool? autoFocus;
 
-  const SearchTextField({
+
+
+   SearchTextField({
     super.key,
     this.icon,
     required this.hintText,
     this.obscureText = false,
+    this.onChanged,
+    this.onClear,
+    this.autoFocus,
+    this.controller,
   });
 
   @override
@@ -33,6 +43,9 @@ class SearchTextField extends StatelessWidget {
 
             ),
             child: TextFormField(
+              // autofocus: autoFocus,
+              controller: controller,
+              onChanged: onChanged,
               obscureText: obscureText,
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black87,

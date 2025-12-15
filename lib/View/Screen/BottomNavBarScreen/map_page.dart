@@ -12,7 +12,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: Padding(
@@ -23,9 +23,7 @@ class _MapPageState extends State<MapPage> {
             width: 15.w,
           ),
         ),
-        title: Align(
-          alignment: Alignment.bottomLeft,
-          child: Text('GATHERING')),
+        title: Align(alignment: Alignment.bottomLeft, child: Text('GATHERING')),
       ),
     );
   }
