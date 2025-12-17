@@ -2,10 +2,14 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Model/get_single_event_model.dart';
+import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
+import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/View/Widgets/details_event_highlightMessage.dart';
 import 'package:gathering_app/View/Widgets/orgenizer_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -26,177 +30,216 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   late CarouselSliderController carouselController;
-
+  SingleEventDataModel? singleEvent;
+  double _currentRating = 5.0;
+  final TextEditingController _reviewController = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    carouselController = CarouselSliderController(); //  ইনিশিয়ালাইজ
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final eventId = ModalRoute.of(context)!.settings.arguments as String;
+      context.read<EventDetailsController>().getSingleEvent(eventId);
+      print("Event ID in Details Screen: $eventId");
+    });
+
+    carouselController = CarouselSliderController();
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _reviewController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<EventDetailsController>();
+    final singleEvent = controller.singleEvent;
+
+    if (controller.inProgress) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (controller.errorMessage != null) {
+      return Scaffold(body: Center(child: Text(controller.errorMessage!)));
+    }
+
+    if (singleEvent == null) {
+      return const Scaffold(body: Center(child: Text('No event found')));
+    }
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    void WriteCommentAlertDialogue(BuildContext context) {
+    void WriteReviewAlertDialogue(BuildContext context) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: SingleChildScrollView(
-            child: SizedBox(
-              width: double.maxFinite,
-              child: Padding(
-                padding: EdgeInsets.all(15.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Write a Review",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18.sp.clamp(18, 20)),
-                                overflow: TextOverflow.ellipsis,
+        builder: (_) => Consumer<ReivewController>(
+          builder:(context,controller,child)=> AlertDialog(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+            ),
+            contentPadding: EdgeInsets.zero,
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: double.maxFinite,
+                child: Padding(
+                  padding: EdgeInsets.all(15.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Write a Review",
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18.sp.clamp(18, 20),
+                                      ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  textAlign: TextAlign.center,
+                                  "Share your experience at Electric Paradise Festival",
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Consumer<ThemeProvider>(
+                            builder: (context, controller, child) => GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                margin: EdgeInsets.only(right: 10),
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: controller.isDarkMode
+                                      ? Color(0xFF3E043F)
+                                      : Color(0xFF686868),
+                                  // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Image.asset(
+                                    'assets/images/cross_icon.png',
+                                  ),
+                                ),
                               ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                textAlign: TextAlign.center,
-                                "Share your experience at Electric Paradise Festival",
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20.h),
+                   // Rating Bar
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Rating', style: Theme.of(context).textTheme.titleSmall),
+                      SizedBox(height: 10.h),
+                      Row(
+                        children: [
+                          RatingBar.builder(
+                            initialRating: 5,
+                            minRating: 1,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            itemSize: 35.h,
+                            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star_border_outlined,
+                              color: Colors.white,
+                            ),
+                            onRatingUpdate: (rating) {
+                              _currentRating = rating;
+                            },
+                          ),
+                          SizedBox(width: 10.w,),
+                          Text('${_currentRating.toStringAsFixed(1)}')
+                        ],
+                      ),
+                    ],
+                  ),
+                      SizedBox(height: 24.h),
+                      AuthTextField(
+                        controller: _reviewController,
+                        hintText: 'Tell us about your experience...',
+                        labelText: 'Your Review',
+                      ),
+                      SizedBox(height: 5.h),
+                      Column(
+                        children: [
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '0/500',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 3.h),
+                              Row(
+                                children: [
+                                  Text(
+                                    'characters',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(width: 10.w,),
-                        Consumer<ThemeProvider>(
-                          builder: (context, controller, child) => GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              margin: EdgeInsets.only(right: 10),
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: controller.isDarkMode
-                                    ? Color(0xFF3E043F)
-                                    : Color(0xFF686868),
-                                // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                        ],
+                      ),
+                      SizedBox(height: 15.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: SizedBox(
+                          width: double.infinity, // full width inside dialog
+                          height: 55.h,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDark
+                                  ? Colors.black
+                                  : Colors.white,
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset(
-                                  'assets/images/cross_icon.png',
-                                ),
+                              padding: EdgeInsets.zero, // overflow রোধ
+                            ),
+                            onPressed: ()=>controller.inProgress? null: ()async{
+                              if(_reviewController.text.trim().isEmpty){
+                                showCustomSnackBar(context: context, message: "Please write a review");
+                              }return ;
+                            },
+                            child: Text(
+                              'Submit Review',
+                              style: TextStyle(
+                                fontSize: 15.sp.clamp(15, 15),
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Rating',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        SizedBox(height: 10.h),
-                        Row(
-                          children: [
-                            Icon(Icons.star_border_outlined, size: 25.h),
-                            SizedBox(width: 5.w),
-                            Icon(Icons.star_border_outlined, size: 25.h),
-                            SizedBox(width: 5.w),
-                            Icon(Icons.star_border_outlined, size: 25.h),
-                            SizedBox(width: 5.w),
-                            Icon(Icons.star_border_outlined, size: 25.h),
-                            SizedBox(width: 5.w),
-                            Icon(Icons.star_border_outlined, size: 25.h),
-                            SizedBox(width: 10.w),
-                            Text(
-                              '5 Star',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24.h),
-                    AuthTextField(
-                      hintText: 'Tell us about your experience...',
-                      labelText: 'Your Review',
-                    ),
-                    SizedBox(height: 5.h),
-                    Column(
-                      children: [
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '0/500',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 3.h),
-                            Row(
-                              children: [
-                                Text(
-                                  'characters',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 15.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                      ), 
-                      child: SizedBox(
-                        width: double.infinity, // full width inside dialog
-                        height: 55.h,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark ? Colors.black : Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.zero, // overflow রোধ
-                          ),
-                          onPressed: () {},
-                          child: Text(
-                            'Submit Review',
-                            style: TextStyle(
-                              fontSize: 15.sp.clamp(15, 15),
-                              color: isDark ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -204,7 +247,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
       );
     }
-
 
     void GetTicketAlertDialogue(BuildContext context) {
       showDialog(
@@ -482,7 +524,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bar Rebel',
+                        '${singleEvent?.data?.title}',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Row(
@@ -697,15 +739,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Date',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 16.sp.clamp(16, 17)),
                               ),
                               Text(
-                                'Nov 11',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
+                                '${singleEvent?.data?.startDate}',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 14.sp.clamp(14, 15)),
                               ),
                             ],
                           ),
@@ -755,15 +795,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Time',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 16.sp.clamp(16, 17)),
                               ),
                               Text(
-                                '9:00 PM',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
+                                '${singleEvent?.data?.startTime}',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 14.sp.clamp(14, 15)),
                               ),
                             ],
                           ),
@@ -800,37 +838,35 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Image.asset(
+                                  'assets/images/colorful_location_icon.png',
                                   height: 20,
                                   width: 20,
-                                  'assets/images/colorful_location_icon.png',
                                   color: Color(0xFF00D9FF),
                                 ),
                               ),
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Location',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Location',
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontSize: 16.sp.clamp(16, 17)),
                                 ),
-                              ),
-                              Text(
-                                'Blue Note Club',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
+                                Text(
+                                  singleEvent?.data?.address ??
+                                      'No address available',
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontSize: 14.sp.clamp(14, 15)),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
                                 ),
-                              ),
-                              Text(
-                                '789 Jazz Ave, Midtown',
-                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -881,15 +917,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             children: [
                               Text(
                                 'Organized by',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(16, 17),
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 16.sp.clamp(16, 17)),
                               ),
                               Text(
-                                'Blue Note Productions',
-                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 16.sp.clamp(10, 13),
-                                ),
+                                'B${singleEvent?.data?.organizerId?.name ?? "Unknown"} ',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontSize: 16.sp.clamp(10, 13)),
                               ),
                             ],
                           ),
@@ -927,14 +961,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
               SizedBox(height: 10.h),
               SizedBox(
-                child: Text(
-                  'Experience the smooth sounds of live jazz in our intimate club setting. Featuring world-renowned musicians and a full bar with classic cocktails.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    singleEvent?.data?.description ??
+                        'No description available',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
               ),
-
               SizedBox(height: 20.h),
               Align(
                 alignment: Alignment.centerLeft,
@@ -944,7 +981,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
               ),
 
-              SizedBox(height: 10.h),
               SizedBox(height: 10.h),
 
               ListView.builder(
@@ -1007,7 +1043,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     height: 40.h,
                     width: 150.w,
                     child: GestureDetector(
-                      onTap: () => WriteCommentAlertDialogue(context),
+                      onTap: () => WriteReviewAlertDialogue(context),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20.r),
@@ -1033,7 +1069,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
                 ],
               ),
-            SizedBox(height: 20.h,),
+              SizedBox(height: 20.h),
               Consumer<ThemeProvider>(
                 builder: (context, controller, child) => SizedBox(
                   child: Container(

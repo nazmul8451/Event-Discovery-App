@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:provider/provider.dart' show Consumer;
+import 'package:provider/provider.dart' show Consumer, ReadContext, WatchContext;
 
 class ViewEventScreen extends StatefulWidget {
   const ViewEventScreen({super.key});
@@ -16,8 +17,43 @@ class ViewEventScreen extends StatefulWidget {
 }
 
 class _ViewEventScreenState extends State<ViewEventScreen> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+    final eventId =
+        ModalRoute.of(context)!.settings.arguments as String;
+
+    context
+        .read<EventDetailsController>()
+        .getSingleEvent(eventId);
+  });
+  }
   @override
   Widget build(BuildContext context) {
+        final controller = context.watch<EventDetailsController>();
+
+  if (controller.inProgress) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  if (controller.errorMessage != null) {
+    return Scaffold(
+      body: Center(child: Text(controller.errorMessage!)),
+    );
+  }
+
+  final event = controller.singleEvent;
+
+  if (event == null) {
+    return const Scaffold(
+      body: Center(child: Text('No event found')),
+    );
+  }
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),

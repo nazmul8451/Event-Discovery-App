@@ -6,6 +6,7 @@ class Urls {
   static const String verifyOtpUrl = "$baseUrl/api/v1/auth/verify-account";
   static const String resetPassUrl = "$baseUrl/api/v1/auth/reset-password";
   static const String getAllEvent = "$baseUrl/api/v1/event";
-
+  static String getSingleEvent(String eventID) =>
+      "$baseUrl/api/v1/event/$eventID";
+  static const String reviewUrl = "$baseUrl/api/v1/review";
 }
-
