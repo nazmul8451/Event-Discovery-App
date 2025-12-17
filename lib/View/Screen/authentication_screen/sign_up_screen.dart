@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
 import '../../Theme/theme_provider.dart';
 import 'forgot_pass_screen.dart';
@@ -149,9 +151,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           SizedBox(height: 20.h),
                           GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(context, LogInScreen.name);
-                            },
+                            onTap: _signUpIn_Progress
+                                ? null
+                                : onTapSignUp_button,
                             child: Consumer<ThemeProvider>(
                               builder: (context, controller, child) =>
                                   Container(
@@ -167,39 +169,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       ),
                                     ),
                                     child: Center(
-                                      child: Text(
-                                        'Sign up',
-                                        style: TextStyle(
-                                          fontSize: 14.sp.clamp(14, 16),
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      child: _signUpIn_Progress
+                                          ? SizedBox(
+                                              height: 24.h,
+                                              width: 24.h,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 3,
+                                              ),
+                                            )
+                                          : Text(
+                                              'Sign up',
+                                              style: TextStyle(
+                                                fontSize: 14.sp.clamp(14, 16),
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                     ),
                                   ),
                             ),
                           ),
-                          // Consumer2<SignUpController, ThemeProvider>(
-                          //   builder: (context, signUpCtrl, themeCtrl, child) {
-                          //     final progressColor = themeCtrl.isDarkMode
-                          //         ? Color(0xFFCC18CA)
-                          //         : const Color(0xFF6A7282);
 
-                          //     return signUpCtrl.inProgress
-                          //         ? Center(
-                          //             child: CircularProgressIndicator(
-                          //               color: progressColor,
-                          //               strokeWidth: 2,
-                          //             ),
-                          //           )
-                          //         : GestureDetector(
-                          //             onTap: onTapSignUp_button,
-                          //             child: CustomButton(
-                          //               buttonName: 'Sign up',
-                          //             ),
-                          //           );
-                          //   },
-                          // ),
                           SizedBox(height: 20.h),
                           Text(
                             'OR CONTINUE WITH',
@@ -254,35 +245,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void onTapSignUp_button() async {
-    Navigator.pushNamed(context, LogInScreen.name);
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _signUpIn_Progress = true;
+    });
+
+    await _signUp();
+
+    setState(() {
+      _signUpIn_Progress = false;
+    });
   }
-  //sign up api calling
-  // Future<void> _signUp() async {
-  //   final signUpController = Provider.of<SignUpController>(
-  //     context,
-  //     listen: false,
-  //   );
 
-  //   bool isSuccess = await signUpController.signUp(
-  //     emialController.text.trim(),
-  //     nameController.text.trim(),
-  //     passController.text.trim()
-  //     );
+  //  sign up api calling
+  Future<void> _signUp() async {
+    final email = emialController.text.trim();
+    final signUpController = Provider.of<SignUpController>(
+      context,
+      listen: false,
+    );
 
-  //   if (isSuccess) {
-  //     _clearTextField();
-  //     showCustomSnackBar(
-  //       context: context,
-  //       message: "Registration successful! Please verify your email",
-  //     );
-  //   } else {
-  //     showCustomSnackBar(
-  //       context: context,
-  //       message: signUpController.errorMessage ?? "Registration failed",
-  //     );
-  //   }
-  // }
+    bool isSuccess = await signUpController.signUp(
+      email: emialController.text.trim(),
+      name: nameController.text.trim(),
+      password: passController.text,
+      context: context,
+    );
+
+    if (isSuccess) {
+      _clearTextField();
+      showCustomSnackBar(
+        context: context,
+        message: "Registration successful! Please verify your email",
+      );
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerifyAccount(
+              email: email.trim(),
+            ), // trim() যোগ করো + নিশ্চিত করো email empty না
+          ),
+        );
+        print("Email : $email");
+      }
+    } else {
+      showCustomSnackBar(
+        context: context,
+        message: signUpController.errorMessage ?? "Registration failed",
+      );
+    }
+  }
 
   void _clearTextField() {
     nameController.clear();
@@ -303,6 +319,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 }
+
 // Social Login Container – Dark Mode Ready
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
@@ -318,7 +335,7 @@ class ContinueWithContainer extends StatelessWidget {
       height: 36.h,
       width: 70.w,
       decoration: BoxDecoration(
-        color:isDark? Colors.black.withOpacity(0.06): Colors.white,
+        color: isDark ? Colors.black.withOpacity(0.06) : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: isDark
@@ -337,9 +354,13 @@ class ContinueWithContainer extends StatelessWidget {
               ],
       ),
       child: Center(
-        child: Image.asset(iconImg, height: 15.h, width: 15.h,color: isDark? Colors.white: Colors.black,),
+        child: Image.asset(
+          iconImg,
+          height: 15.h,
+          width: 15.h,
+          color: isDark ? Colors.white : Colors.black,
+        ),
       ),
     );
   }
 }
-

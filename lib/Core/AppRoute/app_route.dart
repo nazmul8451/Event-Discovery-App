@@ -9,6 +9,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.d
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
 import '../../View/Screen/Onboarding_screen/get_start_screen.dart';
 import '../../View/Screen/Onboarding_screen/interest_screen.dart';
 import '../../View/Screen/Onboarding_screen/splash_screen.dart';
@@ -33,6 +34,7 @@ class AppRoutes {
   static const String viewEventScreen = ViewEventScreen.name;
   static const String liveStream = LiveStream.name;
   static const String newPassScreen = NewPasswordScreen.name;
+  static const String verifyAccount = '/verify-account';
 
   static final routes = {
     splash: (context) => const SplashScreen(),
@@ -51,5 +53,6 @@ class AppRoutes {
     viewEventScreen: (context) => const ViewEventScreen(),
     liveStream: (context) => LiveStream(),
     newPassScreen: (context) => NewPasswordScreen(),
+    verifyAccount : (context) => VerifyAccount(email: '',),
   };
 }

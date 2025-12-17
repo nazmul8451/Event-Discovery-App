@@ -18,6 +18,7 @@ class EventDetailsController extends ChangeNotifier {
     try {
       final response = await NetworkCaller.getRequest(
         url: Urls.getSingleEvent(eventId),
+        token: "",
       );
 
       print("=====================Raw Response========================");

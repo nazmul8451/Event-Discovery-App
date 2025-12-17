@@ -1,52 +1,50 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 class ReivewController extends ChangeNotifier {
-  final bool _inProgress = false;
+  bool _inProgress = false;
   String? _errorMessage;
+
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
-  Future<bool> submitReview(
-    String eventId,
-    String reviewText,
-    int rating,
-  ) async {
-    bool _inProgress = false;
-    bool isSuccess = false;
+  Future<bool> submitReview({
+    required String eventId,
+    required String reviewText,
+    required double rating,  // int এর পরিবর্তে double রাখো, কারণ half rating আসতে পারে
+  }) async {
+    _inProgress = true;
+    _errorMessage = null;
     notifyListeners();
+
     final Map<String, dynamic> requestBody = {
       "eventId": eventId,
-      "reviewText": reviewText,
+      "reviewText": reviewText.trim(),
       "rating": rating,
     };
 
     try {
       final response = await NetworkCaller.postRequest(
         url: Urls.reviewUrl,
-        body: requestBody as Map<String, String>?,
+        body: requestBody,
       );
 
       if (response.isSuccess) {
-        isSuccess = true;
         _inProgress = false;
         notifyListeners();
+        return true;
       } else {
-        isSuccess = false;
+        _errorMessage = response.errorMessage ?? "Failed to submit review";
         _inProgress = false;
         notifyListeners();
-        throw Exception('Failed to submit review: ${response.errorMessage}');
+        return false;
       }
     } catch (e) {
       _errorMessage = "Something went wrong! Please try again.";
-    } finally {
       _inProgress = false;
       notifyListeners();
+      return false;
     }
-
-    return isSuccess;
   }
 }

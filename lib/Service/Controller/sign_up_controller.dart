@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
-import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
-import 'package:provider/provider.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/verify_account.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 
 class SignUpController extends ChangeNotifier {
   bool _inProgress = false;
@@ -11,47 +11,65 @@ class SignUpController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
+  Future<bool> signUp({
+    required String email,
+    required String name,
+    required String password,
+    required BuildContext context,
+  }) async {
+    _inProgress = true;
+    _errorMessage = null;
+    notifyListeners();
 
-Future<bool> signUp({
-  required String email,
-  required String name,
-  required String password,
-  required BuildContext context,     // এটা বাধ্যতামূলক
-}) async {
-  _inProgress = true;
-  _errorMessage = null;
-  notifyListeners();
+    final body = {
+      "name": name,
+      "email": email,
+      "password": password,
+    };
 
-  final body = {"name": name, "email": email, "password": password};
+    try {
+      final response = await NetworkCaller.postRequest(
+        url: Urls.registrationUrl, // /api/v1/auth/signup
+        body: body,
+      );
 
-  try {
-    final response = await NetworkCaller.postRequest(
-      url: Urls.registrationUrl,
-      body: body,
-    );
+      _inProgress = false;
+      notifyListeners();
 
-    if (response.isSuccess) {
-      // এখন এখানে email সেভ + OTP পাঠাও
-      final emailVerifyCtrl = Provider.of<EmailVerifyController>(context, listen: false);
-
-      final otpSent = await emailVerifyCtrl.initializeAndSendOtp(email);
-
-      if (otpSent) {
-        return true;           // SignUp + OTP সব সাকসেস
+      if (response.isSuccess) {
+        // সাকসেস — OTP অটো সেন্ড হয়েছে ব্যাকএন্ড থেকে
+        if (context.mounted) {
+          showCustomSnackBar(
+            context: context,
+            message: "Registration successful! Please check your email for OTP",
+            isError: false,
+          );        
+        }
+        return true;
       } else {
-        _errorMessage = emailVerifyCtrl.errorMessage;
+        // এরর হ্যান্ডেল
+        String errorMsg = "Registration failed";
+        if (response.body != null && response.body is Map) {
+          final Map bodyMap = response.body as Map;
+          if (bodyMap['errorMessages'] is List && (bodyMap['errorMessages'] as List).isNotEmpty) {
+            errorMsg = bodyMap['errorMessages'][0]['message'];
+          } else if (bodyMap['message'] is String) {
+            errorMsg = bodyMap['message'];
+          }
+        }
+
+        _errorMessage = errorMsg;
+
+        if (context.mounted) {
+          showCustomSnackBar(context: context, message: errorMsg);
+        }
         return false;
       }
-    } else {
-      _errorMessage = response.errorMessage ?? "Registration failed";
+    } catch (e) {
+      _inProgress = false;
+      _errorMessage = "Something went wrong";
+      notifyListeners();
       return false;
     }
-  } catch (e) {
-    _errorMessage = "Something went wrong";
-    return false;
-  } finally {
-    _inProgress = false;
-    notifyListeners();
   }
-}
 }

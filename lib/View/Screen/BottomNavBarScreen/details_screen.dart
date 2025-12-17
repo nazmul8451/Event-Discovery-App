@@ -45,6 +45,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     carouselController = CarouselSliderController();
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -74,7 +75,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         context: context,
         barrierDismissible: false,
         builder: (_) => Consumer<ReivewController>(
-          builder:(context,controller,child)=> AlertDialog(
+          builder: (context, controller, child) => AlertDialog(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
@@ -118,61 +119,67 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                           SizedBox(width: 10.w),
                           Consumer<ThemeProvider>(
-                            builder: (context, controller, child) => GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Container(
-                                margin: EdgeInsets.only(right: 10),
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: controller.isDarkMode
-                                      ? Color(0xFF3E043F)
-                                      : Color(0xFF686868),
-                                  // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.asset(
-                                    'assets/images/cross_icon.png',
+                            builder: (context, controller, child) =>
+                                GestureDetector(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Container(
+                                    margin: EdgeInsets.only(right: 10),
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: controller.isDarkMode
+                                          ? Color(0xFF3E043F)
+                                          : Color(0xFF686868),
+                                      // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Image.asset(
+                                        'assets/images/cross_icon.png',
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
                           ),
                         ],
                       ),
                       SizedBox(height: 20.h),
-                   // Rating Bar
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Rating', style: Theme.of(context).textTheme.titleSmall),
-                      SizedBox(height: 10.h),
-                      Row(
+                      // Rating Bar
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          RatingBar.builder(
-                            initialRating: 5,
-                            minRating: 1,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            itemSize: 35.h,
-                            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                            itemBuilder: (context, _) => Icon(
-                              Icons.star_border_outlined,
-                              color: Colors.white,
-                            ),
-                            onRatingUpdate: (rating) {
-                              _currentRating = rating;
-                            },
+                          Text(
+                            'Rating',
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
-                          SizedBox(width: 10.w,),
-                          Text('${_currentRating.toStringAsFixed(1)}')
+                          SizedBox(height: 10.h),
+                          Row(
+                            children: [
+                              RatingBar.builder(
+                                initialRating: 5,
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 35.h,
+                                itemPadding: EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                ),
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.star_border_outlined,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                                onRatingUpdate: (rating) {
+                                  _currentRating = rating;
+                                },
+                              ),
+                              SizedBox(width: 10.w),
+                              Text('${_currentRating.toStringAsFixed(1)}'),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
                       SizedBox(height: 24.h),
                       AuthTextField(
                         controller: _reviewController,
@@ -188,7 +195,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 children: [
                                   Text(
                                     '0/500',
-                                    style: Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                 ],
                               ),
@@ -197,7 +206,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 children: [
                                   Text(
                                     'characters',
-                                    style: Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                 ],
                               ),
@@ -222,11 +233,53 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               ),
                               padding: EdgeInsets.zero, // overflow রোধ
                             ),
-                            onPressed: ()=>controller.inProgress? null: ()async{
-                              if(_reviewController.text.trim().isEmpty){
-                                showCustomSnackBar(context: context, message: "Please write a review");
-                              }return ;
-                            },
+                            onPressed: controller.inProgress
+                                ? null
+                                : () async {
+                                    if (_reviewController.text.trim().isEmpty) {
+                                      showCustomSnackBar(
+                                        context: context,
+                                        message: "Please write a review",
+                                      );
+                                      return;
+                                    }
+
+                                    if (_currentRating < 1) {
+                                      showCustomSnackBar(
+                                        context: context,
+                                        message: "Please give a rating",
+                                      );
+                                      return;
+                                    }
+
+                                    final eventId = singleEvent!.data!.id;
+                                    final bool success = await context
+                                        .read<ReivewController>()
+                                        .submitReview(
+                                          eventId: eventId as String,
+                                          reviewText: _reviewController.text
+                                              .trim(),
+                                          rating: _currentRating,
+                                        );
+                                    if (success) {
+                                      Navigator.pop(context);
+                                      showCustomSnackBar(
+                                        context: context,
+                                        message:
+                                            "Review submitted successfully!",
+                                        isError: false,
+                                      );
+                                    } else {
+                                      showCustomSnackBar(
+                                        context: context,
+                                        message:
+                                            context
+                                                .read<ReivewController>()
+                                                .errorMessage ??
+                                            "Failed to submit review",
+                                      );
+                                    }
+                                  },
                             child: Text(
                               'Submit Review',
                               style: TextStyle(

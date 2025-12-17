@@ -16,7 +16,7 @@ class GetAllEventController extends ChangeNotifier {
   String _selectedCategory = "All";
 
   // =========================
-  // ✅ Getters (UI safe)
+  //  Getters
   // =========================
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
@@ -28,17 +28,19 @@ class GetAllEventController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
 
   //coocing search query function for user search experience;
+
   void updateSearchQuery(String query) {
     _searchQuery = query.trim();
     _applySearchAndFilter();
     notifyListeners();
   }
+
   //clear search field
   void clearSearch() {
-  _searchQuery = "";
-  _applySearchAndFilter();
-  notifyListeners();
-}
+    _searchQuery = "";
+    _applySearchAndFilter();
+    notifyListeners();
+  }
 
   //coocing search query function for user search experience;
   void _applySearchAndFilter() {
@@ -70,15 +72,18 @@ class GetAllEventController extends ChangeNotifier {
   }
 
   /// First 2 events → ListView
-List<EventData> get topTwoEvents {
-  return _filteredEvents.take(_filteredEvents.length >= 2 ? 2 : _filteredEvents.length).toList();
-}
+  List<EventData> get topTwoEvents {
+    return _filteredEvents
+        .take(_filteredEvents.length >= 2 ? 2 : _filteredEvents.length)
+        .toList();
+  }
 
-/// Remaining events after removing top 2 → GridView
-List<EventData> get remainingEvents {
-  if (_filteredEvents.length <= 2) return [];
-  return _filteredEvents.skip(2).toList();
-}
+  /// Remaining events after removing top 2 → GridView
+  List<EventData> get remainingEvents {
+    if (_filteredEvents.length <= 2) return [];
+    return _filteredEvents.skip(2).toList();
+  }
+
   List<String> get categories => _categories;
   String get selectedCategory => _selectedCategory;
 
@@ -90,13 +95,12 @@ List<EventData> get remainingEvents {
     _errorMessage = null;
     notifyListeners();
 
-    final token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoSWQiOiI2OTNiM2VlMjAxNDcwOTJlZWUyMTY5OWUiLCJyb2xlIjoidXNlciIsIm5hbWUiOiJraGFsdCIsImVtYWlsIjoib2p6N3pia3dpNEBtcm90emlzLmNvbSIsImlhdCI6MTc2NTU2NjE3MSwiZXhwIjoxNzY2NDMwMTcxfQ.QEJQZfSlcgKLcQT_BZ46pBmRqwz0mHTceV7bDCCXHko';
+    // final token =
+    //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoSWQiOiI2OTNiM2VlMjAxNDcwOTJlZWUyMTY5OWUiLCJyb2xlIjoidXNlciIsIm5hbWUiOiJraGFsdCIsImVtYWlsIjoib2p6N3pia3dpNEBtcm90emlzLmNvbSIsImlhdCI6MTc2NTU2NjE3MSwiZXhwIjoxNzY2NDMwMTcxfQ.QEJQZfSlcgKLcQT_BZ46pBmRqwz0mHTceV7bDCCXHko';
 
     try {
       final response = await NetworkCaller.getRequest(
         url: Urls.getAllEvent,
-        token: token,
       );
 
       if (response.statusCode == 200) {
@@ -122,7 +126,6 @@ List<EventData> get remainingEvents {
             _categories.add(e.category!.trim().capitalize());
           }
         }
-
         _categories = _categories.toSet().toList()..sort();
 
         // Default filter
@@ -144,7 +147,7 @@ List<EventData> get remainingEvents {
   }
 
   // =========================
-  // 🔥 Category Filter
+  // Category Filter
   // =========================
   void applyCategoryFilter(String category) {
     _selectedCategory = category;

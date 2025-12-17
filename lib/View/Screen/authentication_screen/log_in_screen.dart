@@ -163,16 +163,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
                       // Login Button
                       GestureDetector(
-                        onTapDown: (_) {
-                          isPressed = true;
-                        },
-                        onTapUp: (_) {
-                          isPressed = false;
-                          Navigator.pushNamed(context, BottomNavBarScreen.name);
-                        },
-                        onTapCancel: () {
-                          isPressed = false;
-                        },
+                        onTap: _signinIn_Progress ? null : onTapLoginButton,
                         child: Consumer<ThemeProvider>(
                           builder: (context, controller, child) {
                             bool isDark = controller.isDarkMode;
@@ -183,8 +174,6 @@ class _LogInScreenState extends State<LogInScreen> {
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
-
-                                // Border Color — Client Requirement 
                                 border: Border.all(
                                   color: isDark ? Colors.grey : Colors.grey,
                                   width: 1.5,
@@ -205,20 +194,24 @@ class _LogInScreenState extends State<LogInScreen> {
                                   ),
                                 ],
                               ),
-
                               child: Center(
-                                child: Text(
-                                  'Log in',
-                                  style: TextStyle(
-                                    fontSize: 14.sp.clamp(14, 16),
-                                    fontWeight: isPressed
-                                        ? FontWeight.bold
-                                        : FontWeight.w600,
-
-                                    // 👉 Light Mode → Black text, Dark Mode → White text
-                                    color: isDark ? Colors.black : Colors.white,
-                                  ),
-                                ),
+                                child: _signinIn_Progress
+                                    ? SizedBox(
+                                        height: 24.h,
+                                        width: 24.h,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 3,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Log in',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             );
                           },
@@ -361,33 +354,51 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void onTapLoginButton() async {
-    Navigator.pushNamed(context, BottomNavBarScreen.name);
-    //validate and call api -> go to home screen
-    if (_formKey.currentState!.validate()) {
-      // await _Login();
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
+
+    setState(() {
+      _signinIn_Progress = true;
+    });
+
+    await _Login();
+
+    setState(() {
+      _signinIn_Progress = false;
+    });
   }
 
-  // Future<void> _Login() async {
-  //   final logInController = Provider.of<LogInController>(
-  //     context,
-  //     listen: false,
-  //   );
-  //   bool isSuccess = await logInController.login(
-  //     emailController.text.trim(),
-  //     passController.text,
-  //   );
-  //   if (isSuccess) {
-  //     showCustomSnackBar(context: context, message: "Log in success");
-  //     print("Ami log in success hoici kintu verify na howate samne agate parcina");
-  //     Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
-  //   } else {
-  //     showCustomSnackBar(
-  //       context: context,
-  //       message: logInController.errorMessage ?? "Login failed",
-  //     );
-  //   }
-  // }
+  Future<void> _Login() async {
+    final logInController = context.read<LogInController>();
+
+    final bool isSuccess = await logInController.login(
+      emailController.text.trim(),
+      passController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    if (isSuccess) {
+      showCustomSnackBar(
+        context: context,
+        message: "Login successful! 🎉",
+        isError: false,
+      );
+
+      // সাকসেস হলে হোমে যাও
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        BottomNavBarScreen.name,
+        (route) => false,
+      );
+    } else {
+      showCustomSnackBar(
+        context: context,
+        message: logInController.errorMessage ?? "Invalid email or password",
+      );
+    }
+  }
 
   void onTapSignUp_button() {
     //TODO: validate user
