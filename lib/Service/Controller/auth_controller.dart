@@ -24,13 +24,14 @@ class AuthController extends ChangeNotifier {
     required String accessToken,
     required String refreshToken,
   }) async {
-    _accessToken = accessToken;
-    _refreshToken = refreshToken;
-    _isLoggedIn = true;
+    _accessToken = accessToken.trim();
+    _refreshToken = refreshToken.trim();
+    _isLoggedIn = _accessToken!.isNotEmpty;
 
-    await _storage.write(key: _accessTokenKey, value: accessToken);
-    await _storage.write(key: _refreshTokenKey, value: refreshToken);
+    await _storage.write(key: _accessTokenKey, value: _accessToken);
+    await _storage.write(key: _refreshTokenKey, value: _refreshToken);
 
+    debugPrint("✅ Tokens saved successfully");
     notifyListeners();
   }
 
@@ -39,7 +40,12 @@ class AuthController extends ChangeNotifier {
     _accessToken = await _storage.read(key: _accessTokenKey);
     _refreshToken = await _storage.read(key: _refreshTokenKey);
 
-    _isLoggedIn = _accessToken != null && _accessToken!.isNotEmpty;
+    // এখানে বাগ ফিক্স — null চেক করে isNotEmpty করা
+    _isLoggedIn = _accessToken != null && _accessToken!.trim().isNotEmpty;
+
+    debugPrint("🔄 Auth initialized - Logged in: $_isLoggedIn");
+    debugPrint("Access Token: ${_accessToken?.substring(0, 20)}..."); // প্রথম ২০ অক্ষর দেখাও
+
     notifyListeners();
   }
 
@@ -51,6 +57,17 @@ class AuthController extends ChangeNotifier {
 
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+
+    debugPrint("🚪 User logged out - Tokens cleared");
+    notifyListeners();
+  }
+
+  // অপশনাল: টোকেন ম্যানুয়ালি আপডেট করা (refresh token এর জন্য)
+  Future<void> updateAccessToken(String newAccessToken) async {
+    _accessToken = newAccessToken.trim();
+    _isLoggedIn = _accessToken!.isNotEmpty;
+
+    await _storage.write(key: _accessTokenKey, value: _accessToken);
 
     notifyListeners();
   }

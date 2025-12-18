@@ -29,17 +29,19 @@ class OtpVerifyController extends ChangeNotifier {
       notifyListeners();
 
       if (response.isSuccess) {
-        final Map<String, dynamic> data = response.body?['data'];
+        // রেসপন্স থেকে টোকেন নাও
+        final Map<String, dynamic> data = response.body!['data'];
 
-        final String accessToken = data['accessToken'] as String;
-        final String refreshToken = data['refreshToken'] as String;
+        final String accessToken = data['accessToken'];
+        final String refreshToken = data['refreshToken'] ?? '';
 
-        // টোকেন সেভ
+        // এই লাইনটা যোগ করো — এটাই মূল ফিক্স!
         await AuthController().saveTokens(
           accessToken: accessToken,
           refreshToken: refreshToken,
         );
 
+        debugPrint("✅ TOKEN SAVED FROM OTP VERIFY: $accessToken");
         return true;
       } else {
         String msg = "Invalid or expired OTP";
