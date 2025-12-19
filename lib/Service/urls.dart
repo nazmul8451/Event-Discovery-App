@@ -9,4 +9,8 @@ class Urls {
   static String getSingleEvent(String eventID) =>
       "$baseUrl/api/v1/event/$eventID";
   static const String reviewUrl = "$baseUrl/api/v1/review";
+  static const String getAllReviewUrl = "$baseUrl/api/v1/review";
+static String getReviewByEventIdUrl(String eventId) {
+    return "$baseUrl/api/v1/review?eventId=$eventId";
+}
 }

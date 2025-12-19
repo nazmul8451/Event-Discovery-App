@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
@@ -33,6 +34,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   SingleEventDataModel? singleEvent;
   double _currentRating = 5.0;
   final TextEditingController _reviewController = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -40,6 +42,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final eventId = ModalRoute.of(context)!.settings.arguments as String;
       context.read<EventDetailsController>().getSingleEvent(eventId);
+      context.read<ReivewController>().getAllReviewsByEventId(eventId: eventId);
       print("Event ID in Details Screen: $eventId");
     });
 
@@ -75,7 +78,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         context: context,
         barrierDismissible: false,
         builder: (_) => Consumer<ReivewController>(
-          builder: (context, controller, child) => AlertDialog(
+          builder: (context, review_controller, child) => AlertDialog(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
@@ -261,23 +264,41 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                               .trim(),
                                           rating: _currentRating,
                                         );
+
                                     if (success) {
-                                      Navigator.pop(context);
+                                      Navigator.pop(context); // dialog close
+                                      _reviewController
+                                          .clear(); // text field clear
+
                                       showCustomSnackBar(
                                         context: context,
                                         message:
                                             "Review submitted successfully!",
                                         isError: false,
                                       );
-                                    } else {
-                                      showCustomSnackBar(
-                                        context: context,
-                                        message:
-                                            context
-                                                .read<ReivewController>()
-                                                .errorMessage ??
-                                            "Failed to submit review",
+
+                                      final currentUserName = "Rimon islam";
+                                      final newReview = AllReviewModelByEventId(
+                                        id: "local_${DateTime.now().millisecondsSinceEpoch}", // temporary id
+                                        eventId: eventId as String,
+                                        reviewerName: currentUserName,
+                                        reviewerId:
+                                            "current_user_id", // optional
+                                        rating: _currentRating,
+                                        reviewText: _reviewController.text
+                                            .trim(),
+                                        createdAt: DateTime.now(),
                                       );
+
+                                      // এটা call করো – list এ উপরে add হবে + count বাড়বে
+                                      context
+                                          .read<ReivewController>()
+                                          .addReviewLocally(newReview);
+
+                                      // optional: text field clear
+                                      _reviewController.clear();
+                                    } else {
+                                      // error
                                     }
                                   },
                             child: Text(
@@ -1055,29 +1076,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 },
               ),
               SizedBox(height: 20.h),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  height: 40.h,
-                  width: 150.w,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFFCC18CA).withOpacity(0.15),
+              Consumer<ReivewController>(
+                builder: (context, ctrl, child) => Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    height: 40.h,
+                    width: 150.w,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          width: 1,
+                          color: Color(0xFFCC18CA).withOpacity(0.15),
+                        ),
                       ),
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.star_border_outlined),
-                          Text(
-                            'Reviews (189)',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                        ],
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.star_border_outlined),
+                            Text(
+                              'Reviews (${ctrl.totalReview})',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1129,135 +1152,117 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     margin: EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFFB026FF).withOpacity(0.15),
-                      ),
+                      // border: Border.all(
+                      //   width: 1,
+                      //   color: Color(0xFFB026FF).withOpacity(0.15),
+                      // ),
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              CircleAvatar(),
-                              SizedBox(width: 10.w),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
+                    child: Consumer<ReivewController>(
+                      builder: (context, reviewCtrl, child) {
+                        if (reviewCtrl.inProgress) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+
+                        if (reviewCtrl.review.isEmpty) {
+                          return Center(
+                            child: Text(
+                              "No reviews yet. Be the first to review!",
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.grey),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: reviewCtrl.review.length,
+                          itemBuilder: (context, index) {
+                            final review = reviewCtrl.review[index];
+
+                            return Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.only(bottom: 12.h),
+                                  padding: EdgeInsets.all(16.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15.r),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Color(
+                                        0xFFB026FF,
+                                      ).withOpacity(0.15),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Alex K.',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium,
+                                      CircleAvatar(
+                                        radius: 22.r,
+                                        backgroundColor: Color(
+                                          0xFFCC18CA,
+                                        ).withOpacity(0.3),
+                                        child: Text(
+                                          review.reviewerName[0].toUpperCase(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.sp,
+                                          ),
+                                        ),
                                       ),
-                                      SizedBox(height: 10.h),
-                                      Text(
-                                        'Oct 2025',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w200,
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              review.reviewerName,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                             ),
+                                            SizedBox(height: 4.h),
+                                            // Text(
+                                            //   _formatDate(review.createdAt),
+                                            //   style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            //     color: Colors.grey,
+                                            //   ),
+                                            // ),
+                                            SizedBox(height: 10.h),
+                                            Text(
+                                              review.reviewText,
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium,
+                                            ),
+                                            SizedBox(height: 10.h),
+                                            RatingBarIndicator(
+                                              rating: review.rating,
+                                              itemBuilder: (context, _) => Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                                size: 18.sp,
+                                              ),
+                                              itemCount: 5,
+                                              itemSize: 20.sp,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
-
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'Beautiful venue',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w400),
-                                  ),
-                                ],
-                              ),
-                              Spacer(),
-                              RatingBarIndicator(
-                                rating: 4.5,
-                                itemBuilder: (context, index) =>
-                                    const Icon(Icons.star, color: Colors.grey),
-                                itemCount: 5,
-                                itemSize: 20.0,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10.h),
-              Consumer<ThemeProvider>(
-                builder: (context, controller, child) => SizedBox(
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        width: 1,
-                        color: Color(0xFFB026FF).withOpacity(0.15),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              CircleAvatar(),
-                              SizedBox(width: 10.w),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        'Jessica T.',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium,
-                                      ),
-                                      SizedBox(height: 10.h),
-                                      Text(
-                                        'Oct 2025',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w200,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'Beautiful venue',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w400),
-                                  ),
-                                ],
-                              ),
-                              Spacer(),
-                              RatingBarIndicator(
-                                rating: 4.5,
-                                itemBuilder: (context, index) =>
-                                    const Icon(Icons.star, color: Colors.grey),
-                                itemCount: 5,
-                                itemSize: 20.0,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),

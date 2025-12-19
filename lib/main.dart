@@ -23,7 +23,7 @@ import 'View/Theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-
+  await AuthController().initialize();
   runApp(
     DevicePreview(
       enabled: true, // ⚡ Device Preview ON
@@ -48,9 +48,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EmailVerifyController()),
         ChangeNotifierProvider(create: (_) => GetAllEventController()),
         ChangeNotifierProvider(create: (_) => EventDetailsController()),
-        ChangeNotifierProvider(create: (_)=>ReivewController()),
-        ChangeNotifierProvider(create:(_)=>OtpVerifyController(),),
-        ChangeNotifierProvider(create: (_)=>AuthController()),
+        ChangeNotifierProvider(create: (_) => ReivewController()),
+        ChangeNotifierProvider(create: (_) => OtpVerifyController()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

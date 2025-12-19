@@ -23,7 +23,8 @@ class NetworkCaller {
   // GET Request
   static Future<NetworkResponse> getRequest({
     required String url,
-    bool requireAuth = true,  String? token, 
+    bool requireAuth = true,
+    String? token,
   }) async {
     try {
       final Uri uri = Uri.parse(url);
@@ -56,52 +57,53 @@ class NetworkCaller {
   }
 
   // POST Request
-static Future<NetworkResponse> postRequest({
-  required String url,
-  Map<String, dynamic>? body,
-  bool requireAuth = true, // ডিফল্ট true — রিভিউর জন্য true রাখো
-}) async {
-  try {
-    final Uri uri = Uri.parse(url);
+  static Future<NetworkResponse> postRequest({
+    required String url,
+    Map<String, dynamic>? body,
+    bool requireAuth = true, 
+  }) async {
+    try {
+      final Uri uri = Uri.parse(url);
 
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
+      final Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
-    // এখানে অটো টোকেন যোগ করো
-    if (requireAuth) {
-      final String? token = AuthController().accessToken;
-      if (token != null && token.isNotEmpty) {
-        headers['Authorization'] = 'Bearer $token';
-        debugPrint("TOKEN ADDED TO HEADER: Bearer $token"); // ডিবাগের জন্য
-      } else {
-        debugPrint("NO TOKEN FOUND IN AuthController");
+      // এখানে অটো টোকেন যোগ করো
+      if (requireAuth) {
+        final String? token = AuthController().accessToken;
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
+          debugPrint("TOKEN ADDED TO HEADER: Bearer $token"); 
+        } else {
+          debugPrint("NO TOKEN FOUND IN AuthController");
+        }
       }
+
+      final String? encodedBody = body != null ? jsonEncode(body) : null;
+
+      _logRequest('POST', url, body, headers);
+
+      final http.Response response = await http.post(
+        uri,
+        headers: headers,
+        body: encodedBody,
+      );
+
+      _logResponse('POST', url, response);
+
+      return _parseResponse(response);
+    } catch (e) {
+      debugPrint('Network Error (POST): $e');
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: -1,
+        errorMessage: 'No internet or server error',
+      );
     }
-
-    final String? encodedBody = body != null ? jsonEncode(body) : null;
-
-    _logRequest('POST', url, body, headers);
-
-    final http.Response response = await http.post(
-      uri,
-      headers: headers,
-      body: encodedBody,
-    );
-
-    _logResponse('POST', url, response);
-
-    return _parseResponse(response);
-  } catch (e) {
-    debugPrint('Network Error (POST): $e');
-    return NetworkResponse(
-      isSuccess: false,
-      statusCode: -1,
-      errorMessage: 'No internet or server error',
-    );
   }
-}
+
   // Common response parser
   static NetworkResponse _parseResponse(http.Response response) {
     try {
