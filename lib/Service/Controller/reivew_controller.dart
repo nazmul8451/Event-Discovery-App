@@ -6,6 +6,7 @@ import 'package:gathering_app/Service/urls.dart';
 class ReivewController extends ChangeNotifier {
   bool _inProgress = false;
   String? _errorMessage;
+  bool _showAllReviews = false;
 
   List<AllReviewModelByEventId> _review = [];
 
@@ -16,6 +17,16 @@ class ReivewController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   List<AllReviewModelByEventId> get review => _review;
   int get totalReview => _totalReview;
+  bool get showAllReviews => _showAllReviews;
+
+  void toggleShowAll(){
+    _showAllReviews = !_showAllReviews;
+    notifyListeners();
+  }
+  void resetShowAll() {
+    _showAllReviews = false;
+    notifyListeners();
+  }
 
   Future<bool> submitReview({
     required String eventId,

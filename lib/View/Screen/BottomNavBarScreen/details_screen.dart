@@ -285,12 +285,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         reviewerId:
                                             "current_user_id", // optional
                                         rating: _currentRating,
-                                        reviewText: _reviewController.text
-                                            .trim(),
+                                        review: _reviewController.text.trim(),
                                         createdAt: DateTime.now(),
                                       );
 
-                                      // এটা call করো – list এ উপরে add হবে + count বাড়বে
                                       context
                                           .read<ReivewController>()
                                           .addReviewLocally(newReview);
@@ -1160,7 +1158,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: Consumer<ReivewController>(
                       builder: (context, reviewCtrl, child) {
                         if (reviewCtrl.inProgress) {
-                          return Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
 
                         if (reviewCtrl.review.isEmpty) {
@@ -1168,106 +1168,154 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             child: Text(
                               "No reviews yet. Be the first to review!",
                               style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: Colors.grey),
+                                  ?.copyWith(
+                                    color: Colors.grey,
+                                    fontSize: 16.sp,
+                                  ),
                             ),
                           );
                         }
 
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: reviewCtrl.review.length,
-                          itemBuilder: (context, index) {
-                            final review = reviewCtrl.review[index];
+                        // কতগুলো review দেখাবে initially?
+                        final int initialDisplayCount = 3;
+                        final bool showSeeMore =
+                            reviewCtrl.review.length > initialDisplayCount;
 
-                            return Column(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(bottom: 12.h),
-                                  padding: EdgeInsets.all(16.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.r),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(
-                                        0xFFB026FF,
-                                      ).withOpacity(0.15),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 22.r,
-                                        backgroundColor: Color(
-                                          0xFFCC18CA,
-                                        ).withOpacity(0.3),
-                                        child: Text(
-                                          review.reviewerName[0].toUpperCase(),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.sp,
-                                          ),
+                        // দেখানোর জন্য reviews determine করো
+                        final List<AllReviewModelByEventId> displayedReviews =
+                            reviewCtrl.showAllReviews
+                            ? reviewCtrl.review
+                            : reviewCtrl.review
+                                  .take(initialDisplayCount)
+                                  .toList();
+
+                        return Column(
+                          children: [
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: displayedReviews.length,
+                              itemBuilder: (context, index) {
+                                final review = displayedReviews[index];
+
+                                return  Container(
+  margin: EdgeInsets.only(bottom: 16.h),
+  padding: EdgeInsets.all(16.w),
+  decoration: BoxDecoration(
+    color: Theme.of(context).cardColor,
+    borderRadius: BorderRadius.circular(15.r),
+    border: Border.all(
+      width: 1,
+      color: Color(0xFFB026FF).withOpacity(0.15),
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.05),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Header: Avatar + Name + Time
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 22.r,
+            backgroundColor: const Color(0xFFCC18CA).withOpacity(0.3),
+            child: Text(
+              review.reviewerName[0].toUpperCase(),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18.sp,
+              ),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  review.reviewerName,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  _formatReviewTime(review.createdAt),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          RatingBarIndicator(
+            rating: review.rating,
+            itemBuilder: (context, _) => const Icon(
+              Icons.star,
+              color: Colors.amber,
+            ),
+            itemCount: 5,
+            itemSize: 20.sp,
+          ),
+        ],
+      ),
+      SizedBox(height: 12.h),
+
+      // Full Review Text – যত লম্বা হোক, নিচে নেমে যাবে
+      Text(
+        review.review,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          height: 1.5, // line spacing for better reading
+        ),
+      ),
+
+    
+    ],
+  ),
+);
+                              },
+                            ),
+
+                            // See More Button
+                            if (showSeeMore)
+                              GestureDetector(
+                                onTap: () {
+                                  context
+                                      .read<ReivewController>()
+                                      .toggleShowAll();
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12.h),
+                                  child: Text(
+                                    reviewCtrl.showAllReviews
+                                        ? "Show Less"
+                                        : "See More Reviews (${reviewCtrl.review.length - initialDisplayCount} more)",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: const Color(0xFFB026FF),
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                      ),
-                                      SizedBox(width: 12.w),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              review.reviewerName,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                            ),
-                                            SizedBox(height: 4.h),
-                                            // Text(
-                                            //   _formatDate(review.createdAt),
-                                            //   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            //     color: Colors.grey,
-                                            //   ),
-                                            // ),
-                                            SizedBox(height: 10.h),
-                                            Text(
-                                              review.reviewText,
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium,
-                                            ),
-                                            SizedBox(height: 10.h),
-                                            RatingBarIndicator(
-                                              rating: review.rating,
-                                              itemBuilder: (context, _) => Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
-                                                size: 18.sp,
-                                              ),
-                                              itemCount: 5,
-                                              itemSize: 20.sp,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
-                              ],
-                            );
-                          },
+                              ),
+                          ],
                         );
                       },
                     ),
                   ),
                 ),
               ),
-
+              SizedBox(height: 20.h),
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, ViewEventScreen.name);
@@ -1281,5 +1329,48 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
       ),
     );
+  }
+
+  String _formatReviewTime(DateTime date) {
+    // সবসময় local timezone-এ convert করো
+    final localDate = date.toLocal();
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final reviewDate = DateTime(localDate.year, localDate.month, localDate.day);
+
+    // Time format (12-hour with AM/PM)
+    String hour = localDate.hour > 12
+        ? (localDate.hour - 12).toString()
+        : localDate.hour.toString();
+    if (hour == '0') hour = '12';
+    String minute = localDate.minute.toString().padLeft(2, '0');
+    String period = localDate.hour >= 12 ? 'PM' : 'AM';
+    String timeStr = "$hour:$minute $period";
+
+    // Date logic
+    if (reviewDate == today) {
+      return timeStr; // আজকের → শুধু time
+    } else if (reviewDate == yesterday) {
+      return "Yesterday at $timeStr"; // গতকাল → time সহ
+    } else {
+      // পুরানো → তারিখ
+      String month = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ][localDate.month - 1];
+      return "$month ${localDate.day} at $timeStr";
+    }
   }
 }

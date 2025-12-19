@@ -4,7 +4,7 @@ class AllReviewModelByEventId {
   final String reviewerName;
   final String reviewerId;
   final double rating;
-  final String reviewText;
+  final String review;
   final DateTime createdAt;
 
   AllReviewModelByEventId({
@@ -13,7 +13,7 @@ class AllReviewModelByEventId {
     required this.reviewerName,
     required this.reviewerId,
     required this.rating,
-    required this.reviewText,
+    required this.review,
     required this.createdAt,
   });
 
@@ -24,7 +24,7 @@ class AllReviewModelByEventId {
       reviewerName: json['reviewer']['name'] ?? 'Anonymous',
       reviewerId: json['reviewer']['_id'] ?? '',
       rating: (json['rating'] as num).toDouble(),
-      reviewText: json['review'] ?? '',
+      review: json['review'] ?? '',
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
