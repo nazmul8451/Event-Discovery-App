@@ -5,7 +5,7 @@ import 'package:gathering_app/Service/urls.dart';
 class EmailVerifyController extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
-  String _email = '';           // এখানে email সেভ থাকবে
+  String _email = '';           
   String? _otpToken;
 
   // Getters

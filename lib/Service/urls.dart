@@ -10,9 +10,10 @@ class Urls {
       "$baseUrl/api/v1/event/$eventID";
   static const String reviewUrl = "$baseUrl/api/v1/review";
   static const String getAllReviewUrl = "$baseUrl/api/v1/review";
-static String getReviewByEventIdUrl(String eventId) {
+  static String getReviewByEventIdUrl(String eventId) {
     return "$baseUrl/api/v1/review?eventId=$eventId";
-}
+  }
+
   static const String userProfileUrl = "$baseUrl/api/v1/user/profile";
   static const String updateProfileUrl = "$baseUrl/api/v1/user/profile";
 }

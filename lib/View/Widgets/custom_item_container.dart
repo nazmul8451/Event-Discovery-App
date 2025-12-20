@@ -31,7 +31,7 @@ class Custom_item_container extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                  child: CachedNetworkImage( // পরে যোগ করবো, আপাতত Image.network
+                  child: CachedNetworkImage( 
                     imageUrl: (event.images != null && event.images!.isNotEmpty)
                         ? "${Urls.baseUrl}${event.images!.first}"
                         : "assets/images/personLocation.jpg",

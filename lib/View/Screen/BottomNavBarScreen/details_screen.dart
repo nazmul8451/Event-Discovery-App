@@ -1198,89 +1198,107 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               itemBuilder: (context, index) {
                                 final review = displayedReviews[index];
 
-                                return  Container(
-  margin: EdgeInsets.only(bottom: 16.h),
-  padding: EdgeInsets.all(16.w),
-  decoration: BoxDecoration(
-    color: Theme.of(context).cardColor,
-    borderRadius: BorderRadius.circular(15.r),
-    border: Border.all(
-      width: 1,
-      color: Color(0xFFB026FF).withOpacity(0.15),
-    ),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.05),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
-      ),
-    ],
-  ),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Header: Avatar + Name + Time
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 22.r,
-            backgroundColor: const Color(0xFFCC18CA).withOpacity(0.3),
-            child: Text(
-              review.reviewerName[0].toUpperCase(),
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18.sp,
-              ),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  review.reviewerName,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  _formatReviewTime(review.createdAt),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          RatingBarIndicator(
-            rating: review.rating,
-            itemBuilder: (context, _) => const Icon(
-              Icons.star,
-              color: Colors.amber,
-            ),
-            itemCount: 5,
-            itemSize: 20.sp,
-          ),
-        ],
-      ),
-      SizedBox(height: 12.h),
-
-      // Full Review Text – যত লম্বা হোক, নিচে নেমে যাবে
-      Text(
-        review.review,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          height: 1.5, // line spacing for better reading
-        ),
-      ),
-
-    
-    ],
-  ),
-);
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: 16.h),
+                                  padding: EdgeInsets.all(16.w),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(15.r),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: Color(
+                                        0xFFB026FF,
+                                      ).withOpacity(0.15),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Header: Avatar + Name + Time
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 22.r,
+                                            backgroundColor: const Color(
+                                              0xFFCC18CA,
+                                            ).withOpacity(0.3),
+                                            child: Text(
+                                              review.reviewerName[0]
+                                                  .toUpperCase(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.sp,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  review.reviewerName,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                ),
+                                                SizedBox(height: 4.h),
+                                                Text(
+                                                  _formatReviewTime(
+                                                    review.createdAt,
+                                                  ),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall
+                                                      ?.copyWith(
+                                                        color: Colors.grey,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          RatingBarIndicator(
+                                            rating: review.rating,
+                                            itemBuilder: (context, _) =>
+                                                const Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                ),
+                                            itemCount: 5,
+                                            itemSize: 20.sp,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      Text(
+                                        review.review,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              height:
+                                                  1.5, // line spacing for better reading
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
                             ),
 

@@ -61,9 +61,7 @@ void showCustomSnackBar({
         right: 20,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 10,
       duration: duration,
       animation: CurvedAnimation(

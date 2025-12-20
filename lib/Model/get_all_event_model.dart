@@ -98,8 +98,8 @@ class EventData {
   int? capacity;
   int? ticketsSold;
   int? ticketPrice;
-  List<String>? images;        // ← এখানে String
-  List<String>? gallery;       // ← এখানে String
+  List<String>? images;       
+  List<String>? gallery;      
   int? views;
   int? favorites;
   bool? hasLiveStream;
