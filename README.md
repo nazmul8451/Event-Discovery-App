@@ -1,4 +1,4 @@
-# Gathering – The Ultimate Event Discovery & Social App
+## Gathering – The Ultimate Event Discovery & Social App
 
 <img src="https://github.com/your-username/Gathering/blob/main/screenshots/banner.jpg?raw=true" alt="Gathering App Banner" />
 
