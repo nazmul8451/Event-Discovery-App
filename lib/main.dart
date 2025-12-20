@@ -8,6 +8,7 @@ import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ProfileController()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),

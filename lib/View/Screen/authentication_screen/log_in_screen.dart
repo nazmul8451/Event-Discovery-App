@@ -261,57 +261,8 @@ class _LogInScreenState extends State<LogInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          GestureDetector(
-                            onTap: () async {
-                              setState(() => _signinIn_Progress = true);
-
-                              try {
-                                final UserCredential? result =
-                                    await GoogleSignInService.signInWithGoogle();
-
-                                if (!mounted) return;
-
-                                if (result != null) {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message:
-                                        "Welcome ${result.user?.displayName ?? "User"}!",
-                                    isError: false,
-                                  );
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    BottomNavBarScreen.name,
-                                  );
-                                } else {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: "Google Sign-In cancelled",
-                                  );
-                                }
-                              } catch (e) {
-                                if (mounted) {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: "Login failed: $e",
-                                  );
-                                }
-                              } finally {
-                                if (mounted) {
-                                  setState(() => _signinIn_Progress = false);
-                                }
-                              }
-                            },
-                            child: _signinIn_Progress
-                                ? const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(
-                                      color: Color(0xFFCC18CA),
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : ContinueWithContainer(
-                                    iconImg: 'assets/images/gmail_icon.png',
-                                  ),
+                          ContinueWithContainer(
+                            iconImg: 'assets/images/facebook_icon.png',
                           ),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',

@@ -1,20 +1,22 @@
 class UserProfileModel {
-  final Location location;
-  final Settings settings;
-  final String id;
-  final String name;
-  final String email;
-  final List<String> interest;
-  final String status;
-  final bool verified;
-  final bool subscribe;
-  final String role;
-  final String timezone;
-  final bool isOnboardingComplete;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final Location? location;
+  final Settings? settings;
+  final String? id;
+  final String? name;
+  final String? email;
+  final List<String>? interest;
+  final String? status;
+  final bool? verified;
+  final bool? subscribe;
+  final String? role;
+  final String? timezone;
+  final String ? description;
+  final bool? isOnboardingComplete;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   UserProfileModel({
+    required this.description,
     required this.location,
     required this.settings,
     required this.id,
@@ -38,6 +40,7 @@ class UserProfileModel {
       settings: Settings.fromJson(json['settings'] ?? {}),
       id: json['id'] ?? json['_id'] ?? '',
       name: json['name'] ?? '',
+      description: json['description'] ?? '',
       email: json['email'] ?? '',
       interest: List<String>.from(json['interest'] ?? []),
       status: json['status'] ?? '',
@@ -46,19 +49,20 @@ class UserProfileModel {
       role: json['role'] ?? '',
       timezone: json['timezone'] ?? '',
       isOnboardingComplete: json['isOnboardingComplete'] ?? false,
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: _parseDate(json['createdAt']),
+      updatedAt: _parseDate(json['updatedAt']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "location": location.toJson(),
-      "settings": settings.toJson(),
+      "location": location,
+      "settings": settings,
       "name": name,
       "email": email,
       "interest": interest,
       "timezone": timezone,
+      "description": description,
       "isOnboardingComplete": isOnboardingComplete,
     };
   }
@@ -68,23 +72,34 @@ class Location {
   final String type;
   final List<double> coordinates;
 
-  Location({
-    required this.type,
-    required this.coordinates,
-  });
+  Location({required this.type, required this.coordinates});
 
   factory Location.fromJson(Map<String, dynamic> json) {
+    var coords = json['coordinates'] ?? [0.0, 0.0];
+    List<double> coordinates;
+    if (coords is List) {
+      coordinates = coords.map((e) => (e as num).toDouble()).toList();
+    } else {
+      coordinates = [0.0, 0.0];
+    }
+
     return Location(
-      type: json['type'] ?? 'Point',
-      coordinates: List<double>.from(json['coordinates'] ?? [0, 0]),
+      type: json['type']?.toString() ?? 'Point',
+      coordinates: coordinates,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      "type": type,
-      "coordinates": coordinates,
-    };
+    return {"type": type, "coordinates": coordinates};
+  }
+}
+
+DateTime _parseDate(String? dateStr) {
+  if (dateStr == null) return DateTime.now();
+  try {
+    return DateTime.parse(dateStr);
+  } catch (e) {
+    return DateTime.now();
   }
 }
 

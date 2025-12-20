@@ -60,7 +60,7 @@ class NetworkCaller {
   static Future<NetworkResponse> postRequest({
     required String url,
     Map<String, dynamic>? body,
-    bool requireAuth = true, 
+    bool requireAuth = true,
   }) async {
     try {
       final Uri uri = Uri.parse(url);
@@ -75,7 +75,7 @@ class NetworkCaller {
         final String? token = AuthController().accessToken;
         if (token != null && token.isNotEmpty) {
           headers['Authorization'] = 'Bearer $token';
-          debugPrint("TOKEN ADDED TO HEADER: Bearer $token"); 
+          debugPrint("TOKEN ADDED TO HEADER: Bearer $token");
         } else {
           debugPrint("NO TOKEN FOUND IN AuthController");
         }
@@ -100,6 +100,53 @@ class NetworkCaller {
         isSuccess: false,
         statusCode: -1,
         errorMessage: 'No internet or server error',
+      );
+    }
+  }
+
+  // PATCH Request (Profile update-এর জন্য)
+  static Future<NetworkResponse> patchRequest({
+    required String url,
+    Map<String, dynamic>? body,
+    bool requireAuth = true,
+  }) async {
+    try {
+      final Uri uri = Uri.parse(url);
+
+      final Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      if (requireAuth) {
+        final String? token = AuthController().accessToken;
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
+          debugPrint("TOKEN ADDED TO PATCH HEADER: Bearer $token");
+        } else {
+          debugPrint("NO TOKEN FOUND IN AuthController for PATCH");
+        }
+      }
+
+      final String? encodedBody = body != null ? jsonEncode(body) : null;
+
+      _logRequest('PATCH', url, body, headers);
+
+      final http.Response response = await http.patch(
+        uri,
+        headers: headers,
+        body: encodedBody,
+      );
+
+      _logResponse('PATCH', url, response);
+
+      return _parseResponse(response);
+    } catch (e) {
+      debugPrint('Network Error (PATCH): $e');
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: -1,
+        errorMessage: 'No internet connection or server error',
       );
     }
   }
