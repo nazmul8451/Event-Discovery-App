@@ -13,4 +13,6 @@ class Urls {
 static String getReviewByEventIdUrl(String eventId) {
     return "$baseUrl/api/v1/review?eventId=$eventId";
 }
+  static const String userProfileUrl = "$baseUrl/api/v1/user/profile";
+
 }

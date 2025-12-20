@@ -294,11 +294,10 @@ class _HomePageState extends State<HomePage> {
                                       controller.remainingEvents[index];
                                   print('All Event -${gridEvent.address}');
                                   return GestureDetector(
-                                    
                                     onTap: () => Navigator.pushNamed(
                                       context,
                                       DetailsScreen.name,
-                                      arguments:gridEvent.id,
+                                      arguments: gridEvent.id,
                                     ),
                                     child: Custom_item_container(
                                       event: controller.remainingEvents[index],
@@ -380,7 +379,7 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                       color: controller.isDarkMode
                           ? Colors.white
-                          : Colors.black,
+                          : Colors.white,
                       fontSize: 22.sp.clamp(22, 22),
                       fontWeight: FontWeight.w700,
                     ),
