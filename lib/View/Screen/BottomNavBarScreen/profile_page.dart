@@ -320,7 +320,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
@@ -1102,31 +1101,46 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ),
                                         SizedBox(height: 30.h),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.person),
-                                            SizedBox(width: 5.w),
-                                            Text(
-                                              'Edit Profile',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
-                                            ),
-                                          ],
+                                        // Row(
+                                        //   children: [
+                                        //     Icon(Icons.person),
+                                        //     SizedBox(width: 5.w),
+                                        //     Text(
+                                        //       'Edit Profile',
+                                        //       style: Theme.of(
+                                        //         context,
+                                        //       ).textTheme.titleMedium,
+                                        //     ),
+                                        //   ],
+                                        // ),
+
+                                        ListTile(
+                                          leading: Icon(Icons.person),
+                                          title: Text(
+                                            'Edit Profile',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          onTap: () {
+                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
+                                          },
                                         ),
                                         SizedBox(height: 20.h),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.favorite_border),
-                                            SizedBox(width: 5.w),
-
-                                            Text(
-                                              'Saved Events',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
-                                            ),
-                                          ],
+                                   
+                                        ListTile(
+                                          leading: Icon(Icons.favorite_border),
+                                          title: Text(
+                                            'Saved Events',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium,
+                                          ),
+                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          onTap: () {
+                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
+                                          },
                                         ),
 
                                         Divider(
@@ -1135,21 +1149,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ).withOpacity(0.15),
                                         ),
                                         SizedBox(height: 20.h),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.logout_outlined,
-                                              color: Colors.red,
-                                            ),
-                                            SizedBox(width: 5.w),
-                                            Text(
-                                              'Sign Out',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium!
-                                                  .copyWith(color: Colors.red),
-                                            ),
-                                          ],
+                                       
+                                        ListTile(
+                                          leading: Icon(Icons.logout_outlined,color: Colors.red,),
+                                          title: Text(
+                                            'Sign Out',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium!.copyWith(color: Colors.red)
+                                          ),
+                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          onTap: () {
+                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
+                                          },
                                         ),
                                       ],
                                     ),

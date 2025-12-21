@@ -287,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                                       crossAxisCount: 2,
                                       mainAxisSpacing: 16.w,
                                       crossAxisSpacing: 16.w,
-                                      childAspectRatio: 0.75,
+                                      childAspectRatio: 0.80,
                                     ),
                                 itemBuilder: (context, index) {
                                   final gridEvent =

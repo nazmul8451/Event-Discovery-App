@@ -67,7 +67,7 @@ class Custom_item_container extends StatelessWidget {
                     event.title ?? "Untitled Event",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 8.h),
                   Row(
@@ -76,8 +76,8 @@ class Custom_item_container extends StatelessWidget {
                       SizedBox(width: 3.w),
                       Expanded(
                         child: Text(
-                        "${event.ticketPrice?? "00"}", // ticketPrice না, date দেখাও
-                          style: TextStyle(fontSize: 9.sp, color: Colors.grey[600]),
+                        "${event.startDate?? "00"}", // ticketPrice না, date দেখাও
+                          style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                         ),
                       ),
                     ],
@@ -90,7 +90,7 @@ class Custom_item_container extends StatelessWidget {
                       Expanded(
                         child: Text(
                           "${event.location ?? "Location TBA"}",
-                          style: TextStyle(fontSize: 9.sp, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
                         ),
                       ),
                     ],
