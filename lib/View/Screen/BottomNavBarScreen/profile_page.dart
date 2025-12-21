@@ -5,6 +5,7 @@ import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -54,8 +55,6 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController bioController = TextEditingController();
 
   void _showEditProfileDialog(BuildContext context) {
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
-    // ProfileController থেকে current user নিয়ে controllers-এ value সেট করা
     final profileController = context.read<ProfileController>();
     final currentUser = profileController.currentUser;
 
@@ -71,11 +70,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
     showDialog(
       context: context,
-      barrierDismissible: !isLoading, // loading থাকলে dialog বন্ধ করা যাবে না
+      barrierDismissible: !isLoading,
       builder: (_) => Consumer<ThemeProvider>(
-        builder:(context,ctrl,child)=> StatefulBuilder(
+        builder: (context, ctrl, child) => StatefulBuilder(
           builder: (context, setState) {
-            final colorScheme  = Theme.of(context).colorScheme;
+            final colorScheme = Theme.of(context).colorScheme;
             final textTheme = Theme.of(context).textTheme;
             return AlertDialog(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -102,7 +101,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   style: TextStyle(
                                     fontSize: 20.sp,
                                     fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                                 SizedBox(height: 4.h),
@@ -110,7 +111,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   "Update your personal information",
                                   textAlign: TextAlign.center,
                                   style: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurface.withOpacity(0.7),)
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.7,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -130,13 +134,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               padding: EdgeInsets.all(10),
-                              child: Image.asset('assets/images/cross_icon.png'),
+                              child: Image.asset(
+                                'assets/images/cross_icon.png',
+                              ),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 24.h),
-        
+
                       // Form Fields
                       Column(
                         children: [
@@ -171,9 +177,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ],
                       ),
-        
+
                       SizedBox(height: 30.h),
-        
+
                       // Buttons
                       Row(
                         children: [
@@ -186,7 +192,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                     : Colors.black54,
                                 elevation: 0,
                                 side: BorderSide(
-                                  color:  ctrl.isDarkMode ? Colors.white38 : Colors.black38,
+                                  color: ctrl.isDarkMode
+                                      ? Colors.white38
+                                      : Colors.black38,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.r),
@@ -197,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   : () => Navigator.pop(context),
                               child: Text(
                                 'Cancel',
-                                style: textTheme.bodyMedium
+                                style: textTheme.bodyMedium,
                               ),
                             ),
                           ),
@@ -217,47 +225,51 @@ class _ProfilePageState extends State<ProfilePage> {
                                       setState(() {
                                         isLoading = true;
                                       });
-        
+
                                       bool success = await profileController
                                           .updateProfile(
-                                            forceRefresh: true,
+                                            // forceRefresh: true,
                                             name: nameController.text.trim(),
-                                            description: bioController.text.trim(),
+                                            description: bioController.text
+                                                .trim(),
+
                                             // location: locationController.text.trim(),
-                                          
-                                          
                                           );
-        
+
                                       if (success) {
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+
                                         if (mounted) {
-                                          Provider.of<ProfileController>(context).fetchProfile(forceRefresh: true);
-                                          Navigator.pop(context);
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
+                                          // if success user profile update go to show snback bar
+                                          showCustomSnackBar(
+                                            context: context,
+                                            message:
                                                 "Profile updated successfully! 🎉",
-                                              ),
-                                              backgroundColor: Colors.green,
-                                            ),
                                           );
+
+                                          // again profile refresh
+                                          Provider.of<ProfileController>(
+                                            context,
+                                            listen: false,
+                                          ).fetchProfile(forceRefresh: true);
+
+                                          //  Dialog off
+                                          Navigator.pop(context);
                                         }
                                       } else {
                                         setState(() {
                                           isLoading = false;
                                         });
                                         if (mounted) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                profileController.errorMessage ??
-                                                    "Failed to update profile",
-                                              ),
-                                              backgroundColor: Colors.red,
-                                            ),
+                                          showCustomSnackBar(
+                                            context: context,
+                                            message:
+                                                profileController
+                                                    .errorMessage ??
+                                                "Failed to update profile",
+                                            isError: true,
                                           );
                                         }
                                       }
@@ -277,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           .textTheme
                                           .bodyMedium
                                           ?.copyWith(
-                                            color:Colors.white,
+                                            color: Colors.white,
                                             fontWeight: FontWeight.w600,
                                           ),
                                     ),
@@ -595,34 +607,85 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                               SizedBox(height: 5.h),
-                              // Filter Chips
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: categories.asMap().entries.map((
-                                    entry,
-                                  ) {
-                                    int index = entry.key;
-                                    var category = entry.value;
-                                    bool isSelected =
-                                        selectedCategoryIndex == index;
 
-                                    return Padding(
-                                      padding: EdgeInsets.only(right: 8.w),
-                                      child: _buildCustomFilterChip(
-                                        label: category["label"],
-                                        icon: category["icon"],
-                                        isSelected: isSelected,
-                                        onTap: () {
-                                          setState(() {
-                                            selectedCategoryIndex = index;
-                                          });
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20.h),
+                                child: Consumer<SavedEventController>(
+                                  builder: (context, savedController, child) {
+                                    final savedEvents =
+                                        savedController.savedEvents;
+
+                                    if (savedEvents.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          "No saved events yet",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.copyWith(color: Colors.grey),
+                                        ),
+                                      );
+                                    }
+
+                                    return SizedBox(
+                                      height: 200.h,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 16.w,
+                                        ),
+                                        itemCount: savedEvents.length,
+                                        itemBuilder: (context, index) {
+                                          final event = savedEvents[index];
+
+                                          return Padding(
+                                            padding: EdgeInsets.only(
+                                              right: 16.w,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                  child: Image.network(
+                                                    event.image ??
+                                                        'https://via.placeholder.com/150',
+                                                    height: 140.h,
+                                                    width: 140.w,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8.h),
+                                                SizedBox(
+                                                  width: 140.w,
+                                                  child: Text(
+                                                    event.title ?? "No title",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
                                         },
                                       ),
                                     );
-                                  }).toList(),
+                                  },
                                 ),
                               ),
+
                               SizedBox(height: 20.h),
                               Row(
                                 mainAxisAlignment:
@@ -805,258 +868,351 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         SizedBox(height: 30.h),
 
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Push Notification',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
-                                                ),
-                                                Text(
-                                                  'Get notified about events',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontSize: 10.sp.clamp(
-                                                          10,
-                                                          13,
-                                                        ),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.78,
-                                              child: Switch(
-                                                value: switchON,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    switchON = newValue;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Email Notifications',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
-                                                ),
-                                                Text(
-                                                  'Receive event updates via email',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontSize: 10.sp.clamp(
-                                                          10,
-                                                          13,
-                                                        ),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.78,
-                                              child: Switch(
-                                                value: notificationSwitch,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    notificationSwitch =
-                                                        newValue;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Location Services',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
-                                                ),
-                                                Text(
-                                                  'Find events near you',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontSize: 10.sp.clamp(
-                                                          10,
-                                                          13,
-                                                        ),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.78,
-                                              child: Switch(
-                                                value: switchON,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    switchON = newValue;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Profile Status',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
-                                                ),
-                                                Text(
-                                                  'Profile Public Or Private',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        fontSize: 10.sp.clamp(
-                                                          10,
-                                                          13,
-                                                        ),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.78,
-                                              child: Switch(
-                                                value: switchON,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    switchON = newValue;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20.h),
+                                        Consumer<ProfileController>(
+                                          builder: (context, profileController, child) {
+                                            final settings = profileController
+                                                .currentUser
+                                                ?.settings;
 
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                            // যদি data না থাকে
+                                            if (settings == null) {
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            }
+
+                                            return Column(
                                               children: [
-                                                Text(
-                                                  'Dark Mode',
-                                                  style: Theme.of(
-                                                    context,
-                                                  ).textTheme.titleMedium,
-                                                ),
-                                                SizedBox(height: 4.h),
-                                                Text(
-                                                  Provider.of<ThemeProvider>(
-                                                        context,
-                                                      ).isDarkMode
-                                                      ? 'Currently Dark'
-                                                      : 'Currently Light',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.copyWith(
-                                                        color: Colors.grey,
-                                                        fontSize: 10.sp.clamp(
-                                                          10,
-                                                          13,
+                                                // Push Notification
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Push Notification',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
                                                         ),
+                                                        Text(
+                                                          'Get notified about events',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .copyWith(
+                                                                fontSize: 10.sp
+                                                                    .clamp(
+                                                                      10,
+                                                                      13,
+                                                                    ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Transform.scale(
+                                                      scale: 0.78,
+                                                      child: Switch(
+                                                        value: settings
+                                                            .pushNotification,
+                                                        activeColor: Color(
+                                                          0xFFB026FF,
+                                                        ),
+                                                        onChanged: (newValue) {
+                                                          profileController
+                                                              .updateSettingsLocally(
+                                                                pushNotification:
+                                                                    newValue,
+                                                              );
+                                                        },
                                                       ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10.h),
+                                                Divider(
+                                                  color: const Color(
+                                                    0xFFCC18CA,
+                                                  ).withOpacity(0.15),
+                                                ),
+                                                SizedBox(height: 10.h),
+
+                                                // Email Notifications
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Email Notifications',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                        ),
+                                                        Text(
+                                                          'Receive event updates via email',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .copyWith(
+                                                                fontSize: 10.sp
+                                                                    .clamp(
+                                                                      10,
+                                                                      13,
+                                                                    ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Transform.scale(
+                                                      scale: 0.78,
+                                                      child: Switch(
+                                                        value: settings
+                                                            .emailNotification,
+                                                        activeColor: Color(
+                                                          0xFFB026FF,
+                                                        ),
+                                                        onChanged: (newValue) {
+                                                          profileController
+                                                              .updateSettingsLocally(
+                                                                emailNotification:
+                                                                    newValue,
+                                                              );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10.h),
+                                                Divider(
+                                                  color: const Color(
+                                                    0xFFCC18CA,
+                                                  ).withOpacity(0.15),
+                                                ),
+                                                SizedBox(height: 10.h),
+
+                                                // Location Services
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Location Services',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                        ),
+                                                        Text(
+                                                          'Find events near you',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .copyWith(
+                                                                fontSize: 10.sp
+                                                                    .clamp(
+                                                                      10,
+                                                                      13,
+                                                                    ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Transform.scale(
+                                                      scale: 0.78,
+                                                      child: Switch(
+                                                        value: settings
+                                                            .locationService,
+                                                        activeColor: Color(
+                                                          0xFFB026FF,
+                                                        ),
+                                                        onChanged: (newValue) {
+                                                          profileController
+                                                              .updateSettingsLocally(
+                                                                locationService:
+                                                                    newValue,
+                                                              );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10.h),
+                                                Divider(
+                                                  color: const Color(
+                                                    0xFFCC18CA,
+                                                  ).withOpacity(0.15),
+                                                ),
+                                                SizedBox(height: 10.h),
+
+                                                // Profile Status (Switch দিয়ে না, Dropdown দিয়ে করা ভালো)
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Profile Status',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                        ),
+                                                        Text(
+                                                          'Profile Public Or Private',
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .titleMedium!
+                                                              .copyWith(
+                                                                fontSize: 10.sp
+                                                                    .clamp(
+                                                                      10,
+                                                                      13,
+                                                                    ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    DropdownButton<String>(
+                                                      value: settings
+                                                          .profileStatus,
+                                                      icon: const Icon(
+                                                        Icons.arrow_drop_down,
+                                                      ),
+                                                      underline:
+                                                          const SizedBox(),
+                                                      items: const [
+                                                        DropdownMenuItem(
+                                                          value: "public",
+                                                          child: Text("Public"),
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          value: "private",
+                                                          child: Text(
+                                                            "Private",
+                                                          ),
+                                                        ),
+                                                      ],
+                                                      onChanged: (newValue) {
+                                                        if (newValue != null) {
+                                                          profileController
+                                                              .updateSettingsLocally(
+                                                                profileStatus:
+                                                                    newValue,
+                                                              );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 20.h),
+
+                                                // Dark Mode (এটা আগের মতোই রাখো — ThemeProvider দিয়ে)
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Dark Mode',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .titleMedium,
+                                                        ),
+                                                        SizedBox(height: 4.h),
+                                                        Text(
+                                                          Provider.of<
+                                                                    ThemeProvider
+                                                                  >(context)
+                                                                  .isDarkMode
+                                                              ? 'Currently Dark'
+                                                              : 'Currently Light',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodySmall
+                                                                  ?.copyWith(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize: 10
+                                                                        .sp
+                                                                        .clamp(
+                                                                          10,
+                                                                          13,
+                                                                        ),
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Transform.scale(
+                                                      scale: 0.85,
+                                                      child: Switch(
+                                                        value:
+                                                            Provider.of<
+                                                                  ThemeProvider
+                                                                >(context)
+                                                                .isDarkMode,
+                                                        activeColor: Color(
+                                                          0xFFB026FF,
+                                                        ),
+                                                        onChanged: (value) {
+                                                          Provider.of<
+                                                                ThemeProvider
+                                                              >(
+                                                                context,
+                                                                listen: false,
+                                                              )
+                                                              .toggleTheme();
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
-                                            ),
-                                            Transform.scale(
-                                              scale: 0.85,
-                                              child: Switch(
-                                                value:
-                                                    Provider.of<ThemeProvider>(
-                                                      context,
-                                                    ).isDarkMode,
-                                                onChanged: (value) {
-                                                  Provider.of<ThemeProvider>(
-                                                    context,
-                                                    listen: false,
-                                                  ).toggleTheme();
-                                                },
-                                              ),
-                                            ),
-                                          ],
+                                            );
+                                          },
                                         ),
 
                                         SizedBox(height: 20.h),
@@ -1101,6 +1257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ),
                                         SizedBox(height: 30.h),
+
                                         // Row(
                                         //   children: [
                                         //     Icon(Icons.person),
@@ -1113,7 +1270,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                         //     ),
                                         //   ],
                                         // ),
-
                                         ListTile(
                                           leading: Icon(Icons.person),
                                           title: Text(
@@ -1122,13 +1278,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                               context,
                                             ).textTheme.titleMedium,
                                           ),
-                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          trailing: Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 16.sp,
+                                          ),
                                           onTap: () {
                                             // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
                                           },
                                         ),
                                         SizedBox(height: 20.h),
-                                   
+
                                         ListTile(
                                           leading: Icon(Icons.favorite_border),
                                           title: Text(
@@ -1137,7 +1296,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                               context,
                                             ).textTheme.titleMedium,
                                           ),
-                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          trailing: Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 16.sp,
+                                          ),
                                           onTap: () {
                                             // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
                                           },
@@ -1149,16 +1311,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ).withOpacity(0.15),
                                         ),
                                         SizedBox(height: 20.h),
-                                       
+
                                         ListTile(
-                                          leading: Icon(Icons.logout_outlined,color: Colors.red,),
+                                          leading: Icon(
+                                            Icons.logout_outlined,
+                                            color: Colors.red,
+                                          ),
                                           title: Text(
                                             'Sign Out',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium!.copyWith(color: Colors.red)
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(color: Colors.red),
                                           ),
-                                          trailing: Icon(Icons.arrow_forward_ios, size: 16.sp,),
+                                          trailing: Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 16.sp,
+                                          ),
                                           onTap: () {
                                             // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
                                           },

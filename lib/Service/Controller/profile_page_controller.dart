@@ -29,120 +29,202 @@ class ProfileController extends ChangeNotifier {
   }
 
   // Profile fetch
-  Future<bool> fetchProfile({required bool forceRefresh}) async {
+Future<bool> fetchProfile({required bool forceRefresh}) async {
+  _inProgress = true;
+  _errorMessage = null;
+  notifyListeners();
+
+  // যদি forceRefresh না হয় এবং ক্যাশে থাকে, তাহলে ক্যাশ থেকে লোড করো
+  if (!forceRefresh) {
+    final cachedJson = _storage.read<Map<String, dynamic>>('cached_user_profile');
+    if (cachedJson != null) {
+      _currentUser = UserProfileModel.fromJson(cachedJson);
+      notifyListeners();
+      _inProgress = false;
+      return true; // ক্যাশ থেকে লোড সাকসেস
+    }
+  }
+
+  try {
+    final response = await NetworkCaller.getRequest(
+      url: Urls.userProfileUrl,
+      requireAuth: true,
+    );
+
+    if (response.isSuccess && response.body != null) {
+      final userData = response.body!['data'] as Map<String, dynamic>;
+
+      print("Full API Response: ${response.body}");
+      print("User Data: $userData");
+
+      _currentUser = UserProfileModel.fromJson(userData);
+
+      // ক্যাশে সেভ করো (এবার মুছবে না!)
+      await _storage.write('cached_user_profile', userData);
+
+      _inProgress = false;
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = response.errorMessage ?? "Failed to load profile";
+      _inProgress = false;
+      notifyListeners();
+      return false;
+    }
+  } catch (e) {
+    _errorMessage = "No internet or server error: $e";
+    _inProgress = false;
+    notifyListeners();
+    return false;
+  }
+}
+Future<bool> updateProfile({
+  String? name,
+  String? description,
+}) async {
+  if (_currentUser == null) return false;
+
+  _inProgress = true;
+  _errorMessage = null;
+  notifyListeners();
+
+  try {
+    _inProgress = true;
+    notifyListeners();
+    Map<String, String> updateData = {};
+
+    if (name != null && name.trim().isNotEmpty) {
+      updateData['name'] = name.trim();
+    }
+    if (description != null && description.trim().isNotEmpty) {
+      updateData['description'] = description.trim();
+    }
+
+    if (updateData.isEmpty) {
+      _inProgress = false;
+      notifyListeners();
+      return true;
+    }
+
+    final response = await NetworkCaller.patchRequest(
+      url: Urls.updateProfileUrl,
+      body: updateData,
+    );
+
+    //  success check
+    if (response.isSuccess) {
+
+      if (name != null && name.trim().isNotEmpty) {
+        _currentUser!.name = name.trim();
+      }
+      if (description != null && description.trim().isNotEmpty) {
+        _currentUser!.description = description.trim();
+      }
+
+      // save storage
+      await _storage.write('cached_user_profile', _currentUser!.toJson());
+      _inProgress = false;
+      notifyListeners();
+
+      return true;
+
+    } else {
+      _errorMessage = response.errorMessage ?? "Update failed";
+      _inProgress = false;
+      notifyListeners();
+      return false;
+    }
+  } catch (e) {
+    _errorMessage = "Update error: $e";
+    _inProgress = false;
+    notifyListeners();
+    return false;
+  }
+}
+
+  // ↑ তোমার updateProfile function এখানে শেষ
+
+  // ================== SETTINGS FUNCTIONS START ==================
+
+  void updateSettingsLocally({
+    bool? pushNotification,
+    bool? emailNotification,
+    bool? locationService,
+    String? profileStatus,
+  }) {
+    if (_currentUser == null || _currentUser!.settings == null) return;
+
+    final updatedSettings = Settings(
+      pushNotification: pushNotification ?? _currentUser!.settings!.pushNotification,
+      emailNotification: emailNotification ?? _currentUser!.settings!.emailNotification,
+      locationService: locationService ?? _currentUser!.settings!.locationService,
+      profileStatus: profileStatus ?? _currentUser!.settings!.profileStatus,
+    );
+
+    _currentUser = UserProfileModel(
+      location: _currentUser!.location,
+      settings: updatedSettings,
+      id: _currentUser!.id,
+      name: _currentUser!.name,
+      email: _currentUser!.email,
+      interest: _currentUser!.interest,
+      status: _currentUser!.status,
+      verified: _currentUser!.verified,
+      subscribe: _currentUser!.subscribe,
+      role: _currentUser!.role,
+      timezone: _currentUser!.timezone,
+      description: _currentUser!.description,
+      isOnboardingComplete: _currentUser!.isOnboardingComplete,
+      createdAt: _currentUser!.createdAt,
+      updatedAt: _currentUser!.updatedAt,
+      profileImageUrl: _currentUser!.profileImageUrl,
+    );
+
+    notifyListeners();
+  }
+
+  Future<bool> saveSettings() async {
+    if (_currentUser == null || _currentUser!.settings == null) return false;
+
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await NetworkCaller.getRequest(
-        url: Urls.userProfileUrl,
-        requireAuth: true,
-      );
-
-      if (response.isSuccess && response.body != null) {
-        final userData = response.body!['data'];
-
-        print("Full API Response: ${response.body}");
-
-        print("User Data: ${response.body!['data']}");
-
-        _currentUser = UserProfileModel.fromJson(userData);
-
-        // Cache-এ save
-        await _storage.write('cached_user_profile', userData);
-        await _storage.remove('cached_user_profile');
-        _inProgress = false;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = response.errorMessage ?? "Failed to lad profile";
-        _inProgress = false;
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = "No internet or server error";
-      _inProgress = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> updateProfile({
-    String? name,
-    String? description,
-    // String? location,
-    bool? forceRefresh,
-  }) async {
-    if (_currentUser == null) return false;
-
-    _inProgress = true;
-    notifyListeners();
-
-    try {
-      // ⚠️ এই লাইনটা মুছে ফেলো → পুরো ইউজার পাঠানো বন্ধ!
-      // Map<String, dynamic> updateData = _currentUser!.toJson();
-
-      // ✅ নতুন করে শুধু দরকারি ফিল্ডগুলোই রাখো
-      Map<String, String> updateData = {};
-
-      if (name != null && name.isNotEmpty) {
-        updateData['name'] = name.trim();
-      }
-      if (description != null) {
-        updateData['description'] = description.trim();
-      }
-      // if (location != null && location.isNotEmpty) {
-      //   updateData['location'] = location.trim();
-      // }
-      // যদি description থাকে তাহলে যোগ করো
-      // if (description != null) updateData['description'] = description;
-
-      // যদি কোনো ফিল্ডই না দেয়া হয় তাহলে কিছু পাঠাবে না
-      if (updateData.isEmpty) {
-        _inProgress = false;
-        notifyListeners();
-        return true; // বা false, যেভাবে চাও
-      }
+      final body = {
+        "settings": _currentUser!.settings!.toJson(),
+      };
 
       final response = await NetworkCaller.patchRequest(
         url: Urls.updateProfileUrl,
-        body: updateData,
+        body: body,
       );
 
       if (response.isSuccess) {
-        // সাকসেস হলে local user আপডেট করো
-        final updatedData = response.body!['data'];
-        // current user আপডেট করো (শুধু যে ফিল্ডগুলো চেঞ্জ হয়েছে)
-        _currentUser = UserProfileModel.fromJson({
-          ..._currentUser!.toJson(),
-          ...updatedData,
-        });
-        notifyListeners();
-        // ক্যাশেও সেভ করো
-        await _storage.write('cached_user_profile', updatedData);
+        await _storage.write('cached_user_profile', _currentUser!.toJson());
         _inProgress = false;
         notifyListeners();
         return true;
       } else {
-        _errorMessage = response.errorMessage ?? "Update failed";
+        _errorMessage = response.errorMessage ?? "Failed to update settings";
         _inProgress = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = "Update error: $e";
+      _errorMessage = "Settings update error: $e";
       _inProgress = false;
       notifyListeners();
       return false;
     }
   }
 
-  //   // Clear profile (logout-এ)
+  // ================== SETTINGS FUNCTIONS END ==================
+
   void clear() {
     _currentUser = null;
     _storage.remove('cached_user_profile');
     notifyListeners();
   }
+
 }

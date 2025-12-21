@@ -49,6 +49,15 @@ class Custom_item_container extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                Positioned(
+                  right: 3,
+                  child: IconButton(
+                  icon: Icon(Icons.bookmark_border_outlined,color: Color(0xFFFF006E)),
+                  onPressed: () {
+                    // Handle favorite button press
+                  },
+                )),
                 // Category & Price Tag (আগের মতোই)
                 // ... তোমার বাকি কোড
               ],

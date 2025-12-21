@@ -1,43 +1,49 @@
 class UserProfileModel {
-  final Location? location;
-  final Settings? settings;
-  final String? id;
-  final String? name;
-  final String? email;
-  final List<String>? interest;
-  final String? status;
-  final bool? verified;
-  final bool? subscribe;
-  final String? role;
-  final String? timezone;
-  final String ? description;
-  final bool? isOnboardingComplete;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  Location? location;
+  Settings? settings;
+  String? id;
+  String? name;
+  String? email;
+  List<String>? interest;
+  String? status;
+  bool? verified;
+  bool? subscribe;
+  String? role;
+  String? timezone;
+  String? description;
+  bool? isOnboardingComplete;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? profileImageUrl;
 
   UserProfileModel({
-    required this.description,
-    required this.location,
-    required this.settings,
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.interest,
-    required this.status,
-    required this.verified,
-    required this.subscribe,
-    required this.role,
-    required this.timezone,
-    required this.isOnboardingComplete,
-    required this.createdAt,
-    required this.updatedAt,
+    this.location,
+    this.settings,
+    this.id,
+    this.name,
+    this.email,
+    this.interest,
+    this.status,
+    this.verified,
+    this.subscribe,
+    this.role,
+    this.timezone,
+    this.description,
+    this.isOnboardingComplete,
+    this.createdAt,
+    this.updatedAt,
+    this.profileImageUrl,
   });
 
   // API response থেকে model বানানো
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      location: Location.fromJson(json['location'] ?? {}),
-      settings: Settings.fromJson(json['settings'] ?? {}),
+      location: json['location'] != null
+          ? Location.fromJson(json['location'])
+          : null,
+      settings: json['settings'] != null
+          ? Settings.fromJson(json['settings'])
+          : null,
       id: json['id'] ?? json['_id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
@@ -51,22 +57,33 @@ class UserProfileModel {
       isOnboardingComplete: json['isOnboardingComplete'] ?? false,
       createdAt: _parseDate(json['createdAt']),
       updatedAt: _parseDate(json['updatedAt']),
+      // ✅ এটা যোগ করো
+      profileImageUrl:
+          json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'],
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "location": location,
-      "settings": settings,
-      "name": name,
-      "email": email,
-      "interest": interest,
-      "timezone": timezone,
-      "description": description,
-      "isOnboardingComplete": isOnboardingComplete,
-    };
-  }
+Map<String, dynamic> toJson() {
+  return {
+    "location": location?.toJson(),           
+    "settings": settings?.toJson(),        
+    "id": id,
+    "name": name,
+    "email": email,
+    "interest": interest,
+    "status": status,
+    "verified": verified,
+    "subscribe": subscribe,
+    "role": role,
+    "timezone": timezone,
+    "description": description,
+    "isOnboardingComplete": isOnboardingComplete,
+    "createdAt": createdAt?.toIso8601String(),
+    "updatedAt": updatedAt?.toIso8601String(),
+    "profileImageUrl": profileImageUrl,       // এটাও যোগ করো
+  };
 }
+}
+
 
 class Location {
   final String type;
@@ -104,10 +121,10 @@ DateTime _parseDate(String? dateStr) {
 }
 
 class Settings {
-  final bool pushNotification;
-  final bool emailNotification;
-  final bool locationService;
-  final String profileStatus;
+  bool pushNotification;
+  bool emailNotification;
+  bool locationService;
+  String profileStatus;
 
   Settings({
     required this.pushNotification,
