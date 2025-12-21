@@ -29,7 +29,7 @@ class ProfileController extends ChangeNotifier {
   }
 
   // Profile fetch
-  Future<bool> fetchProfile() async {
+  Future<bool> fetchProfile({required bool forceRefresh}) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
@@ -69,23 +69,42 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateProfile(
+  Future<bool> updateProfile({
     String? name,
-    String? email,
-    String? bio,
-    String? location,
-  ) async {
+    String? description,
+    // String? location,
+    bool? forceRefresh,
+  }) async {
     if (_currentUser == null) return false;
 
     _inProgress = true;
     notifyListeners();
 
     try {
-      Map<String, dynamic> updateData = _currentUser!.toJson();
-      if (name != null) updateData['name'] = name;
-      if (email != null) updateData['email'] = email;
-      if (bio != null) updateData['bio'] = bio;
-      if (location != null) updateData['location'] = location;
+      // ⚠️ এই লাইনটা মুছে ফেলো → পুরো ইউজার পাঠানো বন্ধ!
+      // Map<String, dynamic> updateData = _currentUser!.toJson();
+
+      // ✅ নতুন করে শুধু দরকারি ফিল্ডগুলোই রাখো
+      Map<String, String> updateData = {};
+
+      if (name != null && name.isNotEmpty) {
+        updateData['name'] = name.trim();
+      }
+      if (description != null) {
+        updateData['description'] = description.trim();
+      }
+      // if (location != null && location.isNotEmpty) {
+      //   updateData['location'] = location.trim();
+      // }
+      // যদি description থাকে তাহলে যোগ করো
+      // if (description != null) updateData['description'] = description;
+
+      // যদি কোনো ফিল্ডই না দেয়া হয় তাহলে কিছু পাঠাবে না
+      if (updateData.isEmpty) {
+        _inProgress = false;
+        notifyListeners();
+        return true; // বা false, যেভাবে চাও
+      }
 
       final response = await NetworkCaller.patchRequest(
         url: Urls.updateProfileUrl,
@@ -93,10 +112,16 @@ class ProfileController extends ChangeNotifier {
       );
 
       if (response.isSuccess) {
-        // Update success → local model + cache update 
-        _currentUser = UserProfileModel.fromJson(response.body!['data']);
-        await _storage.write('cached_user_profile', response.body!['data']);
-
+        // সাকসেস হলে local user আপডেট করো
+        final updatedData = response.body!['data'];
+        // current user আপডেট করো (শুধু যে ফিল্ডগুলো চেঞ্জ হয়েছে)
+        _currentUser = UserProfileModel.fromJson({
+          ..._currentUser!.toJson(),
+          ...updatedData,
+        });
+        notifyListeners();
+        // ক্যাশেও সেভ করো
+        await _storage.write('cached_user_profile', updatedData);
         _inProgress = false;
         notifyListeners();
         return true;
@@ -107,12 +132,13 @@ class ProfileController extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _errorMessage = "Update error";
+      _errorMessage = "Update error: $e";
       _inProgress = false;
       notifyListeners();
       return false;
     }
   }
+
   //   // Clear profile (logout-এ)
   void clear() {
     _currentUser = null;

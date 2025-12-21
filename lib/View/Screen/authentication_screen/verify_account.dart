@@ -92,7 +92,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
               ),
             ),
             SizedBox(height: 40.h),
-
+    
             // OTP Pin Field
           PinCodeTextField(
               backgroundColor: Colors.transparent,
@@ -106,27 +106,27 @@ class _VerifyAccountState extends State<VerifyAccount> {
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
-
+    
               pinTheme: PinTheme(
                 shape: PinCodeFieldShape.box,
                 borderRadius: BorderRadius.circular(16.r),
                 fieldHeight: 64.h,
                 fieldWidth: 64.w,
-
+    
                 activeColor: Colors.transparent,
                 inactiveColor: Colors.transparent,
                 selectedColor: Colors.transparent,
-
+    
                 activeFillColor: const Color(0xFFCC18CA).withOpacity(0.25),
                 selectedFillColor: const Color(0xFFCC18CA).withOpacity(0.35),
                 inactiveFillColor: const Color(0xFFCC18CA).withOpacity(0.15),
                 borderWidth: 0,
               ),
-
+    
               enableActiveFill: true,
               boxShadows: const [],
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
+    
               animationDuration: const Duration(milliseconds: 200),
               controller: otpController,
               appContext: context,
@@ -136,7 +136,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
               },
             ),
             SizedBox(height: 40.h),
-
+    
             // Submit Button with Loading
             _inProgress
                 ? Center(
@@ -153,9 +153,9 @@ class _VerifyAccountState extends State<VerifyAccount> {
                       // onTap: _submitOtp,
                     ),
                   ),
-
+    
             SizedBox(height: 30.h),
-
+    
             // Resend Code
             Center(
               child: RichText(

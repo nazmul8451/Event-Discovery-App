@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProfileController>().initialize();
-      context.read<ProfileController>().fetchProfile();
+      context.read<ProfileController>().fetchProfile(forceRefresh: true);
     });
   }
 
@@ -54,8 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController bioController = TextEditingController();
 
   void _showEditProfileDialog(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
     // ProfileController থেকে current user নিয়ে controllers-এ value সেট করা
     final profileController = context.read<ProfileController>();
     final currentUser = profileController.currentUser;
@@ -73,231 +72,226 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       barrierDismissible: !isLoading, // loading থাকলে dialog বন্ধ করা যাবে না
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28.r),
-            ),
-            contentPadding: EdgeInsets.zero,
-            content: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(24.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white : Colors.black,
+      builder: (_) => Consumer<ThemeProvider>(
+        builder:(context,ctrl,child)=> StatefulBuilder(
+          builder: (context, setState) {
+            final colorScheme  = Theme.of(context).colorScheme;
+            final textTheme = Theme.of(context).textTheme;
+            return AlertDialog(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28.r),
+              ),
+              contentPadding: EdgeInsets.zero,
+              content: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                "Update your personal information",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: isDark
-                                      ? Colors.white70
-                                      : Colors.black54,
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "Update your personal information",
+                                  textAlign: TextAlign.center,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface.withOpacity(0.7),)
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                        GestureDetector(
-                          onTap: isLoading
-                              ? null
-                              : () => Navigator.pop(context),
-                          child: Container(
-                            height: 40.r,
-                            width: 40.r,
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF3E043F)
-                                  : const Color(0xFF686868),
-                              borderRadius: BorderRadius.circular(12.r),
+                              ],
                             ),
-                            padding: EdgeInsets.all(10),
-                            child: Image.asset('assets/images/cross_icon.png'),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24.h),
-
-                    // Form Fields
-                    Column(
-                      children: [
-                        AuthTextField(
-                          hintText: 'user name',
-                          labelText: 'Name',
-                          controller: nameController,
-                        ),
-                        SizedBox(height: 16.h),
-                        AuthTextField(
-                          hintText: 'your email',
-                          labelText: 'Email',
-                          controller: emialController,
-                        ),
-                        SizedBox(height: 16.h),
-                        AuthTextField(
-                          hintText: '+43 04324',
-                          labelText: 'Phone',
-                          controller: phoneController,
-                        ),
-                        SizedBox(height: 16.h),
-                        AuthTextField(
-                          hintText: 'Change Location',
-                          labelText: 'Location',
-                          controller: locationController,
-                        ),
-                        SizedBox(height: 16.h),
-                        AuthTextField(
-                          hintText: 'Tell about yourself',
-                          labelText: 'Your bio',
-                          controller: bioController,
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 30.h),
-
-                    // Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              foregroundColor: isDark
-                                  ? Colors.white70
-                                  : Colors.black54,
-                              elevation: 0,
-                              side: BorderSide(
-                                color: isDark ? Colors.white38 : Colors.black38,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                            ),
-                            onPressed: isLoading
+                          SizedBox(width: 10.w),
+                          GestureDetector(
+                            onTap: isLoading
                                 ? null
                                 : () => Navigator.pop(context),
-                            child: Text(
-                              'Cancel',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
+                            child: Container(
+                              height: 40.r,
+                              width: 40.r,
+                              decoration: BoxDecoration(
+                                color: ctrl.isDarkMode
+                                    ? const Color(0xFF3E043F)
+                                    : const Color(0xFF686868),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
+                              padding: EdgeInsets.all(10),
+                              child: Image.asset('assets/images/cross_icon.png'),
                             ),
-                            onPressed: isLoading
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-
-                                    bool success = await profileController
-                                        .updateProfile(
-                                          nameController.text.trim().isEmpty
-                                              ? null
-                                              : nameController.text.trim(),
-                                          emialController.text.trim().isEmpty
-                                              ? null
-                                              : emialController.text.trim(),
-                                          bioController.text.trim().isEmpty
-                                              ? null
-                                              : bioController.text.trim(),
-                                          phoneController.text.trim().isEmpty
-                                              ? null
-                                              : phoneController.text.trim(),
-                                        );
-
-                                    if (success) {
-                                      if (mounted) {
-                                        Navigator.pop(context); // dialog close
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              "Profile updated successfully! 🎉",
-                                            ),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                      if (mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              profileController.errorMessage ??
-                                                  "Failed to update profile",
-                                            ),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                            child: isLoading
-                                ? SizedBox(
-                                    height: 20.h,
-                                    width: 20.w,
-                                    child: const CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    'Save Change',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                      SizedBox(height: 24.h),
+        
+                      // Form Fields
+                      Column(
+                        children: [
+                          AuthTextField(
+                            hintText: 'user name',
+                            labelText: 'Name',
+                            controller: nameController,
+                          ),
+                          SizedBox(height: 16.h),
+                          AuthTextField(
+                            hintText: 'your email',
+                            labelText: 'Email',
+                            controller: emialController,
+                          ),
+                          SizedBox(height: 16.h),
+                          AuthTextField(
+                            hintText: '+43 04324',
+                            labelText: 'Phone',
+                            controller: phoneController,
+                          ),
+                          SizedBox(height: 16.h),
+                          AuthTextField(
+                            hintText: 'Change Location',
+                            labelText: 'Location',
+                            controller: locationController,
+                          ),
+                          SizedBox(height: 16.h),
+                          AuthTextField(
+                            hintText: 'Tell about yourself',
+                            labelText: 'Your bio',
+                            controller: bioController,
+                          ),
+                        ],
+                      ),
+        
+                      SizedBox(height: 30.h),
+        
+                      // Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: ctrl.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.black54,
+                                elevation: 0,
+                                side: BorderSide(
+                                  color:  ctrl.isDarkMode ? Colors.white38 : Colors.black38,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                              ),
+                              onPressed: isLoading
+                                  ? null
+                                  : () => Navigator.pop(context),
+                              child: Text(
+                                'Cancel',
+                                style: textTheme.bodyMedium
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                              ),
+                              onPressed: isLoading
+                                  ? null
+                                  : () async {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+        
+                                      bool success = await profileController
+                                          .updateProfile(
+                                            forceRefresh: true,
+                                            name: nameController.text.trim(),
+                                            description: bioController.text.trim(),
+                                            // location: locationController.text.trim(),
+                                          
+                                          
+                                          );
+        
+                                      if (success) {
+                                        if (mounted) {
+                                          Provider.of<ProfileController>(context).fetchProfile(forceRefresh: true);
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                "Profile updated successfully! 🎉",
+                                              ),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                profileController.errorMessage ??
+                                                    "Failed to update profile",
+                                              ),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                              child: isLoading
+                                  ? SizedBox(
+                                      height: 20.h,
+                                      width: 20.w,
+                                      child: const CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Save Change',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color:Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -305,10 +299,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _saveProfileChanges() async {
     final controller = context.read<ProfileController>();
     bool isSuccess = await controller.updateProfile(
-      nameController.text.trim(),
-      emialController.text.trim(),
-      bioController.text.trim(),
-      locationController.text.trim(),
+      name: nameController.text.trim(),
+      description: bioController.text.trim(),
+      // location: locationController.text.trim(),
     );
     if (isSuccess) {
       showCustomSnackBar(
@@ -396,7 +389,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       .copyWith(color: Colors.grey),
                                 ),
                                 Text(
-                                  'HTX | DTX | ∮ Good vibes only',
+                                  '${user?.description}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium!
@@ -441,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   '432',
                                   style: Theme.of(
                                     context,
-                                  ).textTheme.titleMedium!.copyWith(),
+                                  ).textTheme.titleMedium,
                                 ),
                                 SizedBox(height: 5.h),
                                 Text(
@@ -466,7 +459,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   '322',
                                   style: Theme.of(
                                     context,
-                                  ).textTheme.titleMedium!.copyWith(),
+                                  ).textTheme.titleMedium,
                                 ),
                                 SizedBox(height: 5.h),
                                 Text(
