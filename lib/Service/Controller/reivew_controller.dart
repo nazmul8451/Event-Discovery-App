@@ -19,10 +19,11 @@ class ReivewController extends ChangeNotifier {
   int get totalReview => _totalReview;
   bool get showAllReviews => _showAllReviews;
 
-  void toggleShowAll(){
+  void toggleShowAll() {
     _showAllReviews = !_showAllReviews;
     notifyListeners();
   }
+
   void resetShowAll() {
     _showAllReviews = false;
     notifyListeners();
@@ -90,48 +91,61 @@ class ReivewController extends ChangeNotifier {
     }
   }
 
-Future<bool> getAllReviewsByEventId({required String eventId}) async {
-  _inProgress = true;
-  _errorMessage = null;
-  _review = [];  // clear previous reviews
-  notifyListeners();
+  Future<bool> getAllReviewsByEventId({required String eventId}) async {
+    _inProgress = true;
+    _errorMessage = null;
+    _review.clear();
+    notifyListeners();
 
-  try {
-    final response = await NetworkCaller.getRequest(
-      url: Urls.getReviewByEventIdUrl(eventId),
-      requireAuth: true,
-    );
+    try {
+      final response = await NetworkCaller.getRequest(
+        url: Urls.getReviewByEventIdUrl(eventId),
+        requireAuth: true,
+      );
 
-    if (response.isSuccess && response.body != null) {
-      final data = response.body!['data'];
-      final List<dynamic> reviewList = data['data'];
+      if (response.isSuccess && response.body != null) {
+        final Map<String, dynamic> body = response.body!;
 
-      final filteredList = reviewList.where((json) => json['eventId'] == eventId).toList();
+        List<dynamic> reviewList = [];
 
-      _review = filteredList.map((e) => AllReviewModelByEventId.fromJson(e)).toList();
-      _totalReview = filteredList.length;  
+        // বিভিন্ন API structure সাপোর্ট
+        if (body['data'] is List) {
+          reviewList = body['data'];
+        } else if (body['data']?['data'] is List) {
+          reviewList = body['data']['data'];
+        } else if (body['reviews'] is List) {
+          reviewList = body['reviews'];
+        }
 
-      _inProgress = false;
-      notifyListeners();
-      return true;
-    } else {
-      _errorMessage = response.errorMessage ?? "Failed to get reviews";
+        _review = reviewList
+            .map(
+              (e) =>
+                  AllReviewModelByEventId.fromJson(e as Map<String, dynamic>),
+            )
+            .toList();
+
+        _inProgress = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.errorMessage ?? "Failed to load reviews";
+        _inProgress = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = "No internet or server error";
       _inProgress = false;
       notifyListeners();
       return false;
     }
-  } catch (e) {
-    _errorMessage = "No internet connection or server error";
-    _inProgress = false;
-    notifyListeners();
-    return false;
   }
-}
-void addReviewLocally(AllReviewModelByEventId newReview) {
-  _review.insert(0, newReview);  
-  _totalReview += 1;
-  notifyListeners();
-}
+
+  void addReviewLocally(AllReviewModelByEventId newReview) {
+    _review.insert(0, newReview);
+    _totalReview += 1;
+    notifyListeners();
+  }
 
   void clearError() {
     _errorMessage = null;

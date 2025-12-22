@@ -16,4 +16,7 @@ class Urls {
 
   static const String userProfileUrl = "$baseUrl/api/v1/user/profile";
   static const String updateProfileUrl = "$baseUrl/api/v1/user/profile";
+  static const String addSaveEvent = "$baseUrl/api/v1/saved";
+  static const String getMySaveEvents = '$baseUrl/api/v1/saved?filter=all';
+  static String deleteSavedEvent (String id) => "$baseUrl/api/v1/saved/$id";
 }

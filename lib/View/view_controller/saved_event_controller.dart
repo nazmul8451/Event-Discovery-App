@@ -1,27 +1,86 @@
-// saved_event_controller.dart
-
-import 'package:flutter/cupertino.dart';
-
-import '../../ViewModel/event_cartModel.dart';
+import 'package:flutter/material.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart';
+import 'package:gathering_app/Service/Api service/network_caller.dart';
+import 'package:gathering_app/Service/urls.dart';
 
 class SavedEventController extends ChangeNotifier {
-  final List<EventCartmodel> _savedEvents = [];
+  final List<EventData> _savedEvents = [];
+  bool _inProgress = false;
+  String? _errorMessage;
 
-  List<EventCartmodel> get savedEvents => _savedEvents;
+  List<EventData> get savedEvents => _savedEvents;
+  bool get inProgress => _inProgress;
+  String? get errorMessage => _errorMessage;
 
-  // এই ফাংশনটা ঠিক করো
-  bool isSaved(EventCartmodel event) {
-    return _savedEvents.any((e) => e.id == event.id); // এখানে id চেক করতে হবে
+  bool isSaved(EventData event) {
+    return _savedEvents.any((e) => e.id == event.id);
   }
 
-  void toggleSave(EventCartmodel event) {
-    if (isSaved(event)) {
-      _savedEvents.removeWhere((e) => e.id == event.id);
-      print("${event.title} removed from saved");
+  /// true = saved, false = removed, null = failed
+  Future<bool?> toggleSave(EventData event) async {
+    final String eventId = event.id!;
+
+    final bool alreadySaved = _savedEvents.any((e) => e.id == eventId);
+
+    _inProgress = true;
+    notifyListeners();
+
+    bool? result;
+
+    if (alreadySaved) {
+      // UNSAVE
+      final response = await NetworkCaller.deleteRequest(
+        Urls.deleteSavedEvent(eventId),
+        requireAuth: true,
+      );
+
+      if (response.isSuccess) {
+        _savedEvents.removeWhere((e) => e.id == eventId);
+        result = false;
+      }
     } else {
-      _savedEvents.add(event);
-      print("${event.title} saved!");
+      // SAVE
+      final response = await NetworkCaller.postRequest(
+        url: Urls.addSaveEvent,
+        body: {"event": eventId},
+        requireAuth: true,
+      );
+
+      if (response.isSuccess) {
+        // ⚠️ IMPORTANT → clone না করে id-based add
+        _savedEvents.add(event);
+        result = true;
+      }
     }
-    notifyListeners(); // এটা না থাকলে UI আপডেট হবে না
+
+    _inProgress = false;
+    notifyListeners();
+    return result;
+  }
+
+  /// App start হলে call করবে
+  Future<void> loadMySavedEvents() async {
+    _inProgress = true;
+    notifyListeners();
+
+    final response = await NetworkCaller.getRequest(
+      url: Urls.getMySaveEvents,
+      requireAuth: true,
+    );
+
+    if (response.isSuccess && response.body != null) {
+      final List<dynamic> list =
+          response.body!['data']['data'] as List<dynamic>;
+
+      _savedEvents.clear();
+      _savedEvents.addAll(
+        list.map(
+          (json) => EventData.fromJson(json['event'] as Map<String, dynamic>),
+        ),
+      );
+    }
+
+    _inProgress = false;
+    notifyListeners();
   }
 }

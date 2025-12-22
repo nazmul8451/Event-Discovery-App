@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
@@ -264,9 +265,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                               .trim(),
                                           rating: _currentRating,
                                         );
+                                    Navigator.pop(context); // dialog close
 
                                     if (success) {
-                                      Navigator.pop(context); // dialog close
                                       _reviewController
                                           .clear(); // text field clear
 
@@ -277,9 +278,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         isError: false,
                                       );
 
-                                      final currentUserName = "Rimon islam";
+                                      final currentUserName = "user_name";
                                       final newReview = AllReviewModelByEventId(
-                                        id: "local_${DateTime.now().millisecondsSinceEpoch}", // temporary id
+                                        id: "local_${DateTime.now().millisecondsSinceEpoch}",
                                         eventId: eventId as String,
                                         reviewerName: currentUserName,
                                         reviewerId:
@@ -1083,7 +1084,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
+                        border: Border.all( 
                           width: 1,
                           color: Color(0xFFCC18CA).withOpacity(0.15),
                         ),

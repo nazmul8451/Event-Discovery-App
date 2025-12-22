@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
@@ -549,48 +551,135 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                           ),
                         ),
-
                         SizedBox(height: 15.h),
-                        //favorite spots list
+
+                        // Favorite Spots List
                         SizedBox(
                           height: 230.h,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 10,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: EdgeInsets.only(right: 12.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: 180.h,
-                                      width: 180.w,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(
-                                          16.r,
-                                        ),
-                                        image: const DecorationImage(
-                                          image: AssetImage(
-                                            'assets/images/container_img.png',
+                          child: Consumer<SavedEventController>(
+                            builder: (context, savedController, child) {
+                              final savedEvents = savedController.savedEvents;
+
+                              if (savedController.inProgress) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+
+                              if (savedEvents.isEmpty) {
+                                return Center(
+                                  child: Text(
+                                    'No saved events yet',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(color: Colors.grey),
+                                  ),
+                                );
+                              }
+
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: savedEvents.length,
+                                itemBuilder: (context, index) {
+                                  final event = savedEvents[index];
+
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 12.w),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          DetailsScreen.name,
+                                          arguments: event.id,
+                                        );
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 180.h,
+                                            width: 180.w,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r),
+                                              image: DecorationImage(
+                                                image:
+                                                    (event.images != null &&
+                                                        event
+                                                            .images!
+                                                            .isNotEmpty)
+                                                    ? NetworkImage(
+                                                        "${Urls.baseUrl}${event.images!.first}",
+                                                      )
+                                                    : const AssetImage(
+                                                            'assets/images/container_img.png',
+                                                          )
+                                                          as ImageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+
+                                            /// 🔖 UNSAVE BUTTON
+                                            child: Align(
+                                              alignment: Alignment.topRight,
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.w),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    Icons.bookmark,
+                                                    color: const Color(
+                                                      0xFFFF006E,
+                                                    ),
+                                                    size: 28.sp,
+                                                  ),
+                                                  onPressed: () async {
+                                                    final result =
+                                                        await savedController
+                                                            .toggleSave(event);
+
+                                                    if (result == false) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Removed from saved',
+                                                          ),
+                                                          duration: Duration(
+                                                            milliseconds: 800,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          fit: BoxFit.cover,
-                                        ),
+                                          SizedBox(height: 8.h),
+                                          SizedBox(
+                                            width: 180.w,
+                                            child: Text(
+                                              event.title ?? 'Untitled Event',
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.titleMedium,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(height: 8.h),
-                                    Text(
-                                      'Electric Feelgood',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
-                                    ),
-                                  ],
-                                ),
+                                  );
+                                },
                               );
                             },
                           ),
                         ),
+
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
@@ -604,85 +693,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                         // color: Colors.black,
                                         fontWeight: FontWeight.w500,
                                       ),
-                                ),
-                              ),
-                              SizedBox(height: 5.h),
-
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 20.h),
-                                child: Consumer<SavedEventController>(
-                                  builder: (context, savedController, child) {
-                                    final savedEvents =
-                                        savedController.savedEvents;
-
-                                    if (savedEvents.isEmpty) {
-                                      return Center(
-                                        child: Text(
-                                          "No saved events yet",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.copyWith(color: Colors.grey),
-                                        ),
-                                      );
-                                    }
-
-                                    return SizedBox(
-                                      height: 200.h,
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 16.w,
-                                        ),
-                                        itemCount: savedEvents.length,
-                                        itemBuilder: (context, index) {
-                                          final event = savedEvents[index];
-
-                                          return Padding(
-                                            padding: EdgeInsets.only(
-                                              right: 16.w,
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        12.r,
-                                                      ),
-                                                  child: Image.network(
-                                                    event.image ??
-                                                        'https://via.placeholder.com/150',
-                                                    height: 140.h,
-                                                    width: 140.w,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 8.h),
-                                                SizedBox(
-                                                  width: 140.w,
-                                                  child: Text(
-                                                    event.title ?? "No title",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
                                 ),
                               ),
 

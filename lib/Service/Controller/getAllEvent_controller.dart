@@ -102,7 +102,8 @@ class GetAllEventController extends ChangeNotifier {
       final response = await NetworkCaller.getRequest(
         url: Urls.getAllEvent,
       );
-
+      
+      
       if (response.statusCode == 200) {
         // Safe body handling
         Map<String, dynamic> body;

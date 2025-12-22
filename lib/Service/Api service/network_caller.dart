@@ -151,6 +151,66 @@ class NetworkCaller {
     }
   }
 
+  static Future<NetworkResponse> deleteRequest(
+    String url, {
+    Map<String, dynamic>? body,
+    bool requireAuth = false,
+  }) async {
+    try {
+      final Map<String, String> headers = {'Content-Type': 'application/json'};
+
+      if (requireAuth) {
+        final String? token = AuthController().accessToken;
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
+        }
+      }
+
+      final uri = Uri.parse(url);
+
+      http.Response response;
+
+      if (body != null) {
+        response = await http.delete(
+          uri,
+          headers: headers,
+          body: jsonEncode(body),
+        );
+      } else {
+        response = await http.delete(uri, headers: headers);
+      }
+
+      // Response parse করো
+      dynamic responseBody;
+      try {
+        responseBody = jsonDecode(response.body);
+      } catch (e) {
+        responseBody = response.body;
+      }
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return NetworkResponse(
+          isSuccess: true,
+          statusCode: response.statusCode,
+          body: responseBody,
+        );
+      } else {
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: responseBody['message'] ?? 'Unknown error',
+          body: responseBody,
+        );
+      }
+    } catch (e) {
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: -1,
+        errorMessage: 'No internet or server error: $e',
+      );
+    }
+  }
+
   // Common response parser
   static NetworkResponse _parseResponse(http.Response response) {
     try {

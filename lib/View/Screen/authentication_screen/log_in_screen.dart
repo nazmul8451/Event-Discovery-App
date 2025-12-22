@@ -23,7 +23,7 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  final _formKey = GlobalKey<FormState>();
+ final GlobalKey<FormState> _f_key = GlobalKey<FormState>();
   bool _signinIn_Progress = false;
   bool isPressed = false;
   //textfromField controller
@@ -82,7 +82,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
                       // TextFields
                       Form(
-                        key: _formKey,
+                        key: _f_key,
                         child: Column(
                           children: [
                             AuthTextField(
@@ -305,7 +305,7 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void onTapLoginButton() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_f_key.currentState!.validate()) {
       return;
     }
 
