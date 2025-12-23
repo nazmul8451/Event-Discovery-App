@@ -17,16 +17,16 @@ class SavedEventController extends ChangeNotifier {
   }
 
   /// true = saved, false = removed, null = failed
-  Future<bool?> toggleSave(EventData event) async {
-    final String eventId = event.id!;
+Future<bool?> toggleSave(EventData event) async {
+  final String eventId = event.id!;
+  final bool alreadySaved = _savedEvents.any((e) => e.id == eventId);
 
-    final bool alreadySaved = _savedEvents.any((e) => e.id == eventId);
+  _inProgress = true;
+  notifyListeners();
 
-    _inProgress = true;
-    notifyListeners();
+  bool? result;
 
-    bool? result;
-
+  try {
     if (alreadySaved) {
       // UNSAVE
       final response = await NetworkCaller.deleteRequest(
@@ -34,9 +34,14 @@ class SavedEventController extends ChangeNotifier {
         requireAuth: true,
       );
 
-      if (response.isSuccess) {
+      if (response.isSuccess &&
+          response.body != null &&
+          response.body!['success'] == true) {
+        // EventData id match করেই remove করা
         _savedEvents.removeWhere((e) => e.id == eventId);
         result = false;
+      } else {
+        result = null; // failed
       }
     } else {
       // SAVE
@@ -46,17 +51,24 @@ class SavedEventController extends ChangeNotifier {
         requireAuth: true,
       );
 
-      if (response.isSuccess) {
-        // ⚠️ IMPORTANT → clone না করে id-based add
+      if (response.isSuccess &&
+          response.body != null &&
+          response.body!['success'] == true) {
         _savedEvents.add(event);
         result = true;
+      } else {
+        result = null; // failed
       }
     }
-
-    _inProgress = false;
-    notifyListeners();
-    return result;
+  } catch (e) {
+    result = null;
   }
+
+  _inProgress = false;
+  notifyListeners();
+  return result;
+}
+
 
   /// App start হলে call করবে
   Future<void> loadMySavedEvents() async {
