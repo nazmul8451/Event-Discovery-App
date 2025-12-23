@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GetAllEventController>(context, listen: false).getAllEvents();
+      context.read<SavedEventController>().loadMySavedEvents();
     });
   }
 
@@ -292,15 +293,13 @@ class _HomePageState extends State<HomePage> {
                                 itemBuilder: (context, index) {
                                   final gridEvent =
                                       controller.remainingEvents[index];
-                                  print('All Event -${gridEvent.address}');
-                                  return GestureDetector(
+
+                                  return Custom_item_container(
+                                    event: gridEvent,
                                     onTap: () => Navigator.pushNamed(
                                       context,
                                       DetailsScreen.name,
                                       arguments: gridEvent.id,
-                                    ),
-                                    child: Custom_item_container(
-                                      event: controller.remainingEvents[index],
                                     ),
                                   );
                                 },
