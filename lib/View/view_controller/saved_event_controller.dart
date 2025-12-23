@@ -4,95 +4,126 @@ import 'package:gathering_app/Service/Api service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 class SavedEventController extends ChangeNotifier {
-  final List<EventData> _savedEvents = [];
+  final List<SavedEventData> _savedEvents = [];
   bool _inProgress = false;
   String? _errorMessage;
 
-  List<EventData> get savedEvents => _savedEvents;
+  List<SavedEventData> get savedEvents => _savedEvents;
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
   bool isSaved(EventData event) {
-    return _savedEvents.any((e) => e.id == event.id);
+    return _savedEvents.any((e) => e.event.id == event.id);
   }
 
   /// true = saved, false = removed, null = failed
-Future<bool?> toggleSave(EventData event) async {
-  final String eventId = event.id!;
-  final bool alreadySaved = _savedEvents.any((e) => e.id == eventId);
+  Future<bool?> toggleSave(EventData event) async {
+    _inProgress = true;
+    notifyListeners();
 
-  _inProgress = true;
-  notifyListeners();
+    bool? result;
 
-  bool? result;
-
-  try {
-    if (alreadySaved) {
-      // UNSAVE
-      final response = await NetworkCaller.deleteRequest(
-        Urls.deleteSavedEvent(eventId),
-        requireAuth: true,
-      );
-
-      if (response.isSuccess &&
-          response.body != null &&
-          response.body!['success'] == true) {
-        // EventData id match করেই remove করা
-        _savedEvents.removeWhere((e) => e.id == eventId);
-        result = false;
-      } else {
-        result = null; // failed
+    try {
+      // যদি আগে থেকে saved থাকে
+      SavedEventData? savedItem;
+      for (var e in _savedEvents) {
+        if (e.event.id == event.id) {
+          savedItem = e;
+          break;
+        }
       }
-    } else {
-      // SAVE
-      final response = await NetworkCaller.postRequest(
-        url: Urls.addSaveEvent,
-        body: {"event": eventId},
-        requireAuth: true,
-      );
 
-      if (response.isSuccess &&
-          response.body != null &&
-          response.body!['success'] == true) {
-        _savedEvents.add(event);
-        result = true;
+      if (savedItem != null) {
+        // DELETE saved event
+        final response = await NetworkCaller.deleteRequest(
+          Urls.deleteSavedEvent(savedItem.savedId),
+          requireAuth: true,
+        );
+
+        print("Delete response: ${response.body}");
+
+        if (response.isSuccess &&
+            response.body != null &&
+            response.body!['success'] == true) {
+          _savedEvents.removeWhere((e) => e.event.id == event.id);
+          result = false;
+        } else {
+          result = null;
+        }
       } else {
-        result = null; // failed
+        // SAVE new event
+        final response = await NetworkCaller.postRequest(
+          url: Urls.addSaveEvent,
+          body: {"event": event.id!},
+          requireAuth: true,
+        );
+
+        print("Save response: ${response.body}");
+
+        if (response.isSuccess &&
+            response.body != null &&
+            response.body!['success'] == true &&
+            response.body!['data'] != null) {
+          final newSavedEvent =
+              SavedEventData.fromJson(response.body!['data']);
+          _savedEvents.add(newSavedEvent);
+          result = true;
+        } else {
+          result = null;
+        }
       }
+    } catch (e) {
+      print("Toggle save error: $e");
+      result = null;
     }
-  } catch (e) {
-    result = null;
+
+    _inProgress = false;
+    notifyListeners();
+    return result;
   }
-
-  _inProgress = false;
-  notifyListeners();
-  return result;
-}
-
 
   /// App start হলে call করবে
   Future<void> loadMySavedEvents() async {
     _inProgress = true;
     notifyListeners();
 
-    final response = await NetworkCaller.getRequest(
-      url: Urls.getMySaveEvents,
-      requireAuth: true,
-    );
-
-    if (response.isSuccess && response.body != null) {
-      final List<dynamic> list =
-          response.body!['data']['data'] as List<dynamic>;
-
-      _savedEvents.clear();
-      _savedEvents.addAll(
-        list.map(
-          (json) => EventData.fromJson(json['event'] as Map<String, dynamic>),
-        ),
+    try {
+      final response = await NetworkCaller.getRequest(
+        url: Urls.getMySaveEvents,
+        requireAuth: true,
       );
+
+      if (response.isSuccess && response.body != null) {
+        final List<dynamic> list =
+            response.body!['data']['data'] as List<dynamic>;
+
+        _savedEvents.clear();
+        _savedEvents.addAll(
+          list.map((json) => SavedEventData.fromJson(json)),
+        );
+      }
+    } catch (e) {
+      print("Load saved events error: $e");
     }
 
     _inProgress = false;
     notifyListeners();
+  }
+}
+
+/// SavedEventData new model (SavedEventModel অনুযায়ী)
+class SavedEventData {
+  final String savedId; // API থেকে আসা savedEvent _id
+  final EventData event;
+
+  SavedEventData({required this.savedId, required this.event});
+
+  factory SavedEventData.fromJson(Map<String, dynamic> json) {
+    return SavedEventData(
+      savedId: json['_id'],
+      event: json['event'] is Map<String, dynamic>
+          ? EventData.fromJson(json['event'])
+          : EventData(id: json['event']), // যদি শুধু event id আসে
+    );
   }
 }

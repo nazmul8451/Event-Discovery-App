@@ -567,10 +567,10 @@ class _ProfilePageState extends State<ProfilePage> {
       if (savedEvents.isEmpty) {
         return Center(
           child: Text(
-            'No saved events yet',
+            'No saved yet 💾',
             style: Theme.of(context)
                 .textTheme
-                .titleMedium
+                .titleSmall
                 ?.copyWith(color: Colors.grey),
           ),
         );
@@ -589,7 +589,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pushNamed(
                   context,
                   DetailsScreen.name,
-                  arguments: event.id,
+                  arguments: event.event.id,
                 );
               },
               child: Column(
@@ -601,10 +601,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16.r),
                       image: DecorationImage(
-                        image: (event.images != null &&
-                                event.images!.isNotEmpty)
+                        image: (event.event.images != null &&
+                                event.event.images!.isNotEmpty)
                             ? NetworkImage(
-                                "${Urls.baseUrl}${event.images!.first}",
+                                "${Urls.baseUrl}${event.event.images!.first}",
                               )
                             : const AssetImage(
                                 'assets/images/container_img.png',
@@ -626,7 +626,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           onPressed: () async {
                             final result = await savedController
-                                .toggleSave(event);
+                                .toggleSave(event.event);
 
                             if (result == false) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -645,7 +645,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     width: 180.w,
                     child: Text(
-                      event.title ?? 'Untitled Event',
+                      event.event.title ?? 'Untitled Event',
                       style: Theme.of(context).textTheme.titleMedium,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

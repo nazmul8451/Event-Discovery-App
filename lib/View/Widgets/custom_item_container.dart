@@ -45,9 +45,12 @@ class Custom_item_container extends StatelessWidget {
                   child: Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12.r),
+                        ),
                         child: CachedNetworkImage(
-                          imageUrl: (event.images != null && event.images!.isNotEmpty)
+                          imageUrl:
+                              (event.images != null && event.images!.isNotEmpty)
                               ? "${Urls.baseUrl}${event.images!.first}"
                               : "assets/images/personLocation.jpg",
                           height: 150.h,
@@ -60,50 +63,52 @@ class Custom_item_container extends StatelessWidget {
                           ),
                           errorWidget: (context, url, error) => Container(
                             color: Colors.grey.shade200,
-                            child: Icon(Icons.image_not_supported, color: Colors.grey),
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                       ),
 
                       // Bookmark Button
-                        /// 🔖 Bookmark Icon (Selector = performance good)
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: Selector<SavedEventController, bool>(
-                      selector: (_, c) => c.isSaved(event),
-                      builder: (context, isSaved, _) {
-                        return IconButton(
-                          icon: Icon(
-                            isSaved
-                                ? Icons.bookmark
-                                : Icons.bookmark_border_outlined,
-                            color: const Color(0xFFFF006E),
-                          ),
-                          onPressed: () async {
-                            final result = await context
-                                .read<SavedEventController>()
-                                .toggleSave(event);
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Selector<SavedEventController, bool>(
+                          selector: (_, c) => c.isSaved(event),
+                          builder: (context, isSaved, _) {
+                            return IconButton(
+                              icon: Icon(
+                                isSaved
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border_outlined,
+                                color: const Color(0xFFFF006E),
+                              ),
+                              onPressed: () async {
+                                final result = await context
+                                    .read<SavedEventController>()
+                                    .toggleSave(event);
 
-                            if (result != null) {
-                              
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration:
-                                      const Duration(milliseconds: 800),
-                                  content: Text(
-                                    result
-                                        ? "Event saved"
-                                        : "Removed from saved",
-                                  ),
-                                ),
-                              );
-                            }
+                                if (result != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      duration: const Duration(
+                                        milliseconds: 800,
+                                      ),
+                                      content: Text(
+                                        result
+                                            ? "Event saved"
+                                            : "Removed from saved",
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
                           },
-                        );
-                      },
-                    ),
-                  )
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -120,17 +125,26 @@ class Custom_item_container extends StatelessWidget {
                           event.title ?? "Untitled Event",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         SizedBox(height: 8.h),
                         Row(
                           children: [
-                            Image.asset('assets/images/calender_icon.png', height: 16.h),
+                            Image.asset(
+                              'assets/images/calender_icon.png',
+                              height: 16.h,
+                            ),
                             SizedBox(width: 3.w),
                             Expanded(
                               child: Text(
                                 event.startDate ?? "00",
-                                style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ),
                           ],
@@ -138,12 +152,18 @@ class Custom_item_container extends StatelessWidget {
                         SizedBox(height: 6.h),
                         Row(
                           children: [
-                            Image.asset('assets/images/location_icon.png', height: 16.h),
+                            Image.asset(
+                              'assets/images/location_icon.png',
+                              height: 16.h,
+                            ),
                             SizedBox(width: 6.w),
                             Expanded(
                               child: Text(
                                 "${event.location ?? "Location TBA"}",
-                                style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ),
                           ],

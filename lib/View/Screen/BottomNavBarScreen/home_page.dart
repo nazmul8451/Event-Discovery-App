@@ -350,9 +350,13 @@ class _HomePageState extends State<HomePage> {
               right: 16.w,
               child: Consumer<SavedEventController>(
                 builder: (context, provider, child) {
-                  final isSaved = false;
+                  final isSaved = provider.isSaved(
+                    event,
+                  ); // check from controller
                   return IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await provider.toggleSave(event);
+                    },
                     icon: Icon(
                       isSaved ? Icons.bookmark : Icons.bookmark_border,
                       color: controller.isDarkMode
