@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
-import 'package:gathering_app/Service/Api service/network_caller.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart'; // EventData model এখানে আছে ধরে নিচ্ছি
+import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 class SavedEventController extends ChangeNotifier {
@@ -12,11 +12,12 @@ class SavedEventController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
 
+  // চেক করা যে এই event টা saved কি না
   bool isSaved(EventData event) {
     return _savedEvents.any((e) => e.event.id == event.id);
   }
 
-  /// true = saved, false = removed, null = failed
+  // Save / Unsave toggle
   Future<bool?> toggleSave(EventData event) async {
     _inProgress = true;
     notifyListeners();
@@ -24,34 +25,29 @@ class SavedEventController extends ChangeNotifier {
     bool? result;
 
     try {
-      // যদি আগে থেকে saved থাকে
-      SavedEventData? savedItem;
-      for (var e in _savedEvents) {
-        if (e.event.id == event.id) {
-          savedItem = e;
-          break;
-        }
-      }
+      final existingSaved = _savedEvents.cast<SavedEventData?>().firstWhere(
+        (e) => e?.event.id == event.id,
+        orElse: () => null,
+      );
 
-      if (savedItem != null) {
-        // DELETE saved event
+      if (existingSaved != null) {
+        // আগে থেকে saved → DELETE করো
         final response = await NetworkCaller.deleteRequest(
-          Urls.deleteSavedEvent(savedItem.savedId),
+          Urls.deleteSavedEvent(existingSaved.savedId),
           requireAuth: true,
         );
 
         print("Delete response: ${response.body}");
 
-        if (response.isSuccess &&
-            response.body != null &&
-            response.body!['success'] == true) {
-          _savedEvents.removeWhere((e) => e.event.id == event.id);
-          result = false;
+        if (response.isSuccess && response.body?['success'] == true) {
+          _savedEvents.remove(existingSaved);
+          result = false; // unsaved
         } else {
+          _errorMessage = response.body?['message'] ?? "Failed to unsave";
           result = null;
         }
       } else {
-        // SAVE new event
+        // নতুন save করো
         final response = await NetworkCaller.postRequest(
           url: Urls.addSaveEvent,
           body: {"event": event.id!},
@@ -61,19 +57,25 @@ class SavedEventController extends ChangeNotifier {
         print("Save response: ${response.body}");
 
         if (response.isSuccess &&
-            response.body != null &&
-            response.body!['success'] == true &&
-            response.body!['data'] != null) {
-          final newSavedEvent =
-              SavedEventData.fromJson(response.body!['data']);
-          _savedEvents.add(newSavedEvent);
+            response.body?['success'] == true &&
+            response.body?['data'] != null) {
+          final String newSavedId = response.body!['data']['_id'] as String;
+
+          final newSaved = SavedEventData(
+            savedId: newSavedId,
+            event: event, // full event object directly
+          );
+
+          _savedEvents.add(newSaved);
           result = true;
         } else {
+          _errorMessage = response.body?['message'] ?? "Failed to save";
           result = null;
         }
       }
     } catch (e) {
       print("Toggle save error: $e");
+      _errorMessage = "Something went wrong";
       result = null;
     }
 
@@ -82,9 +84,10 @@ class SavedEventController extends ChangeNotifier {
     return result;
   }
 
-  /// App start হলে call করবে
+  // আমার সব saved events লোড করো
   Future<void> loadMySavedEvents() async {
     _inProgress = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -93,17 +96,31 @@ class SavedEventController extends ChangeNotifier {
         requireAuth: true,
       );
 
+      print("Load saved events raw response: ${response.body}");
+
       if (response.isSuccess && response.body != null) {
         final List<dynamic> list =
             response.body!['data']['data'] as List<dynamic>;
 
         _savedEvents.clear();
-        _savedEvents.addAll(
-          list.map((json) => SavedEventData.fromJson(json)),
-        );
+
+        for (var json in list) {
+          try {
+            final savedEvent = SavedEventData.fromJson(json);
+            _savedEvents.add(savedEvent);
+          } catch (e) {
+            print("Error parsing saved event: $e, json: $json");
+          }
+        }
+
+        print("Successfully loaded ${_savedEvents.length} saved events");
+      } else {
+        _errorMessage =
+            response.body?['message'] ?? "Failed to load saved events";
       }
     } catch (e) {
       print("Load saved events error: $e");
+      _errorMessage = "Network error";
     }
 
     _inProgress = false;
@@ -111,19 +128,18 @@ class SavedEventController extends ChangeNotifier {
   }
 }
 
-/// SavedEventData new model (SavedEventModel অনুযায়ী)
+// SavedEvent এর জন্য আলাদা model (এটা রাখতেই হবে)
 class SavedEventData {
-  final String savedId; // API থেকে আসা savedEvent _id
-  final EventData event;
+  final String savedId; // savedEvent এর _id
+  final EventData event; // full populated event
 
   SavedEventData({required this.savedId, required this.event});
 
+  // এখন আর কোনো fallback নেই → backend populated data দিচ্ছে
   factory SavedEventData.fromJson(Map<String, dynamic> json) {
     return SavedEventData(
-      savedId: json['_id'],
-      event: json['event'] is Map<String, dynamic>
-          ? EventData.fromJson(json['event'])
-          : EventData(id: json['event']), // যদি শুধু event id আসে
+      savedId: json['_id'] as String,
+      event: EventData.fromJson(json['event'] as Map<String, dynamic>),
     );
   }
 }

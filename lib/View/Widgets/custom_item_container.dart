@@ -159,7 +159,9 @@ class Custom_item_container extends StatelessWidget {
                             SizedBox(width: 6.w),
                             Expanded(
                               child: Text(
-                                "${event.location ?? "Location TBA"}",
+                                event.address?.isNotEmpty == true
+                                    ? event.address!
+                                    : "Location TBA",
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: Colors.grey[600],
