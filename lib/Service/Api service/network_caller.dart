@@ -60,7 +60,7 @@ class NetworkCaller {
   static Future<NetworkResponse> postRequest({
     required String url,
     Map<String, dynamic>? body,
-    bool requireAuth = true,
+    bool requireAuth = false,
   }) async {
     try {
       final Uri uri = Uri.parse(url);

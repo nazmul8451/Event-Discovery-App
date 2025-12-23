@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
+import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
@@ -35,15 +36,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
   SingleEventDataModel? singleEvent;
   double _currentRating = 5.0;
   final TextEditingController _reviewController = TextEditingController();
-
+  late String eventId;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final eventId = ModalRoute.of(context)!.settings.arguments as String;
+      eventId = ModalRoute.of(context)!.settings.arguments as String;
+
+      context.read<EventTicketProvider>().setEventId(eventId);
+
       context.read<EventDetailsController>().getSingleEvent(eventId);
       context.read<ReivewController>().getAllReviewsByEventId(eventId: eventId);
+
       print("Event ID in Details Screen: $eventId");
     });
 
@@ -61,7 +66,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<EventDetailsController>();
     final singleEvent = controller.singleEvent;
-
+    // ticket dialog controller
+    TextEditingController couponController = TextEditingController();
+    TextEditingController qtyController = TextEditingController();
+    TextEditingController priceController = TextEditingController();
     if (controller.inProgress) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -322,6 +330,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
 
     void GetTicketAlertDialogue(BuildContext context) {
+      final String pricePerTicket =
+          singleEvent?.data?.ticketPrice?.toString() ?? "500";
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -343,7 +353,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // এই Column টাকে Expanded দিয়ে wrap করছি যাতে বাকি জায়গা নেয়
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -399,19 +408,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ],
                     ),
                     SizedBox(height: 24.h),
-                    AuthTextField(hintText: 'Summer 25', labelText: 'Coupon'),
                     AuthTextField(
-                      hintText: '1',
+                      controller: couponController,
+                      hintText: 'Summer 25',
+                      labelText: 'Coupon',
+                    ),
+                    AuthTextField(
+                      controller: qtyController,
+                      hintText: 'max 1',
                       labelText: 'Number of Tickets',
                     ),
                     AuthTextField(
-                      hintText: 'Email',
-                      labelText: 'your@email.com',
+                      controller: priceController,
+                      hintText: 'event price',
+                      labelText: 'Price',
                     ),
-                    AuthTextField(
-                      hintText: 'Phone Number',
-                      labelText: '+1 (555) 000-0000',
-                    ),
+
                     SizedBox(height: 20.h),
                     Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
                     SizedBox(height: 20.h),
@@ -483,12 +495,42 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             ),
                             padding: EdgeInsets.zero, // overflow রোধ
                           ),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookingConfirmedScreen(),
-                            ),
-                          ),
+                          onPressed: () async {
+                            final provider = Provider.of<EventTicketProvider>(
+                              context,
+                              listen: false,
+                            );
+
+                            final String coupon = couponController.text.trim();
+                            final int quantity =
+                                int.tryParse(qtyController.text.trim()) ?? 1;
+final int price = int.tryParse(priceController.text.trim()) ?? 0;
+
+                            final bool success = await provider.createTicket(
+                              eventId: eventId,
+                              promotionCode:couponController.text.trim(),
+                              quantity: 1, 
+                              price:price,
+                            );
+
+                            if (success) {
+                              Navigator.pop(context); // dialog close
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BookingConfirmedScreen(),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Ticket booking failed"),
+                                ),
+                              );
+                            }
+                          },
+
                           child: Text(
                             'Confirm Booking',
                             style: TextStyle(
@@ -757,6 +799,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 onTap: () => GetTicketAlertDialogue(context),
                 child: CustomButton(buttonName: 'Get Ticket'),
               ),
+
               SizedBox(height: 10.h),
               ContactOrgenizerButton(buttonName: "Contact Orgenizer"),
 
@@ -1084,7 +1127,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all( 
+                        border: Border.all(
                           width: 1,
                           color: Color(0xFFCC18CA).withOpacity(0.15),
                         ),

@@ -1,5 +1,5 @@
 class Urls {
-  static const String baseUrl = "http://10.10.7.11:5005";
+  static const String baseUrl = "http://10.10.7.50:5005";
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
   static const String loginUrl = "$baseUrl/api/v1/auth/login";
   static const String forgotpassUrl = "$baseUrl/api/v1/auth/forget-password";
@@ -19,4 +19,5 @@ class Urls {
   static const String addSaveEvent = "$baseUrl/api/v1/saved";
   static const String getMySaveEvents = '$baseUrl/api/v1/saved?filter=all';
   static String deleteSavedEvent (String id) => "$baseUrl/api/v1/saved/$id";
+  static const String CreateTicket = "$baseUrl/api/v1/ticket";
 }
