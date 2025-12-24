@@ -47,8 +47,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
       eventId = ModalRoute.of(context)!.settings.arguments as String;
 
       context.read<EventTicketProvider>().setEventId(eventId);
-
-      context.read<EventDetailsController>().getSingleEvent(eventId);
+      context.read<EventDetailsController>().getSingleEvent(eventId).then((_) {
+        // ensure ticket check runs after event load
+        context.read<EventDetailsController>().checkIfUserHasTicket(eventId);
+      });
       context.read<ReivewController>().getAllReviewsByEventId(eventId: eventId);
 
       print("Event ID in Details Screen: $eventId");
@@ -530,6 +532,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ? (provider.ticketData!['id'] ?? provider.ticketData!['_id'] ?? provider.ticketData!['ticketId'] ?? provider.ticketData!['ticket']?['id'])
                                   : null;
 
+                              // update event details controller so UI updates (user now has a ticket)
+                              try {
+                                await context.read<EventDetailsController>().checkIfUserHasTicket(eventId);
+                              } catch (_) {}
+
                               if (ticketId == null) {
                                 final debugStr = provider.ticketData != null ? jsonEncode(provider.ticketData) : 'null';
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ticket ID missing — data: $debugStr')));
@@ -539,6 +546,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               context,
                               OrderSummeryScreen.name,
                               arguments: {
+                                "eventId": eventId,
                                 "eventTitle":
                                   singleEvent?.data?.title ??
                                   "Unknown Event",
@@ -605,17 +613,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                
+                  // Share button (kept)
                   Consumer<ThemeProvider>(
                     builder: (context, controller, child) => GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {},
                       child: Container(
                         height: 36,
                         width: 36,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: controller.isDarkMode
-                              ? Color(0xFF3E043F)
-                              : Color(0xFF686868),
+                          color: controller.isDarkMode ? const Color(0xFF3E043F) : const Color(0xFF686868),
                         ),
                         child: Center(
                           child: Padding(
@@ -623,15 +631,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             child: Icon(
                               Icons.share,
                               size: 20.sp,
-                              color: controller.isDarkMode
-                                  ? Colors.white
-                                  : Colors.white70,
+                              color: controller.isDarkMode ? Colors.white : Colors.white70,
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
+
+                  // Close button
                   Consumer<ThemeProvider>(
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => Navigator.pop(context),
@@ -640,9 +648,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         width: 36,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: controller.isDarkMode
-                              ? Color(0xFF3E043F)
-                              : Color(0xFF686868),
+                          color: controller.isDarkMode ? const Color(0xFF3E043F) : const Color(0xFF686868),
                         ),
                         child: Center(
                           child: Padding(
@@ -660,8 +666,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          try {
+            await context.read<EventDetailsController>().getSingleEvent(eventId);
+            await context.read<EventDetailsController>().checkIfUserHasTicket(eventId);
+          } catch (_) {}
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 10.0),
           child: Column(
             children: [
@@ -833,9 +847,44 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
 
               SizedBox(height: 20.h),
-              GestureDetector(
-                onTap: () => GetTicketAlertDialogue(context),
-                child: CustomButton(buttonName: 'Get Ticket'),
+              Consumer<EventDetailsController>(
+                builder: (context, detailsCtrl, child) {
+                  if (detailsCtrl.hasTicket) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              // Watch live stream — implement actual stream URL/navigation if available
+                              showCustomSnackBar(context: context, message: 'Watch Live Stream');
+                            },
+                            child: CustomButton(buttonName: 'Watch Live Stream'),
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              // Check-in action — could call check-in API or open ticket
+                              final ticketId = detailsCtrl.userTicketId;
+                              if (ticketId != null && ticketId.isNotEmpty) {
+                                showCustomSnackBar(context: context, message: 'Checked in with ticket $ticketId');
+                              } else {
+                                showCustomSnackBar(context: context, message: 'No ticket id available');
+                              }
+                            },
+                            child: CustomButton(buttonName: 'Check-in'),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return GestureDetector(
+                      onTap: () => GetTicketAlertDialogue(context),
+                      child: CustomButton(buttonName: 'Get Ticket'),
+                    );
+                  }
+                },
               ),
 
               SizedBox(height: 10.h),
@@ -1428,6 +1477,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
           ),
         ),
       ),
+    )
     );
   }
 

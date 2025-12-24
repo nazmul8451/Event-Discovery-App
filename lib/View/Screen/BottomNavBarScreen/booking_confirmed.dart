@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart' show BottomNavBarScreen;
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:provider/provider.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:get_storage/get_storage.dart';
 
 class BookingConfirmedScreen extends StatefulWidget {
   const BookingConfirmedScreen({super.key});
@@ -15,6 +18,16 @@ class BookingConfirmedScreen extends StatefulWidget {
 class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    final String eventTitle = args?['eventTitle'] ?? 'Event';
+    final String eventDate = args?['eventDate'] ?? '';
+    final String eventTime = args?['eventTime'] ?? '';
+    final String eventLocation = args?['eventLocation'] ?? '';
+    final int quantity = args?['quantity'] ?? 1;
+    final dynamic totalPaid = args?['totalPaid'] ?? '';
+    final String orderId = args?['orderId'] ?? args?['ticketId'] ?? 'ORD-UNKNOWN';
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -36,7 +49,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 Text(
-                  'Sunset Rooftop Party',
+                  eventTitle,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -138,51 +151,53 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                       children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            
                         children: [
-                          Text('Order ID',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                          Text('ORD-7J68GPVDV',style: Theme.of(context).textTheme.titleSmall,),
+                          Text('Order ID', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Text(orderId, style: Theme.of(context).textTheme.titleSmall,),
+                        ],
+                      ),
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Event', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Text(eventTitle, style: Theme.of(context).textTheme.titleSmall,),
+                        ],
+                      ),
+
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Location', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Expanded(
+                            child: Text(eventLocation, textAlign: TextAlign.right, style: Theme.of(context).textTheme.titleSmall,),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 10.h,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Date', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                          Text('$eventDate ${eventTime.isNotEmpty ? 'at $eventTime' : ''}', style: Theme.of(context).textTheme.titleSmall),
                         ],
                       ),
                         SizedBox(height: 10.h,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Event',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('Sunset Rooftop Party',style: Theme.of(context).textTheme.titleSmall,),
-                          ],
-                        ),
-
-                        SizedBox(height: 10.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Event',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('Sunset Rooftop Party',style: Theme.of(context).textTheme.titleSmall,),
+                            Text('Ticket Type', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                            Text((ModalRoute.of(context)?.settings.arguments as Map<String,dynamic>?)?['ticketType'] ?? 'General Admission', style: Theme.of(context).textTheme.titleSmall),
                           ],
                         ),
                         SizedBox(height: 10.h,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Date',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('Nov 8 at 6:00 PM',style: Theme.of(context).textTheme.titleSmall),
-                          ],
-                        ),
-                        SizedBox(height: 10.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Ticket Type',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('General Admission',style: Theme.of(context).textTheme.titleSmall),
-                          ],
-                        ),
-                        SizedBox(height: 10.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Quantity',style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
-                            Text('1',style: Theme.of(context).textTheme.titleSmall),
+                            Text('Quantity', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey)),
+                            Text(quantity.toString(), style: Theme.of(context).textTheme.titleSmall),
                           ],
                         ),
 
@@ -192,8 +207,8 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Total Paid',style: Theme.of(context).textTheme.titleSmall),
-                            Text('\$49.50',style: Theme.of(context).textTheme.titleSmall?.copyWith(color:Color(0xFFCC18CA) )),
+                            Text('Total Paid', style: Theme.of(context).textTheme.titleSmall),
+                            Text('${totalPaid is num ? '\$${totalPaid}' : totalPaid.toString()}', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Color(0xFFCC18CA) )),
                           ],
                         ),
                     ],
@@ -243,7 +258,29 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                         ),
                         SizedBox(height:30.h,),
                       
-                      Text('1 ticket has been sent to example@gmail.com',style:Theme.of(context).textTheme.bodySmall)
+                      Builder(builder: (context) {
+                        final argsMap = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+                        final profile = Provider.of<ProfileController>(context, listen: false);
+                        String? email = argsMap?['email'] ?? profile.currentUser?.email;
+
+                        // Fallback: try GetStorage cached profile
+                        if ((email == null || email.isEmpty)) {
+                          try {
+                            final storage = GetStorage();
+                            final cached = storage.read('cached_user_profile');
+                            if (cached is Map && cached['email'] != null) {
+                              email = cached['email'].toString();
+                            }
+                          } catch (_) {
+                            // ignore
+                          }
+                        }
+
+                        final String displayEmail = (email == null || email.isEmpty) ? 'example@gmail.com' : email;
+                        final int qty = argsMap?['quantity'] ?? quantity;
+                        final String plural = qty > 1 ? 'tickets' : 'ticket';
+                        return Text('$qty $plural have been sent to $displayEmail', style: Theme.of(context).textTheme.bodySmall);
+                      })
             
                       ],
                     ),

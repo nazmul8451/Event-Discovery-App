@@ -141,7 +141,7 @@ class EventData {
   factory EventData.fromJson(Map<String, dynamic> json) {
     return EventData(
       location: json['location'] != null ? Location.fromJson(json['location']) : null,
-      id: json['_id'] ,
+      id: json['_id'] ?? json['id'],
       title: json['title'],
       description: json['description'],
       category: json['category'],

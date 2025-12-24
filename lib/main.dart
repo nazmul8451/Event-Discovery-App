@@ -26,15 +26,10 @@ import 'View/Theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-   Stripe.publishableKey = ''; 
+  Stripe.publishableKey =
+      'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa';
   await Stripe.instance.applySettings();
-  await AuthController().initialize();
-  runApp(
-    DevicePreview(
-      enabled: false,
-      builder: (context) => const MyApp(),
-    ),
-  );
+  runApp(DevicePreview(enabled: false, builder: (context) => const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -44,7 +39,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        
         ChangeNotifierProvider(create: (_) => ProfileController()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
@@ -57,9 +51,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EventDetailsController()),
         ChangeNotifierProvider(create: (_) => ReivewController()),
         ChangeNotifierProvider(create: (_) => OtpVerifyController()),
-        ChangeNotifierProvider(create: (_) => AuthController()),
-        ChangeNotifierProvider(create: (_)=> EventTicketProvider()),
-
+        ChangeNotifierProvider(create: (_) {
+          final c = AuthController();
+          c.initialize();
+          return c;
+        }),
+        ChangeNotifierProvider(create: (_) => EventTicketProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

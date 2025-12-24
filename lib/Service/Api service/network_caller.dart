@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gathering_app/Service/Controller/auth_controller.dart'; // এটা ইম্পোর্ট করো
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class NetworkResponse {
   final String? errorMessage;
@@ -20,6 +21,14 @@ class NetworkResponse {
 class NetworkCaller {
   static const String _unAuthorizeMessage = 'Unauthorized access';
 
+  // Resolve token from AuthController or secure storage
+  static Future<String?> _getToken() async {
+    final storage = const FlutterSecureStorage();
+    final tokenFromController = AuthController().accessToken;
+    if (tokenFromController != null && tokenFromController.isNotEmpty) return tokenFromController;
+    return await storage.read(key: 'access_token');
+  }
+
   // GET Request
   static Future<NetworkResponse> getRequest({
     required String url,
@@ -33,9 +42,9 @@ class NetworkCaller {
 
       // অটো টোকেন যোগ করো (যদি requireAuth true হয়)
       if (requireAuth) {
-        final String? token = AuthController().accessToken;
-        if (token != null && token.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $token';
+        final String? resolvedToken = await _getToken();
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $resolvedToken';
         }
       }
 
@@ -60,7 +69,7 @@ class NetworkCaller {
   static Future<NetworkResponse> postRequest({
     required String url,
     Map<String, dynamic>? body,
-    bool requireAuth = false,
+    bool requireAuth = true,
   }) async {
     try {
       final Uri uri = Uri.parse(url);
@@ -72,12 +81,12 @@ class NetworkCaller {
 
       // এখানে অটো টোকেন যোগ করো
       if (requireAuth) {
-        final String? token = AuthController().accessToken;
-        if (token != null && token.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $token';
-          debugPrint("TOKEN ADDED TO HEADER: Bearer $token");
+        final String? resolvedToken = await _getToken();
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $resolvedToken';
+          debugPrint("TOKEN ADDED TO HEADER: Bearer $resolvedToken");
         } else {
-          debugPrint("NO TOKEN FOUND IN AuthController");
+          debugPrint("NO TOKEN FOUND (AuthController or storage)");
         }
       }
 
@@ -119,12 +128,12 @@ class NetworkCaller {
       };
 
       if (requireAuth) {
-        final String? token = AuthController().accessToken;
-        if (token != null && token.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $token';
-          debugPrint("TOKEN ADDED TO PATCH HEADER: Bearer $token");
+        final String? resolvedToken = await _getToken();
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $resolvedToken';
+          debugPrint("TOKEN ADDED TO PATCH HEADER: Bearer $resolvedToken");
         } else {
-          debugPrint("NO TOKEN FOUND IN AuthController for PATCH");
+          debugPrint("NO TOKEN FOUND (AuthController or storage) for PATCH");
         }
       }
 
@@ -160,9 +169,9 @@ class NetworkCaller {
       final Map<String, String> headers = {'Content-Type': 'application/json'};
 
       if (requireAuth) {
-        final String? token = AuthController().accessToken;
-        if (token != null && token.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $token';
+        final String? resolvedToken = await _getToken();
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $resolvedToken';
         }
       }
 
@@ -288,3 +297,5 @@ class NetworkCaller {
     );
   }
 }
+
+// (token helper moved into NetworkCaller class)

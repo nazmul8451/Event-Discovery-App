@@ -142,7 +142,6 @@ Future<bool> updateProfile({
   }
 }
 
-  // ↑ তোমার updateProfile function এখানে শেষ
 
   // ================== SETTINGS FUNCTIONS START ==================
 
@@ -160,7 +159,7 @@ Future<bool> updateProfile({
       locationService: locationService ?? _currentUser!.settings!.locationService,
       profileStatus: profileStatus ?? _currentUser!.settings!.profileStatus,
     );
-
+    
     _currentUser = UserProfileModel(
       location: _currentUser!.location,
       settings: updatedSettings,

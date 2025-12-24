@@ -387,28 +387,41 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             SizedBox(width: 10.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${user?.name}',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleLarge!.copyWith(),
-                                ),
-                                Text(
-                                  '${user?.email}',
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .copyWith(color: Colors.grey),
-                                ),
-                                Text(
-                                  '${user?.description}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(fontWeight: FontWeight.w200),
-                                ),
-                              ],
+                            // make the right column flexible so long text wraps instead of overflowing
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${user?.name}',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge!.copyWith(),
+                                  ),
+                                  // email should be a single line with ellipsis
+                                  Text(
+                                    '${user?.email}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(color: Colors.grey),
+                                  ),
+                                  // description may be long — limit lines and allow ellipsis
+                                  SizedBox(height: 4.h),
+                                  Text(
+                                    '${user?.description ?? ''}',
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(fontWeight: FontWeight.w200),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
