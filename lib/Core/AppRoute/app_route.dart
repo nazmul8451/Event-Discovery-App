@@ -4,6 +4,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const String liveStream = LiveStream.name;
   static const String newPassScreen = NewPasswordScreen.name;
   static const String verifyAccount = '/verify-account';
+  static const String orderSummery = OrderSummeryScreen.name;
 
   static final routes = {
     splash: (context) => const SplashScreen(),
@@ -44,7 +46,7 @@ class AppRoutes {
     signup: (context) => const SignUpScreen(),
     forgotPass: (context) => const ForgotPassScreen(),
     codeSend: (context) => const CodeSend(),
-    codeSubmit: (context) =>  CodeSubmit(),
+    codeSubmit: (context) => CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
     userchatScreen: (context) => UserChatScreen(),
@@ -53,6 +55,7 @@ class AppRoutes {
     viewEventScreen: (context) => const ViewEventScreen(),
     liveStream: (context) => LiveStream(),
     newPassScreen: (context) => NewPasswordScreen(),
-    verifyAccount : (context) => VerifyAccount(email: '',),
+    verifyAccount: (context) => VerifyAccount(email: ''),
+    orderSummery: (context) => OrderSummeryScreen(),
   };
 }

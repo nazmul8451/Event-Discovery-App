@@ -9,6 +9,7 @@ import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
@@ -18,6 +19,7 @@ import 'package:gathering_app/View/Widgets/orgenizer_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
 
 import '../../Widgets/auth_textFormField.dart';
 import '../../Widgets/custom carosel_slider.dart';
@@ -504,24 +506,60 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             final String coupon = couponController.text.trim();
                             final int quantity =
                                 int.tryParse(qtyController.text.trim()) ?? 1;
-final int price = int.tryParse(priceController.text.trim()) ?? 0;
+                            final int price =
+                                int.tryParse(priceController.text.trim()) ?? 0;
+                            final int totalPrice = price * quantity;
 
                             final bool success = await provider.createTicket(
                               eventId: eventId,
-                              promotionCode:couponController.text.trim(),
-                              quantity: 1, 
-                              price:price,
+                              promotionCode: couponController.text.trim(),
+                              quantity: 1,
+                              price: price,
                             );
 
                             if (success) {
                               Navigator.pop(context); // dialog close
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BookingConfirmedScreen(),
-                                ),
+                              // get ticket id from provider (backend response)
+                              // Debug: print ticketData to help diagnose missing id
+                              try {
+                                // ignore: avoid_print
+                                print('DEBUG ticketData: ${jsonEncode(provider.ticketData)}');
+                              } catch (_) {}
+
+                              final ticketId = provider.ticketData != null
+                                  ? (provider.ticketData!['id'] ?? provider.ticketData!['_id'] ?? provider.ticketData!['ticketId'] ?? provider.ticketData!['ticket']?['id'])
+                                  : null;
+
+                              if (ticketId == null) {
+                                final debugStr = provider.ticketData != null ? jsonEncode(provider.ticketData) : 'null';
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ticket ID missing — data: $debugStr')));
+                              }
+
+                              Navigator.pushNamed(
+                              context,
+                              OrderSummeryScreen.name,
+                              arguments: {
+                                "eventTitle":
+                                  singleEvent?.data?.title ??
+                                  "Unknown Event",
+                                "eventDate":
+                                  singleEvent?.data?.startDate ?? "",
+                                "eventTime":
+                                  singleEvent?.data?.startTime ?? "",
+                                "eventLocation":
+                                  singleEvent?.data?.address ?? "",
+                                "quantity": quantity,
+                                "price": price,
+                                "totalPrice": totalPrice,
+                                "imageUrl":
+                                  (singleEvent.data?.images != null &&
+                                    singleEvent.data!.images!.isNotEmpty)
+                                  ? singleEvent.data!.images![0]
+                                  : '',
+                                if (ticketId != null) "ticketId": ticketId,
+                              },
                               );
+                              print(singleEvent.data?.images);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(

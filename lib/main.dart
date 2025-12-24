@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
@@ -25,10 +26,12 @@ import 'View/Theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+   Stripe.publishableKey = ''; 
+  await Stripe.instance.applySettings();
   await AuthController().initialize();
   runApp(
     DevicePreview(
-      enabled: true, // ⚡ Device Preview ON
+      enabled: false,
       builder: (context) => const MyApp(),
     ),
   );
