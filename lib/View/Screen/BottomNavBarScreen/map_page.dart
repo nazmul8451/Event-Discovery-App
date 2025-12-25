@@ -13,44 +13,34 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  // Define _initialPosition here
-  static const LatLng _initialPosition = LatLng(
-    37.7749,
-    -122.4194,
-  ); // Example: San Francisco
+  // Default initial position (will be replaced by current location)
+  static const LatLng _initialPosition = LatLng(23.7819724, 90.4030421);
 
   final Set<Marker> _markers = {};
   late GoogleMapController _mapController;
   String? _mapStyle;
   Position? _currentPosition;
+  bool _cameraMoved = false; // Track if camera already moved to current location
 
   @override
   void initState() {
     super.initState();
+    _loadMapStyle();
     _checkLocationPermission();
-    // Load the map style from the JSON file
-    rootBundle
-        .loadString('assets/map_style.json')
-        .then((string) {
-          _mapStyle = string;
-        })
-        .catchError((error) {
-          // Handle error if map style file is missing
-          print("Error loading map style: $error");
-        });
     _addMarkers();
   }
 
-  Future<void> _checkLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  Future<void> _loadMapStyle() async {
+    try {
+      _mapStyle = await rootBundle.loadString('assets/map_style.json');
+    } catch (e) {
+      print("Error loading map style: $e");
+    }
+  }
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  Future<void> _checkLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Location services are disabled. Please enable them.'),
@@ -59,12 +49,10 @@ class _MapPageState extends State<MapPage> {
       return;
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again.
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Location permissions are denied')),
         );
@@ -73,10 +61,9 @@ class _MapPageState extends State<MapPage> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
+        SnackBar(
+          content: const Text(
             'Location permissions are permanently denied, please enable in settings.',
           ),
           action: SnackBarAction(
@@ -88,8 +75,7 @@ class _MapPageState extends State<MapPage> {
       return;
     }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
+    // Permissions granted, fetch current location
     _getCurrentLocation();
   }
 
@@ -98,17 +84,35 @@ class _MapPageState extends State<MapPage> {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
       setState(() {
         _currentPosition = position;
-      });
-      _mapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 14,
+
+        // Remove previous current location marker
+        _markers.removeWhere((m) => m.markerId.value == 'current_location');
+
+        // Add current location marker
+        _markers.add(
+          Marker(
+            markerId: const MarkerId('current_location'),
+            position: LatLng(position.latitude, position.longitude),
+            infoWindow: const InfoWindow(title: 'Current Location'),
           ),
-        ),
-      );
+        );
+      });
+
+      // Move camera only once
+      if (!_cameraMoved) {
+        _mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(position.latitude, position.longitude),
+              zoom: 16,
+            ),
+          ),
+        );
+        _cameraMoved = true;
+      }
     } catch (e) {
       print("Error getting location: $e");
     }
@@ -118,8 +122,8 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       _markers.add(
         Marker(
-          markerId: MarkerId('marker_1'),
-          position: LatLng(37.7749, -122.4194),
+          markerId: const MarkerId('marker_1'),
+          position: const LatLng(37.7749, -122.4194),
           onTap: () {
             _showEventDetailsBottomSheet(
               'Noir Lounge',
@@ -131,8 +135,8 @@ class _MapPageState extends State<MapPage> {
       );
       _markers.add(
         Marker(
-          markerId: MarkerId('marker_2'),
-          position: LatLng(37.7849, -122.4294),
+          markerId: const MarkerId('marker_2'),
+          position: const LatLng(37.7849, -122.4294),
           onTap: () {
             _showEventDetailsBottomSheet(
               'Another Lounge',
@@ -146,10 +150,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _showEventDetailsBottomSheet(
-    String title,
-    String rating,
-    String imagePath,
-  ) {
+      String title, String rating, String imagePath) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -176,11 +177,12 @@ class _MapPageState extends State<MapPage> {
                       height: 80.h,
                       width: 80.w,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      errorBuilder: (context, error, stackTrace) =>
+                          Container(
                         height: 80.h,
                         width: 80.w,
                         color: Colors.grey,
-                        child: Icon(Icons.image_not_supported),
+                        child: const Icon(Icons.image_not_supported),
                       ),
                     ),
                   ),
@@ -207,16 +209,15 @@ class _MapPageState extends State<MapPage> {
                         SizedBox(height: 8.h),
                         ElevatedButton(
                           onPressed: () {
-                            // Navigate to details or perform action
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF5669FF), // Example color
+                            backgroundColor: const Color(0xFF5669FF),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             "View Details",
                             style: TextStyle(color: Colors.white),
                           ),
@@ -234,10 +235,8 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // This function is called when the map is created
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    // Set the map style if it's loaded
     if (_mapStyle != null) {
       _mapController.setMapStyle(_mapStyle);
     }
@@ -257,18 +256,18 @@ class _MapPageState extends State<MapPage> {
             width: 15.w,
           ),
         ),
-        titleSpacing: 0, // This brings the title closer to the leading widget
+        titleSpacing: 0,
         title: Align(alignment: Alignment.bottomLeft, child: Text('GATHERING')),
       ),
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(
+            initialCameraPosition: const CameraPosition(
               target: _initialPosition,
-              zoom: 12,
+              zoom: 16,
             ),
-            markers: _markers, // Add the markers to the map
-            onMapCreated: _onMapCreated, // Add the onMapCreated callback
+            markers: _markers,
+            onMapCreated: _onMapCreated,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
@@ -279,7 +278,7 @@ class _MapPageState extends State<MapPage> {
             child: FloatingActionButton(
               onPressed: _getCurrentLocation,
               backgroundColor: Colors.white,
-              child: Icon(Icons.my_location, color: Colors.black),
+              child: const Icon(Icons.my_location, color: Colors.black),
             ),
           ),
         ],

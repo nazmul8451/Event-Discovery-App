@@ -8,8 +8,10 @@ class Urls {
   static const String getAllEvent = "$baseUrl/api/v1/event";
   static String getSingleEvent(String eventID) =>
       "$baseUrl/api/v1/event/$eventID";
+   
     static String getHasTicket(String eventID) =>
       "$baseUrl/api/v1/event/$eventID/has-ticket";
+      
   static const String reviewUrl = "$baseUrl/api/v1/review";
   static const String getAllReviewUrl = "$baseUrl/api/v1/review";
   static String getReviewByEventIdUrl(String eventId) {
