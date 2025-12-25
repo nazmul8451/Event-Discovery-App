@@ -78,45 +78,44 @@ class _MapPageState extends State<MapPage> {
     // Permissions granted, fetch current location
     _getCurrentLocation();
   }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      setState(() {
-        _currentPosition = position;
-
-        // Remove previous current location marker
-        _markers.removeWhere((m) => m.markerId.value == 'current_location');
-
-        // Add current location marker
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('current_location'),
-            position: LatLng(position.latitude, position.longitude),
-            infoWindow: const InfoWindow(title: 'Current Location'),
-          ),
-        );
-      });
-
-      // Move camera only once
-      if (!_cameraMoved) {
-        _mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 16,
-            ),
-          ),
-        );
-        _cameraMoved = true;
-      }
-    } catch (e) {
-      print("Error getting location: $e");
-    }
+Future<void> _getCurrentLocation() async {
+  if (_currentPosition != null && _cameraMoved) {
+    // ইতিমধ্যে পজিশন আছে এবং ক্যামেরা মুভ করা হয়েছে → আবার করার দরকার নেই
+    return;
   }
+
+  try {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      _currentPosition = position;
+      _markers.removeWhere((m) => m.markerId.value == 'current_location');
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('current_location'),
+          position: LatLng(position.latitude, position.longitude),
+          infoWindow: const InfoWindow(title: 'Current Location'),
+        ),
+      );
+    });
+
+    if (!_cameraMoved && _mapController != null) {  // null চেক যোগ করা ভালো
+      await _mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 16,
+          ),
+        ),
+      );
+      _cameraMoved = true;
+    }
+  } catch (e) {
+    print("Error getting location: $e");
+  }
+}
 
   void _addMarkers() {
     setState(() {
@@ -268,7 +267,7 @@ class _MapPageState extends State<MapPage> {
             ),
             markers: _markers,
             onMapCreated: _onMapCreated,
-            myLocationEnabled: true,
+            myLocationEnabled: false,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
           ),
