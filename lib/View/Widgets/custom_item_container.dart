@@ -140,7 +140,7 @@ class Custom_item_container extends StatelessWidget {
                             SizedBox(width: 3.w),
                             Expanded(
                               child: Text(
-                                event.startDate ?? "00",
+                              "${event.startDate ?? "00"}",
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   color: Colors.grey[600],

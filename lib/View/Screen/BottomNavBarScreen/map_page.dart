@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Required for rootBundle
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class MapPage extends StatefulWidget {
@@ -13,240 +13,39 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  // Default initial position (will be replaced by current location)
-  static const LatLng _initialPosition = LatLng(23.7819724, 90.4030421);
-
-  final Set<Marker> _markers = {};
-  late GoogleMapController _mapController;
-  String? _mapStyle;
-  Position? _currentPosition;
-  bool _cameraMoved = false; // Track if camera already moved to current location
+  late MapController mapCtrl;
 
   @override
   void initState() {
     super.initState();
-    _loadMapStyle();
-    _checkLocationPermission();
-    _addMarkers();
+    mapCtrl = MapController();
+    mapCtrl.addListener(_updateUI); 
+    mapCtrl.init(); 
   }
 
-  Future<void> _loadMapStyle() async {
-    try {
-      _mapStyle = await rootBundle.loadString('assets/map_style.json');
-    } catch (e) {
-      print("Error loading map style: $e");
-    }
+  void _updateUI() {
+    if (mounted) setState(() {});
   }
 
-  Future<void> _checkLocationPermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Location services are disabled. Please enable them.'),
-        ),
-      );
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location permissions are denied')),
-        );
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Location permissions are permanently denied, please enable in settings.',
-          ),
-          action: SnackBarAction(
-            label: 'Settings',
-            onPressed: Geolocator.openAppSettings,
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Permissions granted, fetch current location
-    _getCurrentLocation();
-  }
-Future<void> _getCurrentLocation() async {
-  if (_currentPosition != null && _cameraMoved) {
-    // ইতিমধ্যে পজিশন আছে এবং ক্যামেরা মুভ করা হয়েছে → আবার করার দরকার নেই
-    return;
-  }
-
-  try {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    setState(() {
-      _currentPosition = position;
-      _markers.removeWhere((m) => m.markerId.value == 'current_location');
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('current_location'),
-          position: LatLng(position.latitude, position.longitude),
-          infoWindow: const InfoWindow(title: 'Current Location'),
-        ),
-      );
-    });
-
-    if (!_cameraMoved && _mapController != null) {  // null চেক যোগ করা ভালো
-      await _mapController.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
-            zoom: 16,
-          ),
-        ),
-      );
-      _cameraMoved = true;
-    }
-  } catch (e) {
-    print("Error getting location: $e");
-  }
-}
-
-  void _addMarkers() {
-    setState(() {
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('marker_1'),
-          position: const LatLng(37.7749, -122.4194),
-          onTap: () {
-            _showEventDetailsBottomSheet(
-              'Noir Lounge',
-              '★ 4.0 Open',
-              'assets/images/home_img1.png',
-            );
-          },
-        ),
-      );
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('marker_2'),
-          position: const LatLng(37.7849, -122.4294),
-          onTap: () {
-            _showEventDetailsBottomSheet(
-              'Another Lounge',
-              '★ 4.5 Open',
-              'assets/images/home_img1.png',
-            );
-          },
-        ),
-      );
-    });
-  }
-
-  void _showEventDetailsBottomSheet(
-      String title, String rating, String imagePath) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.r),
-              topRight: Radius.circular(20.r),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: Image.asset(
-                      imagePath,
-                      height: 80.h,
-                      width: 80.w,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Container(
-                        height: 80.h,
-                        width: 80.w,
-                        color: Colors.grey,
-                        child: const Icon(Icons.image_not_supported),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          rating,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.orange,
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF5669FF),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                          ),
-                          child: const Text(
-                            "View Details",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10.h),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
-    if (_mapStyle != null) {
-      _mapController.setMapStyle(_mapStyle);
-    }
+  @override
+  void dispose() {
+    mapCtrl.removeListener(_updateUI);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+        ),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Image.asset(
@@ -256,30 +55,51 @@ Future<void> _getCurrentLocation() async {
           ),
         ),
         titleSpacing: 0,
-        title: Align(alignment: Alignment.bottomLeft, child: Text('GATHERING')),
+        title: Align(
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            'GATHERING',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        centerTitle: false,
       ),
       body: Stack(
         children: [
           GoogleMap(
             initialCameraPosition: const CameraPosition(
-              target: _initialPosition,
-              zoom: 16,
+              target: LatLng(23.8103, 90.4125), // ঢাকা কেন্দ্রিক শুরু
+              zoom: 12,
             ),
-            markers: _markers,
-            onMapCreated: _onMapCreated,
+            markers: mapCtrl.markers,
+            onMapCreated: (GoogleMapController controller) {
+              mapCtrl.setMapController(controller);
+              // প্রথমবার লোড হলে কারেন্ট লোকেশনে যেতে পারো
+              if (mapCtrl.currentPosition != null) {
+                mapCtrl.moveToCurrentLocation();
+              }
+            },
             myLocationEnabled: false,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
           ),
+          // মাই লোকেশন বাটন (controller-এর ফাংশন কল)
           Positioned(
             bottom: 20.h,
             right: 20.w,
             child: FloatingActionButton(
-              onPressed: _getCurrentLocation,
+              onPressed: mapCtrl.moveToCurrentLocation,
               backgroundColor: Colors.white,
               child: const Icon(Icons.my_location, color: Colors.black),
             ),
           ),
+          // লোডিং দেখানো
+          if (mapCtrl.isLoading || mapCtrl.eventsLoading)
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
