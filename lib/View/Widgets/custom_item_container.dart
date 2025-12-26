@@ -162,6 +162,9 @@ class Custom_item_container extends StatelessWidget {
                                 event.address?.isNotEmpty == true
                                     ? event.address!
                                     : "Location TBA",
+                                    softWrap: true,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: Colors.grey[600],

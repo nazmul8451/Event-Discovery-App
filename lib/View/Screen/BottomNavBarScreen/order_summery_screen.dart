@@ -306,12 +306,16 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(title),
-                          Text('Event price: \\${price}'),
+                          Expanded(
+                            flex: 1,
+                            child: Text("${title}",softWrap: true,maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                          Expanded(
+                            flex: 1,
+                            child: Text('Event price: \\${price}'),
+                          ),
                         ],
                       ),
                       SizedBox(height: 20.h),
-
                       Divider(color: const Color(0xFFCC18CA).withOpacity(0.15)),
                       SizedBox(height: 10.h),
 
@@ -323,7 +327,7 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           Text(
-                            '\$${totalPrice}',
+                           ' \$$totalPrice',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ],

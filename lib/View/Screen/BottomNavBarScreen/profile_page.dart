@@ -567,112 +567,139 @@ class _ProfilePageState extends State<ProfilePage> {
                         SizedBox(height: 15.h),
 
                         // Favorite Spots List
-                 SizedBox(
-  height: 230.h,
-  child: Consumer<SavedEventController>(
-    builder: (context, savedController, child) {
-      final savedEvents = savedController.savedEvents;
+                        SizedBox(
+                          height: 230.h,
+                          child: Consumer<SavedEventController>(
+                            builder: (context, savedController, child) {
+                              final savedEvents = savedController.savedEvents;
 
-      if (savedController.inProgress) {
-        return const Center(child: CircularProgressIndicator());
-      }
+                              if (savedController.inProgress) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
 
-      if (savedEvents.isEmpty) {
-        return Center(
-          child: Text(
-            'No saved yet 💾',
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall
-                ?.copyWith(color: Colors.grey),
-          ),
-        );
-      }
+                              if (savedEvents.isEmpty) {
+                                return Center(
+                                  child: Text(
+                                    'No saved yet 💾',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(color: Colors.grey),
+                                  ),
+                                );
+                              }
 
-      return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: savedEvents.length,
-        itemBuilder: (context, index) {
-          final event = savedEvents[index];
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: savedEvents.length,
+                                itemBuilder: (context, index) {
+                                  final event = savedEvents[index];
 
-          return Padding(
-            padding: EdgeInsets.only(right: 12.w),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  DetailsScreen.name,
-                  arguments: event.event.id,
-                );
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 180.h,
-                    width: 180.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.r),
-                      image: DecorationImage(
-                        image: (event.event.images != null &&
-                                event.event.images!.isNotEmpty)
-                            ? NetworkImage(
-                                "${Urls.baseUrl}${event.event.images!.first}",
-                              )
-                            : const AssetImage(
-                                'assets/images/container_img.png',
-                              ) as ImageProvider,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 12.w),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          DetailsScreen.name,
+                                          arguments: event.event.id,
+                                        );
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 180.h,
+                                            width: 180.w,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r),
+                                              image: DecorationImage(
+                                                image:
+                                                    (event.event.images !=
+                                                            null &&
+                                                        event
+                                                            .event
+                                                            .images!
+                                                            .isNotEmpty)
+                                                    ? NetworkImage(
+                                                        "${Urls.baseUrl}${event.event.images!.first}",
+                                                      )
+                                                    : const AssetImage(
+                                                            'assets/images/container_img.png',
+                                                          )
+                                                          as ImageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
 
-                    /// 🔖 UNSAVE BUTTON
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.w),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.bookmark,
-                            color: const Color(0xFFFF006E),
-                            size: 28.sp,
-                          ),
-                          onPressed: () async {
-                            final result = await savedController
-                                .toggleSave(event.event);
+                                            /// 🔖 UNSAVE BUTTON
+                                            child: Align(
+                                              alignment: Alignment.topRight,
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.w),
+                                                child: IconButton(
+                                                  icon: Icon(
+                                                    Icons.bookmark,
+                                                    color: const Color(
+                                                      0xFFFF006E,
+                                                    ),
+                                                    size: 28.sp,
+                                                  ),
+                                                  onPressed: () async {
+                                                    final result =
+                                                        await savedController
+                                                            .toggleSave(
+                                                              event.event,
+                                                            );
 
-                            if (result == false) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Removed from saved'),
-                                  duration: Duration(milliseconds: 800),
-                                ),
+                                                    if (result == false) {
+                                                      ScaffoldMessenger.of(
+                                                        context,
+                                                      ).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Removed from saved',
+                                                          ),
+                                                          duration: Duration(
+                                                            milliseconds: 800,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 8.h),
+                                          Expanded(
+                                            child: SizedBox(
+                                              width: 180.w,
+                                              child: Text(
+                                                event.event.title ??
+                                                    'Untitled Event',
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.titleMedium,
+
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
-                            }
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  SizedBox(
-                    width: 180.w,
-                    child: Text(
-                      event.event.title ?? 'Untitled Event',
-                      style: Theme.of(context).textTheme.titleMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    },
-  ),
-),
 
                         Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -689,9 +716,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                 ),
                               ),
-                             
-
-                            
 
                               SizedBox(height: 20.h),
                               Row(

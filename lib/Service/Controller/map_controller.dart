@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -6,59 +7,81 @@ import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:geolocator/geolocator.dart';
 
 class MapController with ChangeNotifier {
-  // লোডিং স্টেট
+  /// ================= MAP + ROUTE =================
+  late PolylinePoints _polylinePoints;
+  List<LatLng> _polylineCoordinates = [];
+  Polyline? _routePolyline;
+
+  Set<Polyline> get polylines =>
+      _routePolyline != null ? {_routePolyline!} : {};
+
+  /// ================= STATE =================
   bool _isLoading = true;
   bool get isLoading => _isLoading;
 
   bool _eventsLoading = true;
   bool get eventsLoading => _eventsLoading;
 
-  // কারেন্ট ইউজার লোকেশন
+  /// ================= LOCATION =================
   Position? _currentPosition;
   Position? get currentPosition => _currentPosition;
 
-  // মার্কার লিস্ট
+  /// ================= MAP CONTROLLER =================
+  GoogleMapController? _mapController;
+
+  /// ================= MARKERS =================
   final Set<Marker> _markers = {};
   Set<Marker> get markers => _markers;
 
-  // কাস্টম ইভেন্ট আইকন
   BitmapDescriptor? _eventIcon;
-  BitmapDescriptor? get eventIcon => _eventIcon;
 
-  // ইভেন্ট লিস্ট
+  /// ================= EVENTS =================
   List<EventData> _events = [];
   List<EventData> get events => _events;
 
-  // ম্যাপ কন্ট্রোলার (যদি দরকার হয়)
-  GoogleMapController? _mapController;
-  GoogleMapController? get mapController => _mapController;
-
-  // init ফাংশন (MapPage এর initState থেকে কল করবে)
+  /// ================= INIT =================
   Future<void> init() async {
+    _polylinePoints = PolylinePoints(
+      apiKey:
+          'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa',
+    );
     await _loadEventIcon();
-    await _getCurrentLocation();
+    await getCurrentLocation();
     await fetchAndAddEvents();
   }
 
-  // কাস্টম আইকন লোড
-Future<void> _loadEventIcon() async {
-  try {
-    _eventIcon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(size: Size(64, 64)),  // ছোট সাইজ দাও
-      'assets/images/event_marker.png',              // নতুন পাথ
-    );
-    debugPrint("কাস্টম আইকন সাকসেস: event_marker.png");
-  } catch (e) {
-    debugPrint("আইকন লোড ফেল: $e");
-    _eventIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+  /// ================= ZOOM =================
+  Future<void> zoomIn() async {
+    if (_mapController == null) return;
+    final zoom = await _mapController!.getZoomLevel();
+    _mapController!.animateCamera(CameraUpdate.zoomTo(zoom + 1));
   }
-  notifyListeners();
-}
-  // কারেন্ট লোকেশন নেয়া
-  Future<void> _getCurrentLocation() async {
+
+  Future<void> zoomOut() async {
+    if (_mapController == null) return;
+    final zoom = await _mapController!.getZoomLevel();
+    _mapController!.animateCamera(CameraUpdate.zoomTo(zoom - 1));
+  }
+
+  /// ================= ICON =================
+  Future<void> _loadEventIcon() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
+      _eventIcon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(size: Size(64, 64)),
+        'assets/images/event_marker.png',
+      );
+    } catch (_) {
+      _eventIcon = BitmapDescriptor.defaultMarkerWithHue(
+        BitmapDescriptor.hueRed,
+      );
+    }
+  }
+
+  /// ================= LOCATION =================
+  Future<void> getCurrentLocation() async {
+    try {
+      bool enabled = await Geolocator.isLocationServiceEnabled();
+      if (!enabled) return;
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -68,119 +91,132 @@ Future<void> _loadEventIcon() async {
 
       if (permission == LocationPermission.deniedForever) return;
 
-      Position position = await Geolocator.getCurrentPosition(
+      _currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      _currentPosition = position;
-
-      // কারেন্ট লোকেশন মার্কার যোগ করা
       _markers.removeWhere((m) => m.markerId.value == 'current_location');
+
       _markers.add(
         Marker(
           markerId: const MarkerId('current_location'),
-          position: LatLng(position.latitude, position.longitude),
-          infoWindow: const InfoWindow(title: 'আমার অবস্থান'),
+          position: LatLng(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+          ),
+          infoWindow: const InfoWindow(title: 'My Location'),
         ),
       );
 
       notifyListeners();
     } catch (e) {
-      debugPrint("Location error: $e");
+      debugPrint('Location error: $e');
     }
   }
-Future<void> fetchAndAddEvents() async {
-  _eventsLoading = true;
-  notifyListeners();
 
-  // তোমার Urls ক্লাস থেকে URL নেয়া
-  final response = await NetworkCaller.getRequest(
-    url: Urls.getAllEvent,  
-    requireAuth: true,     
-  );
-
-  if (response.isSuccess && response.statusCode == 200 && response.body != null) {
-    final model = GetAllEventModel.fromJson(response.body!);
-    _events = model.data?.data ?? [];
-
-    debugPrint("Event Get: ${_events.length} Total");
-
-    _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));
-
-    int added = 0;
-    for (var event in _events) {
-      // lat/long  (coordinates [lng, lat] )
-      final lat = (event.location?.coordinates?[1] as num?)?.toDouble() ?? 0.0;
-      final lng = (event.location?.coordinates?[0] as num?)?.toDouble() ?? 0.0;
-
-      debugPrint("Event: ${event.title} | lat: $lat, lng: $lng");
-
-      if (lat == 0.0 || lng == 0.0) {
-        continue;
-      }
-
-      _markers.add(
-        Marker(
-          markerId: MarkerId('event_${event.id ?? event.iV ?? 'unknown'}'),
-          position: LatLng(lat, lng),
-          icon: _eventIcon ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          infoWindow: InfoWindow(
-            title: event.title ?? 'Event',
-          ),
-          // onTap যদি দরকার হয় তাহলে এখানে রাখতে পারো বা MapPage থেকে হ্যান্ডেল করো
-        ),
-      );
-      added++;
-    }
-
-    debugPrint("মার্কার যোগ হয়েছে: $added টি");
-  } else {
-    debugPrint("ইভেন্ট লোড ফেল হয়েছে: ${response.errorMessage}");
-  }
-
-  _eventsLoading = false;
-  _isLoading = false;
-  notifyListeners();
-}
-
-  // ম্যাপ কন্ট্রোলার সেট করা (onMapCreated থেকে)
-  void setMapController(GoogleMapController controller) {
-    _mapController = controller;
-    notifyListeners();
-  }
-
-  // ম্যাপকে কারেন্ট লোকেশনে মুভ করা
   Future<void> moveToCurrentLocation() async {
-    if (_currentPosition != null && _mapController != null) {
-      _mapController!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-            zoom: 15,
-          ),
-        ),
-      );
-    }
-  }
-
-  // ম্যাপকে সব ইভেন্ট দেখানোর জন্য ফিট করা (অপশনাল)
-  Future<void> fitAllEvents() async {
-    if (_markers.isEmpty || _mapController == null) return;
-
-    // সিম্পল উপায়: প্রথম ইভেন্টে মুভ (পুরোপুরি bounds করতে LatLngBounds লাগবে)
-    final firstEvent = _markers.firstWhere(
-      (m) => m.markerId.value.startsWith('event_'),
-      orElse: () => _markers.first,
-    );
+    if (_currentPosition == null || _mapController == null) return;
 
     _mapController!.animateCamera(
-      CameraUpdate.newLatLng(firstEvent.position),
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+          ),
+          zoom: 15,
+        ),
+      ),
     );
   }
 
-  // লোডিং রিসেট বা রিফ্রেশ
-  void resetLoading() {
-    _isLoading = true;
+  /// ================= EVENTS =================
+  Future<void> fetchAndAddEvents() async {
+    _eventsLoading = true;
     notifyListeners();
+
+    final response = await NetworkCaller.getRequest(
+      url: Urls.getAllEvent,
+      requireAuth: true,
+    );
+
+    if (response.isSuccess && response.body != null) {
+      final model = GetAllEventModel.fromJson(response.body!);
+      _events = model.data?.data ?? [];
+
+      _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));
+
+      for (var event in _events) {
+        final lat = (event.location?.coordinates?[1] as num?)?.toDouble() ?? 0;
+        final lng = (event.location?.coordinates?[0] as num?)?.toDouble() ?? 0;
+
+        if (lat == 0 || lng == 0) continue;
+
+        _markers.add(
+          Marker(
+            markerId: MarkerId('event_${event.id ?? event.iV}'),
+            position: LatLng(lat, lng),
+            icon: _eventIcon!,
+            infoWindow: InfoWindow(title: event.title),
+            onTap: () {
+              showRouteToEvent(LatLng(lat, lng));
+            },
+          ),
+        );
+      }
+    }
+
+    _eventsLoading = false;
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// ================= ROUTE =================
+  void clearRoute() {
+    _polylineCoordinates.clear();
+    _routePolyline = null;
+    notifyListeners();
+  }
+
+Future<void> showRouteToEvent(LatLng eventLatLng) async {
+  if (_currentPosition == null || _mapController == null) return;
+
+  clearRoute();
+
+  final polylinePoints = PolylinePoints(apiKey: 'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa');
+
+  try {
+    // Use PolylineRequest instead of RoutesApiRequest
+    final request = PolylineRequest(
+      origin: PointLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+      destination: PointLatLng(eventLatLng.latitude, eventLatLng.longitude), mode: TravelMode.driving,
+    );
+
+    final response = await polylinePoints.getRouteBetweenCoordinates(
+      request: request,
+    );
+
+    if (response.points.isNotEmpty) {
+      _polylineCoordinates = response.points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+
+      _routePolyline = Polyline(
+        polylineId: const PolylineId('route'),
+        color: Colors.blue,
+        width: 5,
+        points: _polylineCoordinates,
+      );
+
+      notifyListeners();
+    }
+  } catch (e) {
+    debugPrint('Route error: $e');
+  }
+}
+
+  /// ================= MAP CONTROLLER =================
+  void setMapController(GoogleMapController controller) {
+    _mapController = controller;
   }
 }

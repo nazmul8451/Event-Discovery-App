@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -19,8 +18,8 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     mapCtrl = MapController();
-    mapCtrl.addListener(_updateUI); 
-    mapCtrl.init(); 
+    mapCtrl.addListener(_updateUI);
+    mapCtrl.init();
   }
 
   void _updateUI() {
@@ -40,7 +39,6 @@ class _MapPageState extends State<MapPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         elevation: 0,
-        scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -72,32 +70,59 @@ class _MapPageState extends State<MapPage> {
         children: [
           GoogleMap(
             initialCameraPosition: const CameraPosition(
-              target: LatLng(23.8103, 90.4125), // ঢাকা কেন্দ্রিক শুরু
-              zoom: 12,
+              target: LatLng(23.8103, 90.4125),
+              zoom: 15,
             ),
             markers: mapCtrl.markers,
-            onMapCreated: (GoogleMapController controller) {
+            polylines: mapCtrl.polylines,
+            onMapCreated: (controller) {
               mapCtrl.setMapController(controller);
-              // প্রথমবার লোড হলে কারেন্ট লোকেশনে যেতে পারো
               if (mapCtrl.currentPosition != null) {
                 mapCtrl.moveToCurrentLocation();
               }
             },
+            zoomControlsEnabled: false,
             myLocationEnabled: false,
             myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
           ),
-          // মাই লোকেশন বাটন (controller-এর ফাংশন কল)
+
           Positioned(
-            bottom: 20.h,
+            bottom: 100.h,
             right: 20.w,
             child: FloatingActionButton(
-              onPressed: mapCtrl.moveToCurrentLocation,
+              heroTag: 'myLocation',
+              onPressed: () async {
+                await mapCtrl.moveToCurrentLocation();
+              },
               backgroundColor: Colors.white,
               child: const Icon(Icons.my_location, color: Colors.black),
             ),
           ),
-          // লোডিং দেখানো
+
+          Positioned(
+            bottom: 170.h,
+            right: 20.w,
+            child: Column(
+              children: [
+                FloatingActionButton(
+                  mini: true,
+                  heroTag: 'zoomIn',
+                  onPressed: mapCtrl.zoomIn,
+                  backgroundColor: Colors.white,
+                  child: const Icon(Icons.add, color: Colors.black),
+                ),
+                SizedBox(height: 8.h),
+                FloatingActionButton(
+                  mini: true,
+                  heroTag: 'zoomOut',
+                  onPressed: mapCtrl.zoomOut,
+                  backgroundColor: Colors.white,
+                  child: const Icon(Icons.remove, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+
           if (mapCtrl.isLoading || mapCtrl.eventsLoading)
             const Center(child: CircularProgressIndicator()),
         ],
