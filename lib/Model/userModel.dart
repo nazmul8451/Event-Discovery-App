@@ -15,6 +15,7 @@ class UserProfileModel {
   DateTime? createdAt;
   DateTime? updatedAt;
   String? profileImageUrl;
+  Stats? stats;
 
   UserProfileModel({
     this.location,
@@ -33,6 +34,7 @@ class UserProfileModel {
     this.createdAt,
     this.updatedAt,
     this.profileImageUrl,
+    this.stats,
   });
 
   // API response থেকে model বানানো
@@ -60,6 +62,7 @@ class UserProfileModel {
       // ✅ এটা যোগ করো
       profileImageUrl:
           json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'],
+      stats: json['stats'] != null ? Stats.fromJson(json['stats']) : null,
     );
   }
 Map<String, dynamic> toJson() {
@@ -80,6 +83,7 @@ Map<String, dynamic> toJson() {
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "profileImageUrl": profileImageUrl,       // এটাও যোগ করো
+    "stats": stats?.toJson(),
   };
 }
 }
@@ -150,4 +154,26 @@ class Settings {
       "profileStatus": profileStatus,
     };
   }
+}
+
+class Stats {
+  final int events;
+  final int followers;
+  final int following;
+
+  Stats({required this.events, required this.followers, required this.following});
+
+  factory Stats.fromJson(Map<String, dynamic> json) {
+    return Stats(
+      events: json['events'] ?? 0,
+      followers: json['followers'] ?? 0,
+      following: json['following'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'events': events,
+        'followers': followers,
+        'following': following,
+      };
 }

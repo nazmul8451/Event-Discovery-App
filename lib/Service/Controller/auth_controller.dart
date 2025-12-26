@@ -52,6 +52,8 @@ class AuthController extends ChangeNotifier {
     debugPrint("✅ Tokens & User data saved successfully");
     notifyListeners();
   }
+  //ki je kori 
+
 
   // অ্যাপ স্টার্টে সব লোড করা
   Future<void> initialize() async {
@@ -86,7 +88,7 @@ class AuthController extends ChangeNotifier {
       if (response.isSuccess && response.body != null) {
         final Map<String, dynamic> data = response.body!['data'] ?? response.body!;
 
-        // তোমার API response structure অনুযায়ী চেঞ্জ করো
+        //  API response structure 
         final String accessToken = data['accessToken'] ?? data['token'] ?? '';
         final String refreshToken = data['refreshToken'] ?? '';
 
@@ -112,7 +114,6 @@ class AuthController extends ChangeNotifier {
           userName: userName,
         );
 
-        // প্রোফাইল ফেচ (যদি দরকার হয়)
         final profileController = Provider.of<ProfileController>(context, listen: false);
         await profileController.fetchProfile(forceRefresh: true);
 

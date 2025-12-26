@@ -17,7 +17,7 @@ class ChatPage extends StatelessWidget {
    ChatModel(
    name: 'Rimon Islam',
    currentMessage: 'Hello kemon aco?',
-   id: 01,
+   id: '01',
    imageIcon: 'assets/images/person_svg.svg', // .svg হলে AssetImage এ সমস্যা হতে পারে
    isGroup: false,
    status: 'online',
@@ -26,7 +26,7 @@ class ChatPage extends StatelessWidget {
    ChatModel(
    name: 'Ayesha Khan',
    currentMessage: 'Ki khobor?',
-   id: 02,
+   id: '02',
    imageIcon: 'assets/images/person_svg.svg',
    isGroup: false,
    status: 'offline',
@@ -35,7 +35,7 @@ class ChatPage extends StatelessWidget {
    ChatModel(
    name: 'Festival Organizers',
    currentMessage: 'Welcome to the group!',
-   id: 03,
+   id: '03',
    imageIcon: 'assets/images/group_svg.svg',
    isGroup: true,
    status: 'online',
@@ -44,7 +44,7 @@ class ChatPage extends StatelessWidget {
      ChatModel(
        name: 'Marup Vai',
        currentMessage: 'Hello Rimon',
-       id: 03,
+       id: '03',
        imageIcon: 'assets/images/person_svg.svg',
        isGroup: true,
        status: 'offline',

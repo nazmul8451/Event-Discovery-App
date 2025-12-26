@@ -5,7 +5,7 @@ class ChatModel {
   String? time;
   bool? isGroup;
   String? status;
-  int? id;
+  String? id;
 
   ChatModel({
     this.name,
@@ -16,4 +16,28 @@ class ChatModel {
     this.status,
     this.time,
   });
+
+  factory ChatModel.fromJson(Map<String, dynamic> json) {
+    return ChatModel(
+      name: json['name'],
+      id: json['_id'] ?? json['id'],
+      currentMessage: json['currentMessage'],
+      imageIcon: json['imageIcon'],
+      isGroup: json['isGroup'],
+      status: json['status'],
+      time: json['time'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      '_id': id,
+      'currentMessage': currentMessage,
+      'imageIcon': imageIcon,
+      'isGroup': isGroup,
+      'status': status,
+      'time': time,
+    };
+  }
 }

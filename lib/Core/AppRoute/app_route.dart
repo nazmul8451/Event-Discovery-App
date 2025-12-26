@@ -1,10 +1,12 @@
 // View/app.dart
+import 'package:flutter/material.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
@@ -57,5 +59,9 @@ class AppRoutes {
     newPassScreen: (context) => NewPasswordScreen(),
     verifyAccount: (context) => VerifyAccount(email: ''),
     orderSummery: (context) => OrderSummeryScreen(),
+    OtherUserProfileScreen.name: (context) {
+      final userId = ModalRoute.of(context)!.settings.arguments as String;
+      return OtherUserProfileScreen(userId: userId);
+    },
   };
 }

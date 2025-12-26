@@ -29,6 +29,7 @@ class ReivewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  //Review Create
   Future<bool> submitReview({
     required String eventId,
     required String reviewText,
@@ -91,6 +92,7 @@ class ReivewController extends ChangeNotifier {
     }
   }
 
+  //get all review by event id
   Future<bool> getAllReviewsByEventId({required String eventId}) async {
     _inProgress = true;
     _errorMessage = null;
@@ -123,6 +125,9 @@ class ReivewController extends ChangeNotifier {
                   AllReviewModelByEventId.fromJson(e as Map<String, dynamic>),
             )
             .toList();
+
+        // Update total review count based on list length
+        _totalReview = _review.length;
 
         _inProgress = false;
         notifyListeners();

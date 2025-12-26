@@ -70,55 +70,56 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            Row(
+           Stack(
               children: [
-                const Spacer(),
-                Consumer<ThemeProvider>(
-                  builder: (context, controller, child) => Text(
-                    'Gathering',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 35.sp,
-                      color: controller.isDarkMode
-                          ? Colors.white
-                          : Colors.black,
+                Center(
+                  child: Consumer<ThemeProvider>(
+                    builder: (context, controller, child) => Text(
+                      'Gathering',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 27.sp,
+                        color: controller.isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                      ),
                     ),
                   ),
                 ),
-                // const SizedBox(width: 16),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, NotificationScreen.name);
-                        },
-                        icon: const Icon(Icons.notifications_none),
-                      ),
-                      const Positioned(
-                        right: 4,
-                        top: 4,
-                        child: CircleAvatar(
-                          radius: 9,
-                          backgroundColor: Color(0xFFFF006E),
-                          child: Text(
-                            '5',
-                            style: TextStyle(color: Colors.white, fontSize: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, NotificationScreen.name);
+                          },
+                          icon: const Icon(Icons.notifications_none),
+                        ),
+                        const Positioned(
+                          right: 4,
+                          top: 4,
+                          child: CircleAvatar(
+                            radius: 9,
+                            backgroundColor: Color(0xFFFF006E),
+                            child: Text(
+                              '5',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 10),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-
             SizedBox(height: 5.h),
-
-            // শুধু এই অংশটা চেঞ্জ করা হয়েছে → SmartRefresher যোগ করা
             Expanded(
               child: SmartRefresher(
                 enablePullDown: true,

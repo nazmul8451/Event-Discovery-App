@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
+import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart' show Consumer;
 
 class ViewEventScreen extends StatefulWidget {
-  const ViewEventScreen({super.key});
+  final bool hasTicket;
+  const ViewEventScreen({super.key, this.hasTicket = false});
 
   static const String name = '/view-event-screen';
 
@@ -221,35 +223,43 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
 
             Row(
               children: [
-                // TextButton(onPressed: (){
-                //   Navigator.pushNamed(context, LiveStream.name);
-                // }, child: Text('Check in')),
-                GestureDetector(
-                  onTap: (){
-                    Navigator.pushNamed(context,LiveStream.name );
-                  },
-                  child: Container(
-                    height: 50.h,
-                    width: 120.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50.r),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.deepPurpleAccent,
-                          const Color.fromARGB(255, 66, 42, 107),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                if (widget.hasTicket)
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, LiveStream.name);
+                    },
+                    child: Container(
+                      height: 50.h,
+                      width: 120.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50.r),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.deepPurpleAccent,
+                            const Color.fromARGB(255, 66, 42, 107),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Check in',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        'Check in',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                  )
+                else
+                  SizedBox(
+                    width: 120.w,
+                    child: CustomButton(
+                      buttonName: 'Get Ticket',
+                      onPressed: () {
+                        // NOTE: You can add navigation to your order summary screen here
+                      },
                     ),
                   ),
-                ),
                 SizedBox(width: 20.w),
                 Container(
                   width: 60.w,

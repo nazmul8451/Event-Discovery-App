@@ -1,4 +1,5 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -9,6 +10,7 @@ import 'package:gathering_app/Service/Controller/event%20_detailsController.dart
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
+import 'package:gathering_app/Service/Controller/other_user_profile_controller.dart';
 import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
@@ -50,13 +52,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GetAllEventController()),
         ChangeNotifierProvider(create: (_) => EventDetailsController()),
         ChangeNotifierProvider(create: (_) => ReivewController()),
+        ChangeNotifierProvider(create: (_) => OtherUserProfileController()),
         ChangeNotifierProvider(create: (_) => OtpVerifyController()),
-        ChangeNotifierProvider(create: (_) {
-          final c = AuthController();
-          c.initialize();
-          return c;
-        }),
+
+        ChangeNotifierProvider(
+          create: (_) {
+            final c = AuthController();
+            c.initialize();
+            return c;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => EventTicketProvider()),
+        ChangeNotifierProvider(create: (_) => ChatController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

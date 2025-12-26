@@ -21,8 +21,12 @@ class AllReviewModelByEventId {
     return AllReviewModelByEventId(
       id: json['_id'] ?? '',
       eventId: json['eventId'] ?? '',
-      reviewerName: json['reviewer']['name'] ?? 'Anonymous',
-      reviewerId: json['reviewer']['_id'] ?? '',
+      reviewerName: json['reviewer'] != null
+          ? json['reviewer']['name'] ?? 'Anonymous'
+          : 'Anonymous',
+      reviewerId: json['reviewer'] != null
+          ? (json['reviewer']['id'] ?? json['reviewer']['_id'] ?? '')
+          : '',
       rating: (json['rating'] as num).toDouble(),
       review: json['review'] ?? '',
       createdAt: DateTime.parse(json['createdAt']),
