@@ -54,6 +54,35 @@ class EventTicketProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> checkIn(String ticketId) async {
+    print("🎟️ Attempting check-in for ticketId: $ticketId");
+    _setStatus(TicketStatus.loading);
+    try {
+      final response = await NetworkCaller.postRequest(
+        url: Urls.checkInUrl,
+        body: {"_id": ticketId},
+        requireAuth: true,
+      );
+
+      print("🎟️ Check-in Response Status: ${response.statusCode}");
+      print("🎟️ Check-in Response Body: ${response.body}");
+
+      if (response.isSuccess) {
+        print("✅ Check-in successful!");
+        _setStatus(TicketStatus.checkedIn);
+        return true;
+      } else {
+        print("❌ Check-in failed: ${response.errorMessage}");
+        _setStatus(TicketStatus.purchased);
+        return false;
+      }
+    } catch (e) {
+      print("⚠️ Check-in Exception: $e");
+      _setStatus(TicketStatus.error);
+      return false;
+    }
+  }
+
   // নতুন: eventId set করার মেথড
   void setEventId(String newEventId) {
     if (_eventId != newEventId) {
@@ -63,94 +92,6 @@ class EventTicketProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // Future<void> checkTicketStatus() async {
-  //   _setStatus(TicketStatus.loading);
-  //   try {
-  //     // তোমার backend API call করো
-  //     final response = await NetworkCaller.getRequest(
-  //       Urls.checkTicketStatus(eventId), // তুমি URL বানিয়ে নাও
-  //     );
-
-  //     if (response.isSuccess) {
-  //       final data = response.body['data'];
-  //       if (data['has_ticket'] == true) {
-  //         _ticketData = data['ticket'];
-  //         if (data['checked_in'] == true) {
-  //           _setStatus(TicketStatus.checkedIn);
-  //         } else {
-  //           _setStatus(TicketStatus.purchased);
-  //         }
-  //       } else {
-  //         _setStatus(TicketStatus.notPurchased);
-  //       }
-  //     } else {
-  //       _setStatus(TicketStatus.notPurchased);
-  //     }
-  //   } catch (e) {
-  //     _setStatus(TicketStatus.error);
-  //     showSnackBar("Failed to check ticket status");
-  //   }
-  // }
-
-  // Future<void> startPurchaseFlow({
-  //   required int quantity,
-  //   required String email,
-  //   required String phone,
-  //   String? coupon,
-  // }) async {
-  //   _setStatus(TicketStatus.loading);
-  //   try {
-  //     // ১. Backend-এ PaymentIntent create করাও
-  //     final response = await NetworkCaller.postRequest(
-  //       Urls.createPaymentIntent(eventId),
-  //       body: {
-  //         "quantity": quantity,
-  //         "email": email,
-  //         "phone": phone,
-  //         if (coupon != null && coupon.isNotEmpty) "coupon": coupon,
-  //       },
-  //     );
-
-  //     if (!response.isSuccess) {
-  //       throw "Payment intent failed";
-  //     }
-
-  //     final clientSecret = response.body['client_secret'];
-
-  //     // ২. Stripe Payment Sheet ওপেন
-  //     await Stripe.instance.initPaymentSheet(
-  //       paymentSheetParameters: SetupPaymentSheetParameters(
-  //         paymentIntentClientSecret: clientSecret,
-  //         merchantDisplayName: "Gathering App",
-  //         style: Theme.of(context).brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
-  //       ),
-  //     );
-
-  //     await Stripe.instance.presentPaymentSheet();
-
-  //     // ৩. Payment success → backend-এ confirm করো
-  //     final confirmResponse = await NetworkCaller.postRequest(
-  //       Urls.confirmTicketPurchase(eventId),
-  //     );
-
-  //     if (confirmResponse.isSuccess) {
-  //       _ticketData = confirmResponse.body['ticket'];
-  //       _setStatus(TicketStatus.purchased);
-  //       showSnackBar("Ticket purchased successfully!", isError: false);
-  //     }
-  //   } on StripeException catch (e) {
-  //     if (e.error.code == PaymentIntentsStatus.Canceled) {
-  //       showSnackBar("Payment cancelled");
-  //     } else {
-  //       showSnackBar("Payment failed: ${e.error.message}");
-  //     }
-  //     _setStatus(TicketStatus.notPurchased);
-  //   } catch (e) {
-  //     showSnackBar("Error: $e");
-  //     _setStatus(TicketStatus.notPurchased);
-  //   }
-  // }
 
   void _setStatus(TicketStatus status) {
     _status = status;

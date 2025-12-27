@@ -20,6 +20,8 @@ class OrderSummeryScreen extends StatefulWidget {
 }
 
 class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
+  bool _isPaymentLoading = false;
+
   Future<void> _handlePayment(
     BuildContext context,
     int totalPrice,
@@ -33,6 +35,9 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
     required String eventId,
     String imageUrl = '',
   }) async {
+    setState(() {
+      _isPaymentLoading = true;
+    });
     try {
       final int amount = totalPrice * 100;
 
@@ -140,6 +145,12 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPaymentLoading = false;
+        });
+      }
     }
   }
 
@@ -335,7 +346,10 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
                       SizedBox(height: 30.h),
                       CustomButton(
                         buttonName: 'Proceed to payment',
-                        onPressed: () async {
+                        isLoading: _isPaymentLoading,
+                        onPressed: _isPaymentLoading
+                            ? null
+                            : () async {
                           await _handlePayment(
                             context,
                             totalPrice,

@@ -3,13 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
+import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:provider/provider.dart' show Consumer;
+import 'package:provider/provider.dart';
 
 class ViewEventScreen extends StatefulWidget {
   final bool hasTicket;
-  const ViewEventScreen({super.key, this.hasTicket = false});
+  final String? ticketId;
+  const ViewEventScreen({super.key, this.hasTicket = false, this.ticketId});
 
   static const String name = '/view-event-screen';
 
@@ -225,12 +228,36 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
               children: [
                 if (widget.hasTicket)
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, LiveStream.name);
+                    onTap: () async {
+                      print("📱 Check-in button tapped. TicketId: ${widget.ticketId}");
+                      if (widget.ticketId != null) {
+                        final provider = context.read<EventTicketProvider>();
+                        final success = await provider.checkIn(widget.ticketId!);
+                        if (success) {
+                          print("🚀 Check-in success! Navigating to Live Stream...");
+                          Navigator.pushNamed(
+                            context,
+                            LiveStream.name,
+                            arguments: {'ticketId': widget.ticketId},
+                          );
+                        } else {
+                          print("🚫 Check-in failed in UI.");
+                          showCustomSnackBar(
+                            context: context,
+                            message: 'Check-in failed. Please try again.',
+                          );
+                        }
+                      } else {
+                        print("⚠️ No ticket ID available on this screen.");
+                        showCustomSnackBar(
+                          context: context,
+                          message: 'No ticket ID found for check-in.',
+                        );
+                      }
                     },
                     child: Container(
                       height: 50.h,
-                      width: 120.w,
+                      width: 120.w, 
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50.r),
                         gradient: LinearGradient(

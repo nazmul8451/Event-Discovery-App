@@ -888,6 +888,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             MaterialPageRoute(
                               builder: (context) => ViewEventScreen(
                                 hasTicket: detailsCtrl.hasTicket,
+                                ticketId: detailsCtrl.userTicketId,
                               ),
                             ),
                           );

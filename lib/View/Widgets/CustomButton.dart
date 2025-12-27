@@ -28,21 +28,20 @@ class CustomButton extends StatelessWidget {
           height: 56.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: isDark
-                ? const Color.fromARGB(255, 0, 0, 0)           
-                : Colors.white,                     // Light mode এ সাদা
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFB290FF),
+                Color(0xFF8063F4),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(16.r),
-            // border: Border.all(
-            //   color: isDark
-            //       ? Colors.white.withOpacity(0.2)
-            //       : Colors.grey.shade300,
-            //   width: 1.2,
-            // ),
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.grey.withOpacity(0.3),
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.black.withOpacity(0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
                 spreadRadius: 0,
@@ -64,8 +63,7 @@ class CustomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.sp.clamp(14, 16),
                 fontWeight: FontWeight.w700,
-                // টেক্সট কালার অটো
-                color: isDark ? Colors.white : Colors.black,
+                color: Colors.white,
               ),
             ),
           ),
