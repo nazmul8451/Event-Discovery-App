@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class InterestScreen extends StatelessWidget {
@@ -200,6 +201,8 @@ class InterestScreen extends StatelessWidget {
                   } else {
                     return GestureDetector(
                       onTap: () {
+                        // Mark onboarding as seen
+                        GetStorage().write('hasSeenOnboarding', true);
                         //TODO: NAVIGATE LOG IN SCREEN
                         Navigator.pushNamed(context, LogInScreen.name);
                       },

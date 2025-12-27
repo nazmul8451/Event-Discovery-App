@@ -72,17 +72,25 @@ class _ChatPageState extends State<ChatPage> {
           // Chat List
           Expanded(
             child: Consumer<ChatController>(
-              builder: (context, controller, child) {
-                if (controller.inProgress) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                
-                if (controller.chatList.isEmpty) {
-                   if (controller.errorMessage != null) {
-                     return Center(child: Text(controller.errorMessage!));
-                   }
-                   return const Center(child: Text("No conversations yet"));
-                }
+               builder: (context, controller, child) {
+    debugPrint("🔄 ChatPage rebuild - inProgress: ${controller.inProgress}, chatCount: ${controller.chatList.length}");
+    
+    if (controller.inProgress && controller.chatList.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (controller.chatList.isEmpty) {
+      if (controller.errorMessage != null) {
+        return Center(child: Text("Error: ${controller.errorMessage!}"));
+      }
+      return const Center(child: Text("No conversations yet"));
+    }
+
+    // Show the actual data for debugging
+    debugPrint("📱 Displaying ${controller.chatList.length} chats:");
+    for (var chat in controller.chatList) {
+      debugPrint("  - ${chat.name}: ${chat.currentMessage}");
+    }
 
                 return RefreshIndicator(
                   onRefresh: () async {

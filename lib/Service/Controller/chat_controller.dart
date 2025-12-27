@@ -124,83 +124,112 @@ class ChatController extends ChangeNotifier {
     return null;
   }
 
-  Future<void> getChats() async {
-    _inProgress = true;
-    notifyListeners();
-    
-    final response = await NetworkCaller.getRequest(url: Urls.getAllChatsUrl);
-    
-    _inProgress = false;
+Future<void> getChats() async {
+  _inProgress = true;
+  notifyListeners();
+  
+  final response = await NetworkCaller.getRequest(url: Urls.getAllChatsUrl);
+  
+  _inProgress = false;
 
-    if (response.isSuccess) {
-      final rawList = response.body!['data'] as List?;
-      if (rawList != null) {
-        final authId = AuthController().userId;
-        String? currentUserId = authId;
-        if (currentUserId == null || currentUserId.isEmpty) {
-          final cachedProfile = GetStorage().read<Map<String, dynamic>>('cached_user_profile');
-          currentUserId = cachedProfile?['id']?.toString() ?? cachedProfile?['_id']?.toString();
+  if (response.isSuccess) {
+    debugPrint("✅ getChats Response Body: ${response.body}");
+    
+    // The data structure is: {"data": {"chats": [...]}}
+    final dynamic dataField = response.body?['data'];
+    
+    List? rawList;
+    if (dataField != null && dataField is Map) {
+      // Check for "chats" array inside the data object
+      rawList = dataField['chats'] as List?;
+      debugPrint("🔍 Found chats array: ${rawList?.length ?? 0} items");
+    }
+    
+    if (rawList != null && rawList.isNotEmpty) {
+      final authId = AuthController().userId;
+      String? currentUserId = authId;
+      if (currentUserId == null || currentUserId.isEmpty) {
+        final cachedProfile = GetStorage().read<Map<String, dynamic>>('cached_user_profile');
+        currentUserId = cachedProfile?['id']?.toString() ?? cachedProfile?['_id']?.toString();
+      }
+
+      debugPrint("🔍 getChats - MyID: $currentUserId");
+
+      _chatList = rawList.map((chatData) {
+        final participants = chatData['participants'] as List?;
+        Map<String, dynamic>? otherUserMap;
+        String? otherUserId;
+        String? otherUserName;
+        
+        if (participants != null && participants.isNotEmpty) {
+          debugPrint("👥 Participants for ${chatData['_id']}: $participants");
+          
+          // Find the other user (not current user)
+          for (var p in participants) {
+            if (p is Map<String, dynamic>) {
+              String? pId = (p['_id'] ?? p['id'])?.toString();
+              
+              // Check if this participant is NOT the current user
+              if (pId != null && 
+                  currentUserId != null && 
+                  pId != currentUserId) {
+                otherUserMap = p;
+                otherUserId = pId;
+                otherUserName = p['name']?.toString();
+                break;
+              }
+            }
+          }
+          
+          // If we couldn't find other user (maybe group chat or only one participant)
+          // Use the first participant
+          if (otherUserId == null && participants.isNotEmpty) {
+            final first = participants.first;
+            if (first is Map<String, dynamic>) {
+              otherUserMap = first;
+              otherUserId = (first['_id'] ?? first['id'])?.toString();
+              otherUserName = first['name']?.toString();
+            }
+          }
         }
 
-        debugPrint("🔍 getChats - MyID: $currentUserId");
+        // Get last message text
+        String? lastMessageText;
+        final lastMessage = chatData['lastMessage'];
+        if (lastMessage != null && lastMessage is Map) {
+          lastMessageText = lastMessage['text']?.toString() ?? 'Sent a message';
+        } else {
+          lastMessageText = 'No messages yet';
+        }
 
-        _chatList = rawList.map((chatData) {
-          final participants = chatData['participants'] as List?;
-          Map<String, dynamic>? otherUserMap;
-          String? otherUserId;
-          
-          if (participants != null && participants.isNotEmpty) {
-              debugPrint("👥 Participants for ${chatData['_id']}: $participants");
-              for (var p in participants) {
-                  String? pId;
-                  if (p is Map<String, dynamic>) {
-                      pId = (p['_id'] ?? p['id'])?.toString();
-                  } else if (p is String) {
-                      pId = p;
-                  }
-                  
-                  // Filter out MY ID to find the OTHER person
-                  if (pId != null && 
-                      currentUserId != null && 
-                      pId.toString().trim() != currentUserId.toString().trim()) {
-                      
-                      if (p is Map<String, dynamic>) otherUserMap = p;
-                      otherUserId = pId;
-                      break;
-                  }
-              }
-              
-              // Fallback: If still null (maybe I am the only one or ID mismatch), pick the first one anyway
-              if (otherUserId == null && participants.isNotEmpty) {
-                 final first = participants.first;
-                 if (first is Map<String, dynamic>) {
-                   otherUserMap = first;
-                   otherUserId = (first['_id'] ?? first['id'])?.toString();
-                 } else {
-                   otherUserId = first.toString();
-                 }
-              }
-          }
+        debugPrint("💬 Chat ${chatData['_id']} - Other: $otherUserName ($otherUserId)");
 
-          debugPrint("💬 Chat ${chatData['_id']} - OtherID: $otherUserId");
-
-          return ChatModel(
-            id: chatData['_id'] ?? chatData['id'],
-            otherUserId: otherUserId,
-            name: otherUserMap?['name'] ?? 'User',
-            imageIcon: otherUserMap?['profileImage'] ?? otherUserMap?['image'] ?? otherUserMap?['avatar'], 
-            currentMessage: chatData['lastMessage'] != null ? chatData['lastMessage']['content'] ?? 'Sent an attachment' : 'No messages yet', 
-            time: chatData['updatedAt'], 
-            status: 'offline', 
-            isGroup: false,
-          );
-        }).toList();
-      }
+        return ChatModel(
+          id: chatData['_id']?.toString(),
+          otherUserId: otherUserId,
+          name: otherUserName ?? 'Unknown User',
+          imageIcon: otherUserMap?['profileImage']?.toString() ?? 
+                    otherUserMap?['image']?.toString() ?? 
+                    otherUserMap?['avatar']?.toString(),
+          currentMessage: lastMessageText,
+          time: chatData['updatedAt']?.toString() ?? '',
+          status: 'offline', // You might want to get this from socket or another API
+          isGroup: false,
+        );
+      }).toList();
+      
+      debugPrint("✅ Parsed ${_chatList.length} chats");
     } else {
-      _errorMessage = response.errorMessage;
+      debugPrint("⚠️ No chats found or empty list");
+      _chatList = [];
     }
-    notifyListeners();
+  } else {
+    _errorMessage = response.errorMessage;
+    debugPrint("❌ Error getting chats: $_errorMessage");
   }
+  
+  notifyListeners();
+}
 
   List<MessageModel> _messageList = [];
   List<MessageModel> get messageList => _messageList;
@@ -214,7 +243,14 @@ class ChatController extends ChangeNotifier {
     _inProgress = false;
 
     if (response.isSuccess) {
-      final rawList = response.body!['data'] as List?;
+      final dynamic dataField = response.body?['data'];
+      List? rawList;
+      if (dataField is List) {
+        rawList = dataField;
+      } else if (dataField is Map && dataField['data'] is List) {
+        rawList = dataField['data'];
+      }
+      
       if (rawList != null) {
         final messages = rawList.map((e) => MessageModel.fromJson(e)).toList();
         // Sort: Newest First (Descending) because we use reverse: true in UI

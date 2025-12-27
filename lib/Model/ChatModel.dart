@@ -21,14 +21,14 @@ class ChatModel {
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
     return ChatModel(
-      name: json['name'],
-      id: json['_id'] ?? json['id'],
-      otherUserId: json['otherUserId'],
-      currentMessage: json['currentMessage'],
-      imageIcon: json['imageIcon'],
-      isGroup: json['isGroup'],
-      status: json['status'],
-      time: json['time'],
+      name: json['name']?.toString(),
+      id: json['_id']?.toString() ?? json['id']?.toString(),
+      otherUserId: json['otherUserId']?.toString(),
+      currentMessage: json['currentMessage']?.toString() ?? json['lastMessage']?['text']?.toString(),
+      imageIcon: json['imageIcon']?.toString() ?? json['profileImage']?.toString(),
+      isGroup: json['isGroup'] as bool? ?? false,
+      status: json['status']?.toString() ?? 'offline',
+      time: json['time']?.toString() ?? json['updatedAt']?.toString(),
     );
   }
 
