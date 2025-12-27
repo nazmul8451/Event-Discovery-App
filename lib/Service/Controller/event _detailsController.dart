@@ -55,22 +55,53 @@ class EventDetailsController extends ChangeNotifier {
   Future<void> checkIfUserHasTicket(String eventId) async {
     try {
       final response = await NetworkCaller.getRequest(
-        url: Urls.getHasTicket(eventId),
+        url: Urls.myTicketsUrl,
         requireAuth: true,
       );
 
       if (response.isSuccess && response.body != null) {
         final Map<String, dynamic> body = response.body!;
-        // expected response: { hasTicket: bool, ticketId?: string }
-        final bool found = (body['hasTicket'] == true) || (body['data']?['hasTicket'] == true);
-        hasTicket = found;
-        // ticket id can be in several places depending on backend shape
-        userTicketId = body['ticketId']?.toString() ?? body['data']?['ticketId']?.toString() ?? body['data']?['ticket']?['id']?.toString();
+        final dynamic data = body['data'];
+        List tickets = [];
+
+        if (data is List) {
+          tickets = data;
+        } else if (data is Map && data['data'] is List) {
+          tickets = data['data'];
+        }
+
+        // Search for the ticket that matches this eventId
+        final ticket = tickets.firstWhere(
+          (t) {
+            // The event info can be in 'eventId' (as an object or string) or 'event'
+            final eventObj = t['eventId'] ?? t['event'];
+            String? ticketEventId;
+            
+            if (eventObj is Map) {
+              ticketEventId = eventObj['_id']?.toString() ?? eventObj['id']?.toString();
+            } else {
+              ticketEventId = eventObj?.toString();
+            }
+
+            return ticketEventId == eventId;
+          },
+          orElse: () => null,
+        );
+
+        if (ticket != null) {
+          hasTicket = true;
+          userTicketId = ticket['_id']?.toString() ?? ticket['id']?.toString();
+        } else {
+          hasTicket = false;
+          userTicketId = null;
+        }
       } else {
+        print("❌ API failed or returned null body");
         hasTicket = false;
         userTicketId = null;
       }
     } catch (e) {
+      print("⚠️ Error checking ticket status: $e");
       hasTicket = false;
       userTicketId = null;
     }

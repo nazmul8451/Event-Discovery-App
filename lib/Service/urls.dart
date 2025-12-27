@@ -1,6 +1,9 @@
 class Urls {
+  //base url 
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
    static const String baseUrl = "http://10.10.7.50:4005";
+
+   //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
   static const String loginUrl = "$baseUrl/api/v1/auth/login";
   static const String forgotpassUrl = "$baseUrl/api/v1/auth/forget-password";
@@ -14,6 +17,8 @@ class Urls {
 
   static String getHasTicket(String eventID) =>
       "$baseUrl/api/v1/event/$eventID/has-ticket";
+
+  static const String myTicketsUrl = "$baseUrl/api/v1/ticket/my-tickets";
 
 
   static const String reviewUrl = "$baseUrl/api/v1/review";

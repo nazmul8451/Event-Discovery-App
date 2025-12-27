@@ -881,44 +881,18 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 Consumer<EventDetailsController>(
                   builder: (context, detailsCtrl, child) {
                     if (detailsCtrl.hasTicket) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                // Watch live stream — implement actual stream URL/navigation if available
-                                showCustomSnackBar(
-                                  context: context,
-                                  message: 'Watch Live Stream',
-                                );
-                              },
-                              child: CustomButton(
-                                buttonName: 'Watch Live Stream',
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewEventScreen(
+                                hasTicket: detailsCtrl.hasTicket,
                               ),
                             ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                // Check-in action — could call check-in API or open ticket
-                                final ticketId = detailsCtrl.userTicketId;
-                                if (ticketId != null && ticketId.isNotEmpty) {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: 'Checked in with ticket $ticketId',
-                                  );
-                                } else {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: 'No ticket id available',
-                                  );
-                                }
-                              },
-                              child: CustomButton(buttonName: 'Check-in'),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
+                        child: CustomButton(buttonName: 'View Event'),
                       );
                     } else {
                       return GestureDetector(
@@ -944,20 +918,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 //     ],
                 //   ),
                 // ),
-                SizedBox(height: 20.h),
-                GestureDetector(
-                  onTap: () {
-                    final controller = context.read<EventDetailsController>();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ViewEventScreen(hasTicket: controller.hasTicket),
-                      ),
-                    );
-                  },
-                  child: CustomButton(buttonName: 'View Event'),
-                ),
+           
                 SizedBox(height: 20.h),
                 Container(
                   decoration: BoxDecoration(
@@ -1579,13 +1540,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20.h),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, ViewEventScreen.name);
-                  },
-                  child: CustomButton(buttonName: 'View Event'),
                 ),
                 SizedBox(height: 20.h),
                 //end
