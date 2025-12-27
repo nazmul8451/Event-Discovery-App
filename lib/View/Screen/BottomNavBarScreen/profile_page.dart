@@ -7,6 +7,8 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -1289,8 +1291,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                             Icons.arrow_forward_ios,
                                             size: 16.sp,
                                           ),
-                                          onTap: () {
-                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
+                                          onTap: () async {
+                                            // Sign Out Confirmation or Direct Logout
+                                            final authController = context.read<AuthController>();
+                                            await authController.logout();
+                                            
+                                            if (mounted) {
+                                              Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(builder: (_) => LogInScreen()),
+                                                (route) => false, // Remove all previous routes
+                                              );
+                                            }
                                           },
                                         ),
                                       ],

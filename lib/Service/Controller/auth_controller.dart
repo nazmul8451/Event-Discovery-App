@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 class AuthController extends ChangeNotifier {
@@ -155,6 +156,7 @@ class AuthController extends ChangeNotifier {
     _isLoggedIn = false;
 
     await _storage.deleteAll(); // সব ক্লিয়ার করো (সহজ উপায়)
+    await GetStorage().erase(); // Clear cached profile and other session data
 
     // প্রোফাইল ক্লিয়ার
     // Provider.of<ProfileController>(context, listen: false).clear(); // context না থাকলে অন্যভাবে করো
