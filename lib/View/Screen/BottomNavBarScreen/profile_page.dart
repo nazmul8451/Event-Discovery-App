@@ -456,7 +456,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     _showEditProfileDialog(context),
                                 child: Text(
                                   'Edit Profile',
-                                  style: TextStyle(fontSize: 15.sp),
+                                  style: TextStyle(fontSize: 15.sp, color: Colors.white),
                                 ),
                               ),
                             ),
@@ -467,7 +467,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: SizedBox(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
+                                    minimumSize: Size(double.infinity, 48),
+                                    backgroundColor:
+                                        Provider.of<ThemeProvider>(context)
+                                                .isDarkMode
+                                            ? Colors.grey[800]
+                                            : Colors.black,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16.r),
                                     ),
@@ -475,7 +480,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   onPressed: () {},
                                   child: Text(
                                     'Settings',
-                                    style: TextStyle(fontSize: 15.sp),
+                                    style: TextStyle(fontSize: 15.sp, color: Colors.white),
                                   ),
                                 ),
                               ),

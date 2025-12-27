@@ -34,7 +34,11 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.add)),
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           TextButton(
             onPressed: () {},
