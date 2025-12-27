@@ -255,9 +255,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     await _signUp();
 
-    setState(() {
-      _signUpIn_Progress = false;
-    });
+    if (mounted) {
+      setState(() {
+        _signUpIn_Progress = false;
+      });
+    }
   }
 
   //  sign up api calling
@@ -275,13 +277,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       context: context,
     );
 
+    if (!mounted) return;
+
     if (isSuccess) {
       _clearTextField();
       showCustomSnackBar(
         context: context,
         message: "Registration successful! Please verify your email",
+        isError: false,
       );
-      if (context.mounted) {
+      if (mounted) {
         Navigator.push(
           context,
           MaterialPageRoute(

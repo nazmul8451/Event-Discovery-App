@@ -315,9 +315,11 @@ class _LogInScreenState extends State<LogInScreen> {
 
     await _Login();
 
-    setState(() {
-      _signinIn_Progress = false;
-    });
+    if (mounted) {
+      setState(() {
+        _signinIn_Progress = false;
+      });
+    }
   }
 
   Future<void> _Login() async {
@@ -326,7 +328,10 @@ class _LogInScreenState extends State<LogInScreen> {
     final bool isSuccess = await logInController.login(
       emailController.text.trim(),
       passController.text.trim(),
+      context,
     );
+
+    if (!mounted) return;
 
     if (!mounted) return;
 

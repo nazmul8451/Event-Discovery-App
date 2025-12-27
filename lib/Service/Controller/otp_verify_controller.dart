@@ -21,6 +21,7 @@ class OtpVerifyController extends ChangeNotifier {
       final response = await NetworkCaller.postRequest(
         url: Urls.verifyOtpUrl,
         body: body,
+        requireAuth: false,
       );
 
       _inProgress = false;

@@ -31,6 +31,7 @@ class SignUpController extends ChangeNotifier {
       final response = await NetworkCaller.postRequest(
         url: Urls.registrationUrl, // /api/v1/auth/signup
         body: body,
+        requireAuth: false,
       );
 
       _inProgress = false;

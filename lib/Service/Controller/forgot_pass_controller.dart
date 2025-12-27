@@ -28,6 +28,7 @@ class ForgotPasswordController extends ChangeNotifier {
       final response = await NetworkCaller.postRequest(
         url: Urls.forgotpassUrl,
         body: requestBody as Map<String,String>?,
+        requireAuth: false,
       );
 
       if (response.isSuccess) {
@@ -68,6 +69,7 @@ class ForgotPasswordController extends ChangeNotifier {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.verifyOtpUrl,
         body: requestBody as Map<String, String>?,
+        requireAuth: false,
       );
 
       if (response.isSuccess && response.body != null) {
@@ -122,6 +124,7 @@ class ForgotPasswordController extends ChangeNotifier {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.resetPassUrl,
         body: requestBody as Map<String, String>?,
+        requireAuth: false,
       );
 
       if (response.isSuccess) {

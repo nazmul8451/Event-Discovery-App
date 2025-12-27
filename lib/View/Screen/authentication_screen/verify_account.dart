@@ -204,8 +204,9 @@ class _VerifyAccountState extends State<VerifyAccount> {
     _inProgress = false;
   });
 
-  if (success) {
+  if (!mounted) return;
 
+  if (success) {
     if (mounted) {
       showCustomSnackBar(
         context: context,
