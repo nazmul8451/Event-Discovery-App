@@ -9,10 +9,15 @@ class SocketService {
 
   IO.Socket? socket;
 
-  void connect(String token) {
-    if (socket != null && socket!.connected) return;
+  bool get isConnected => socket != null && socket!.connected;
 
-    debugPrint("🔌 Connecting to socket... ${Urls.baseUrl}");
+  void connect(String token) {
+    if (isConnected) {
+      debugPrint("🔌 Socket already connected.");
+      return;
+    }
+
+    debugPrint("🔌 Connecting to socket... URL: ${Urls.baseUrl}, Token: ${token.substring(0, 10)}...");
     
     socket = IO.io(Urls.baseUrl, <String, dynamic>{
       'transports': ['websocket'],

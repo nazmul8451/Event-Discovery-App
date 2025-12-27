@@ -22,7 +22,15 @@ class ChatController extends ChangeNotifier {
   final SocketService _socketService = SocketService();
 
   void initSocket(String chatId) {
+    String? myId = AuthController().userId;
+    if (myId == null || myId.isEmpty) {
+      final cachedProfile = GetStorage().read<Map<String, dynamic>>('cached_user_profile');
+      myId = cachedProfile?['id']?.toString() ?? cachedProfile?['_id']?.toString();
+    }
+    
     final token = AuthController().accessToken;
+    debugPrint("🚀 initSocket - chatId: $chatId, myId: $myId, hasToken: ${token != null}");
+
     if (token != null) {
       _socketService.connect(token);
       
@@ -33,23 +41,60 @@ class ChatController extends ChangeNotifier {
       
       _socketService.off(eventName); // Ensure no duplicate listeners
       _socketService.on(eventName, (data) {
-        debugPrint("📩 Received socket message: $data");
+        debugPrint("📩 Received socket message for $chatId: $data");
         if (data != null) {
           final newMessage = MessageModel.fromJson(data);
           
-          // Avoid duplicates if already added via sendMessage or initial fetch
+          // Avoid duplicates
           final exists = _messageList.any((m) => m.sId == newMessage.sId);
           if (!exists) {
-            _messageList.insert(0, newMessage); // Insert at top since reversed: true
+            _messageList.insert(0, newMessage);
             notifyListeners();
+          } else {
+            debugPrint("⏭️ Message ${newMessage.sId} already exists, skipping insert.");
           }
         }
       });
+    } else {
+      debugPrint("⚠️ initSocket failed: Token is null");
     }
   }
 
   void disposeSocket(String chatId) {
     _socketService.off("getMessage::$chatId");
+  }
+
+  void initChatListSocket() {
+    String? myId = AuthController().userId;
+    if (myId == null || myId.isEmpty) {
+      final cachedProfile = GetStorage().read<Map<String, dynamic>>('cached_user_profile');
+      myId = cachedProfile?['id']?.toString() ?? cachedProfile?['_id']?.toString();
+    }
+
+    final token = AuthController().accessToken;
+    debugPrint("🚀 initChatListSocket - myId: $myId, hasToken: ${token != null}");
+
+    if (myId != null && token != null) {
+      _socketService.connect(token);
+      
+      final eventName = "updateChatList::$myId";
+      debugPrint("👂 Listening for chat list socket event: $eventName");
+      
+      _socketService.off(eventName);
+      _socketService.on(eventName, (data) {
+        debugPrint("📬 Received chat list update socket event for $myId: $data");
+        getChats(); // Simply refresh the chat list
+      });
+    } else {
+      debugPrint("⚠️ initChatListSocket failed: myId ($myId) or token (${token != null}) is missing");
+    }
+  }
+
+  void disposeChatListSocket() {
+    final myId = AuthController().userId;
+    if (myId != null) {
+      _socketService.off("updateChatList::$myId");
+    }
   }
 
   Future<String?> createChat(String otherUserId) async {

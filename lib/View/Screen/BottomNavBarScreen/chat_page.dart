@@ -25,11 +25,19 @@ class _ChatPageState extends State<ChatPage> {
       if (auth.userId == null) {
          context.read<ProfileController>().fetchProfile(forceRefresh: false).then((_) {
            context.read<ChatController>().getChats();
+           context.read<ChatController>().initChatListSocket();
          });
       } else {
         context.read<ChatController>().getChats();
+        context.read<ChatController>().initChatListSocket();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    context.read<ChatController>().disposeChatListSocket();
+    super.dispose();
   }
 
   @override
