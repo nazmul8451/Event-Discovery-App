@@ -5,7 +5,7 @@ class ThemeColor {
     brightness: Brightness.light,
     useMaterial3: true,
     scaffoldBackgroundColor: Colors.white,
-    // কালার স্কিম
+
     colorScheme: const ColorScheme.light(
       primary: Color(0xFFCC18CA),
       onPrimary: Colors.white,
@@ -23,6 +23,8 @@ class ThemeColor {
         fontWeight: FontWeight.bold,
       ),
       displayMedium: TextStyle(color: Colors.black87),
+      bodyLarge: TextStyle(color: Colors.black87), // Added
+      bodyMedium: TextStyle(color: Colors.black54), // Added
       bodySmall: TextStyle(
         fontSize: 13,
         color: Colors.white,
@@ -32,11 +34,10 @@ class ThemeColor {
       labelMedium: TextStyle(color: Color(0xFFCC18CA)), // TextButton
     ),
 
-    // আইকন কালার
     iconTheme: const IconThemeData(color: Colors.black87),
     primaryIconTheme: const IconThemeData(color: Colors.white),
 
-    // Elevated Button (তোমার লগইন বাটন)
+    // Elevated Button ==
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFCC18CA),
@@ -103,7 +104,7 @@ class ThemeColor {
       secondary: Color(0xFFCC18CA),
       surface: Color(0xFF140C22),
       onSurface: Colors.white,
-      onSurfaceVariant: Colors.grey, // ← এটাই তোমার গ্রে হিন্ট
+      onSurfaceVariant: Colors.grey,
       surfaceContainerHighest: Color(0xFF2A1E3F),
     ),
 
@@ -112,6 +113,7 @@ class ThemeColor {
       displayMedium: TextStyle(color: Colors.white),
       bodyLarge: TextStyle(color: Colors.white),
       bodyMedium: TextStyle(color: Colors.white70),
+      bodySmall: TextStyle(fontSize: 13, color: Colors.white60), // Added
       titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
       labelLarge: TextStyle(color: Colors.white),
       labelMedium: TextStyle(color: Color(0xFFCC18CA)),
@@ -127,11 +129,15 @@ class ThemeColor {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         padding: const EdgeInsets.symmetric(vertical: 16),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600), // Added for parity
       ),
     ),
 
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: const Color(0xFFCC18CA)),
+      style: TextButton.styleFrom(
+        foregroundColor: const Color(0xFFCC18CA),
+        textStyle: const TextStyle(fontWeight: FontWeight.w500), // Added for parity
+      ),
     ),
 
     inputDecorationTheme: InputDecorationTheme(

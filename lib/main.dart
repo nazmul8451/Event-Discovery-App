@@ -1,5 +1,6 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
+import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -41,7 +42,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ProfileController()),
+        ChangeNotifierProvider(create: (_) {
+          final p = ProfileController();
+          p.initialize();
+          return p;
+        }),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),
@@ -64,6 +69,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => EventTicketProvider()),
         ChangeNotifierProvider(create: (_) => ChatController()),
+        ChangeNotifierProvider(create: (_) => BottomNavController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

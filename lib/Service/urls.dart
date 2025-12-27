@@ -41,4 +41,10 @@ class Urls {
 
   // chat api
   static  String chatUrl(String other_user_id) => "$baseUrl/api/v1/chat/${other_user_id}";
+
+  static const String getAllChatsUrl = "$baseUrl/api/v1/chat";
+
+  static  String getMessage(String chatId) => "$baseUrl/api/v1/message/${chatId}";
+
+  static String sendMessage = "$baseUrl/api/v1/message";
 }

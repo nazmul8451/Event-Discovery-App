@@ -1,56 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gathering_app/Model/ChatModel.dart';
+import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../Widgets/serch_textfield.dart';
 
-class ChatPage extends StatelessWidget {
-   ChatPage({super.key});
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
 
-  // পরে API থেকে আসবে – এখন হার্ডকোডেড ডামি ডাটা
-  final List<Map<String, dynamic>> chats = const [
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
 
-  ];
-   final List<ChatModel> userChats = [
-   ChatModel(
-   name: 'Rimon Islam',
-   currentMessage: 'Hello kemon aco?',
-   id: '01',
-   imageIcon: 'assets/images/person_svg.svg', // .svg হলে AssetImage এ সমস্যা হতে পারে
-   isGroup: false,
-   status: 'online',
-   time: '4:32',
-   ),
-   ChatModel(
-   name: 'Ayesha Khan',
-   currentMessage: 'Ki khobor?',
-   id: '02',
-   imageIcon: 'assets/images/person_svg.svg',
-   isGroup: false,
-   status: 'offline',
-   time: '12:15',
-   ),
-   ChatModel(
-   name: 'Festival Organizers',
-   currentMessage: 'Welcome to the group!',
-   id: '03',
-   imageIcon: 'assets/images/group_svg.svg',
-   isGroup: true,
-   status: 'online',
-   time: 'Yesterday',
-   ),
-     ChatModel(
-       name: 'Marup Vai',
-       currentMessage: 'Hello Rimon',
-       id: '03',
-       imageIcon: 'assets/images/person_svg.svg',
-       isGroup: true,
-       status: 'offline',
-       time: 'Yesterday',
-     )
-   ];
+class _ChatPageState extends State<ChatPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ChatController>().getChats();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +30,7 @@ class ChatPage extends StatelessWidget {
 
       // AppBar (Messages + Search)
       appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-
+        backgroundColor: Theme.of(context).colorScheme.surface,
         automaticallyImplyLeading: false,
         surfaceTintColor: Colors.transparent,
         title: Align(
@@ -83,60 +54,65 @@ class ChatPage extends StatelessWidget {
 
           // Chat List
           Expanded(
-            child: ListView.builder(
-              itemCount: userChats.length,
-              itemBuilder: (context, index) {
-                final userChat = userChats[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 26.r,
-                    backgroundColor: Colors.grey[200],
-                    child: ClipOval(
-                      child: SvgPicture.asset(
+            child: Consumer<ChatController>(
+              builder: (context, controller, child) {
+                if (controller.inProgress) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                
+                if (controller.chatList.isEmpty) {
+                   if (controller.errorMessage != null) {
+                     return Center(child: Text(controller.errorMessage!));
+                   }
+                   return const Center(child: Text("No conversations yet"));
+                }
 
-                        "${userChat.imageIcon}",
-                        width: 30.w,
-                        height: 30.h,
-                        fit: BoxFit.cover,
-                        placeholderBuilder: (context) => const CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(
-                        userChat.name as String,
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
-                      ),
-                      // if (userChatchat["isOrganizer"] == true) ...[
-                      //   SizedBox(width: 6.w),
-                      //   Container(
-                      //     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.pink[100],
-                      //       borderRadius: BorderRadius.circular(12.r),
-                      //     ),
-                      //     child: Text(
-                      //       "Organizer",
-                      //       style: TextStyle(color: Colors.pink[800], fontSize: 10.sp),
-                      //     ),
-                      //   ),
-                      // ],
-                    ],
-                  ),
-                  subtitle: Text(
-                    userChat.currentMessage as String,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                  trailing: Text(
-                    userChat.time as String,
-                    style: TextStyle(color: Colors.grey, fontSize: 12.sp),
-                  ),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await context.read<ChatController>().getChats();
                   },
+                  child: ListView.builder(
+                    itemCount: controller.chatList.length,
+                    itemBuilder: (context, index) {
+                      final userChat = controller.chatList[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          radius: 26.r,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.startsWith('http'))
+                              ? NetworkImage(userChat.imageIcon!)
+                              : null,
+                          child: (userChat.imageIcon == null || !userChat.imageIcon!.startsWith('http'))
+                              ? const Icon(Icons.person, color: Colors.grey)
+                              : null,
+                        ),
+                        title: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                userChat.name ?? 'Unknown',
+                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Text(
+                          userChat.currentMessage ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        trailing: Text(
+                          userChat.time != null ? userChat.time!.toString() : '', // Simplify formatting for now
+                          style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                        ),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

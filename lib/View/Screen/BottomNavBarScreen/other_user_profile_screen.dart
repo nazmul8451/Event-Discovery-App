@@ -6,6 +6,7 @@ import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 
 class OtherUserProfileScreen extends StatefulWidget {
   final String userId;
@@ -182,6 +183,14 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                         status: 'offline',
                                       );
 
+                                      // Switch to Chat Tab (index 3) first
+                                      context.read<BottomNavController>().onItemTapped(3);
+
+                                      // Pop everything until the BottomNavBarScreen is reached (assuming it's the root or nearly root)
+                                      // Using popUntil to go back to the BottomNavBarScreen.
+                                      Navigator.of(context).popUntil((route) => route.isFirst); 
+
+                                      // Then Push UserChatScreen
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gathering_app/Model/ChatModel.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:gathering_app/Service/Controller/chat_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:provider/provider.dart';
 
 class UserChatScreen extends StatefulWidget {
   ChatModel? chat;
@@ -15,6 +19,32 @@ class UserChatScreen extends StatefulWidget {
 }
 
 class _UserChatScreenState extends State<UserChatScreen> {
+  final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authController = AuthController();
+      if (widget.chat?.id != null) {
+        context.read<ChatController>().getMessages(widget.chat!.id!);
+      }
+      
+      // If userId is missing, try to fetch profile to get it
+      if (authController.userId == null) {
+        context.read<ProfileController>().fetchProfile(forceRefresh: false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +52,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80.h),
         child: AppBar(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-
-        automaticallyImplyLeading: false,
-        surfaceTintColor: Colors.transparent,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          automaticallyImplyLeading: false,
+          surfaceTintColor: Colors.transparent,
           centerTitle: false,
           titleSpacing: 0,
           title: Row(
@@ -43,7 +72,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     radius: 20.r,
                     backgroundColor: Colors.grey[300],
                     child: ClipOval(
-                      child: SvgPicture.asset(
+                      child: (widget.chat?.imageIcon != null && widget.chat!.imageIcon!.startsWith('http'))
+                      ? Image.network(
+                        widget.chat!.imageIcon!,
+                        fit: BoxFit.cover,
+                        width: 40.r,
+                        height: 40.r,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
+                      )
+                      : SvgPicture.asset(
                         "${widget.chat?.imageIcon}",
                         fit: BoxFit.cover,
                         placeholderBuilder: (_) =>
@@ -72,7 +109,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
               SizedBox(width: 12.w),
 
-              // এখানেই ম্যাজিক → নাম + স্ট্যাটাস
+              // Name + Status
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,52 +150,131 @@ class _UserChatScreenState extends State<UserChatScreen> {
           ],
         ),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Stack(
-          children: [
-            ListView(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.image_outlined),
-                    ),
-                    Expanded(
+      body: Column(
+        children: [
+          Expanded(
+            child: Consumer2<ChatController, ProfileController>(
+              builder: (context, chatController, profileController, child) {
+                if (chatController.inProgress && chatController.messageList.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (chatController.messageList.isEmpty) {
+                  return const Center(child: Text("Say Hello! 👋"));
+                }
+
+                final messages = chatController.messageList;
+                final myId = AuthController().userId ?? profileController.currentUser?.id;
+
+                return ListView.builder(
+                  controller: _scrollController,
+                  reverse: true,
+                  itemCount: messages.length,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final isMe = message.sender != null && 
+                                 myId != null && 
+                                 message.sender!.toString().trim() == myId.toString().trim();
+
+                    return Align(
+                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
-                        width: MediaQuery.of(context).size.width - 70,
+                        margin: EdgeInsets.only(bottom: 10.h),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                         decoration: BoxDecoration(
-                          /////
-                          ////
-                        ),
-                        child: TextFormField(
-                          maxLines: 5,
-                          minLines: 1,
-                          textAlignVertical: TextAlignVertical.center,     // হিন্ট + টেক্সট মাঝে থাকবে
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10.w,
-                              vertical: 10.h
-                            ),
-                            hintText: 'Type a message...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(
-                                50.r,
-                              ), 
-                            ),
+                          color: isMe ? const Color(0xFF2B004E) : Colors.grey[900],
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16.r),
+                            topRight: Radius.circular(16.r),
+                            bottomLeft: isMe ? Radius.circular(16.r) : Radius.zero,
+                            bottomRight: isMe ? Radius.zero : Radius.circular(16.r),
                           ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                           if(message.image != null)
+                             Padding(
+                               padding: const EdgeInsets.only(bottom: 5.0),
+                               child: Image.network(message.image!, height: 150, fit: BoxFit.cover,),
+                             ),
+                            Text(
+                              message.text ?? '',
+                              style: TextStyle(
+                                color: Colors.white, // Always white for dark bubbles
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.image_outlined),
+                  ),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        // color: Colors.grey[200], 
+                        borderRadius: BorderRadius.circular(50.r),
+                      ),
+                      child: TextFormField(
+                        controller: _textController,
+                        maxLines: 5,
+                        minLines: 1,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 15.w,
+                              vertical: 10.h
+                          ),
+                          hintText: 'Type a message...',
+                          border: InputBorder.none, 
                         ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(right: 10, left: 5),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      if (_textController.text.trim().isEmpty) return;
+                      
+                      final text = _textController.text.trim();
+                      _textController.clear();
+                      
+                      if (widget.chat?.id != null) {
+                       bool success = await context.read<ChatController>().sendMessage(widget.chat!.id!, text);
+                       if(success) {
+                         // Scroll to bottom
+                         if (_scrollController.hasClients) {
+                            _scrollController.animateTo(
+                              0.0, // Scroll to 'bottom' (start of list in reverse)
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                         }
+                       }
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 5, left: 10),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(50),
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -167,14 +283,14 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       ),
                       height: 45,
                       width: 45,
-                      child: Icon(Icons.send),
+                      child: Icon(Icons.send, color: Colors.white, size: 20),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
