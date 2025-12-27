@@ -14,10 +14,12 @@ class ChatController extends ChangeNotifier {
   bool _inProgress = false;
   String? _errorMessage;
   List<ChatModel> _chatList = [];
+  int _unreadCount = 0;
 
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
   List<ChatModel> get chatList => _chatList;
+  int get unreadCount => _unreadCount;
 
   final SocketService _socketService = SocketService();
 
@@ -140,9 +142,34 @@ Future<void> getChats() async {
     
     List? rawList;
     if (dataField != null && dataField is Map) {
+      debugPrint("🔍 dataField keys: ${dataField.keys.toList()}");
       // Check for "chats" array inside the data object
       rawList = dataField['chats'] as List?;
-      debugPrint("🔍 Found chats array: ${rawList?.length ?? 0} items");
+      
+      // Try multiple possible keys for unread count in both dataField and response.body
+      final dynamic uc = dataField['unreadCount'] ?? 
+                         dataField['totalUnreadCount'] ?? 
+                         dataField['unread_count'] ??
+                         response.body?['unreadCount'] ??
+                         response.body?['totalUnreadCount'];
+      
+      _unreadCount = int.tryParse(uc?.toString() ?? '0') ?? 0;
+      
+      debugPrint("🔍 Found chats array: ${rawList?.length ?? 0} items, unreadCount from API: $_unreadCount (from $uc)");
+
+      // Fallback: If API says 0, but we have lists, calculate manually just in case
+      if (_unreadCount == 0 && rawList != null && rawList.isNotEmpty) {
+        int manualCount = 0;
+        for (var chat in rawList) {
+          if (chat is Map && chat['lastMessage'] != null && chat['lastMessage']['seen'] == false) {
+            manualCount++;
+          }
+        }
+        if (manualCount > 0) {
+          _unreadCount = manualCount;
+          debugPrint("💡 Manual unreadCount calculation: $_unreadCount");
+        }
+      }
     }
     
     if (rawList != null && rawList.isNotEmpty) {
@@ -238,8 +265,9 @@ void markChatAsSeenLocally(String chatId) {
   final index = _chatList.indexWhere((chat) => chat.id == chatId);
   if (index != -1 && _chatList[index].isSeen == false) {
     _chatList[index].isSeen = true;
+    if (_unreadCount > 0) _unreadCount--;
     notifyListeners();
-    debugPrint("✅ Chat $chatId marked as seen locally");
+    debugPrint("✅ Chat $chatId marked as seen locally, new unreadCount: $_unreadCount");
   }
 }
 
