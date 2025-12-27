@@ -30,6 +30,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
       final authController = AuthController();
       if (widget.chat?.id != null) {
         context.read<ChatController>().getMessages(widget.chat!.id!);
+        context.read<ChatController>().initSocket(widget.chat!.id!);
       }
       
       // If userId is missing, try to fetch profile to get it
@@ -41,6 +42,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
   @override
   void dispose() {
+    if (widget.chat?.id != null) {
+      context.read<ChatController>().disposeSocket(widget.chat!.id!);
+    }
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();

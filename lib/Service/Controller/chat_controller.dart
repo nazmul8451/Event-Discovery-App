@@ -8,6 +8,7 @@ import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/Model/MessageModel.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:gathering_app/Service/Socket/socket_service.dart';
 
 class ChatController extends ChangeNotifier {
   bool _inProgress = false;
@@ -17,6 +18,39 @@ class ChatController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
   List<ChatModel> get chatList => _chatList;
+
+  final SocketService _socketService = SocketService();
+
+  void initSocket(String chatId) {
+    final token = AuthController().accessToken;
+    if (token != null) {
+      _socketService.connect(token);
+      
+      // Listen for messages: getMessage::chatId
+      final eventName = "getMessage::$chatId";
+      print("EventName: $eventName"); 
+      debugPrint("👂 Listening for socket event: $eventName");
+      
+      _socketService.off(eventName); // Ensure no duplicate listeners
+      _socketService.on(eventName, (data) {
+        debugPrint("📩 Received socket message: $data");
+        if (data != null) {
+          final newMessage = MessageModel.fromJson(data);
+          
+          // Avoid duplicates if already added via sendMessage or initial fetch
+          final exists = _messageList.any((m) => m.sId == newMessage.sId);
+          if (!exists) {
+            _messageList.insert(0, newMessage); // Insert at top since reversed: true
+            notifyListeners();
+          }
+        }
+      });
+    }
+  }
+
+  void disposeSocket(String chatId) {
+    _socketService.off("getMessage::$chatId");
+  }
 
   Future<String?> createChat(String otherUserId) async {
     // ... existing createChat implementation ...
