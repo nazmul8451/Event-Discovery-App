@@ -51,7 +51,7 @@ class LogInController extends ChangeNotifier {
                                 'User';
 
         if (accessToken.isNotEmpty && userId.isNotEmpty) {
-          final authController = AuthController(); // Using singleton instance
+          final authController = AuthController(); 
           await authController.saveUserData(
             accessToken: accessToken,
             refreshToken: refreshToken,
