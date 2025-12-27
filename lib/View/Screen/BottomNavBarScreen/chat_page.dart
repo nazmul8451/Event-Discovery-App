@@ -91,7 +91,6 @@ class _ChatPageState extends State<ChatPage> {
     for (var chat in controller.chatList) {
       debugPrint("  - ${chat.name}: ${chat.currentMessage}");
     }
-
                 return RefreshIndicator(
                   onRefresh: () async {
                     await context.read<ChatController>().getChats();
@@ -116,7 +115,11 @@ class _ChatPageState extends State<ChatPage> {
                             Expanded(
                               child: Text(
                                 userChat.name ?? 'Unknown',
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                                style: TextStyle(
+                                  fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.w600,
+                                  fontSize: 14.sp,
+                                  color: userChat.isSeen == false ? Colors.black : Colors.black87,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -126,14 +129,21 @@ class _ChatPageState extends State<ChatPage> {
                           userChat.currentMessage ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey[600]),
+                          style: TextStyle(
+                            color: userChat.isSeen == false ? Colors.black : Colors.grey[600],
+                            fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                         trailing: Text(
                           userChat.time != null ? userChat.time!.toString() : '', // Simplify formatting for now
                           style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                         ),
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                        onTap: () async {
+                          await Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                          // When returning, if we have a chat ID, mark it as seen locally for immediate feedback
+                          if (userChat.id != null) {
+                            controller.markChatAsSeenLocally(userChat.id!);
+                          }
                         },
                       );
                     },

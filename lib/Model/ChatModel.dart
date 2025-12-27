@@ -7,6 +7,7 @@ class ChatModel {
   String? status;
   String? id;
   String? otherUserId;
+  bool? isSeen;
 
   ChatModel({
     this.name,
@@ -17,6 +18,7 @@ class ChatModel {
     this.isGroup,
     this.status,
     this.time,
+    this.isSeen,
   });
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class ChatModel {
       isGroup: json['isGroup'] as bool? ?? false,
       status: json['status']?.toString() ?? 'offline',
       time: json['time']?.toString() ?? json['updatedAt']?.toString(),
+      isSeen: json['isSeen'] as bool? ?? true,
     );
   }
 
@@ -42,6 +45,7 @@ class ChatModel {
       'isGroup': isGroup,
       'status': status,
       'time': time,
+      'isSeen': isSeen,
     };
   }
 }

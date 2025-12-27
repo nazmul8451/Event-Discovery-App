@@ -193,16 +193,18 @@ Future<void> getChats() async {
           }
         }
 
-        // Get last message text
+        // Get last message text and seen status
         String? lastMessageText;
+        bool lastMessageSeen = true;
         final lastMessage = chatData['lastMessage'];
         if (lastMessage != null && lastMessage is Map) {
           lastMessageText = lastMessage['text']?.toString() ?? 'Sent a message';
+          lastMessageSeen = lastMessage['seen'] == true; // If false or null, it's false
         } else {
           lastMessageText = 'No messages yet';
         }
 
-        debugPrint("💬 Chat ${chatData['_id']} - Other: $otherUserName ($otherUserId)");
+        debugPrint("💬 Chat ${chatData['_id']} - Other: $otherUserName ($otherUserId), seen: $lastMessageSeen");
 
         return ChatModel(
           id: chatData['_id']?.toString(),
@@ -213,8 +215,9 @@ Future<void> getChats() async {
                     otherUserMap?['avatar']?.toString(),
           currentMessage: lastMessageText,
           time: chatData['updatedAt']?.toString() ?? '',
-          status: 'offline', // You might want to get this from socket or another API
+          status: 'offline', 
           isGroup: false,
+          isSeen: lastMessageSeen,
         );
       }).toList();
       
@@ -229,6 +232,15 @@ Future<void> getChats() async {
   }
   
   notifyListeners();
+}
+
+void markChatAsSeenLocally(String chatId) {
+  final index = _chatList.indexWhere((chat) => chat.id == chatId);
+  if (index != -1 && _chatList[index].isSeen == false) {
+    _chatList[index].isSeen = true;
+    notifyListeners();
+    debugPrint("✅ Chat $chatId marked as seen locally");
+  }
 }
 
   List<MessageModel> _messageList = [];
