@@ -177,6 +177,8 @@ Future<bool> updateProfile({
       createdAt: _currentUser!.createdAt,
       updatedAt: _currentUser!.updatedAt,
       profileImageUrl: _currentUser!.profileImageUrl,
+      stats: _currentUser!.stats,
+      isFollowing: _currentUser!.isFollowing,
     );
 
     notifyListeners();

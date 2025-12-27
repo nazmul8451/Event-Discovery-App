@@ -16,6 +16,7 @@ class UserProfileModel {
   DateTime? updatedAt;
   String? profileImageUrl;
   Stats? stats;
+  bool? isFollowing;
 
   UserProfileModel({
     this.location,
@@ -35,6 +36,7 @@ class UserProfileModel {
     this.updatedAt,
     this.profileImageUrl,
     this.stats,
+    this.isFollowing,
   });
 
   // API response থেকে model বানানো
@@ -62,7 +64,14 @@ class UserProfileModel {
       // ✅ এটা যোগ করো
       profileImageUrl:
           json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'],
-      stats: json['stats'] != null ? Stats.fromJson(json['stats']) : null,
+      stats: json['stats'] != null
+          ? Stats.fromJson(json['stats'])
+          : Stats(
+              events: int.tryParse((json['eventCount'] ?? json['events'] ?? '0').toString()) ?? 0,
+              followers: int.tryParse((json['followerCount'] ?? json['followers'] ?? '0').toString()) ?? 0,
+              following: int.tryParse((json['followingCount'] ?? json['following'] ?? '0').toString()) ?? 0,
+            ),
+      isFollowing: json['isFollowing'] ?? json['isFollowed'] ?? false,
     );
   }
 Map<String, dynamic> toJson() {
@@ -84,6 +93,7 @@ Map<String, dynamic> toJson() {
     "updatedAt": updatedAt?.toIso8601String(),
     "profileImageUrl": profileImageUrl,       // এটাও যোগ করো
     "stats": stats?.toJson(),
+    "isFollowing": isFollowing,
   };
 }
 }
@@ -165,9 +175,9 @@ class Stats {
 
   factory Stats.fromJson(Map<String, dynamic> json) {
     return Stats(
-      events: json['events'] ?? 0,
-      followers: json['followers'] ?? 0,
-      following: json['following'] ?? 0,
+      events: int.tryParse(json['events']?.toString() ?? '0') ?? 0,
+      followers: int.tryParse(json['followers']?.toString() ?? '0') ?? 0,
+      following: int.tryParse(json['following']?.toString() ?? '0') ?? 0,
     );
   }
 

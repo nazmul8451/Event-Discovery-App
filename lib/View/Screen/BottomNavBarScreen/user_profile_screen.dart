@@ -142,81 +142,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Column(
-                              children: [
-                                Text(
-                                  '10',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium!.copyWith(),
-                                ),
-                                SizedBox(height: 5.h),
-                                Text(
-                                  'Events',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                        color:
-                                            Provider.of<ThemeProvider>(
-                                              context,
-                                            ).isDarkMode
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '432',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
-                                SizedBox(height: 5.h),
-                                Text(
-                                  'Followers',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                        color:
-                                            Provider.of<ThemeProvider>(
-                                              context,
-                                            ).isDarkMode
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '322',
-                                  style: Theme.of(
-                                    context,
-                                  ).textTheme.titleMedium,
-                                ),
-                                SizedBox(height: 5.h),
-                                Text(
-                                  'Following',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium!
-                                      .copyWith(
-                                        color:
-                                            Provider.of<ThemeProvider>(
-                                              context,
-                                            ).isDarkMode
-                                            ? Colors.grey
-                                            : Colors.black,
-                                      ),
-                                ),
-                              ],
-                            ),
+                            _buildStatColumn(context, '${user?.stats?.events ?? 0}', 'Events'),
+                            _buildStatColumn(context, '${user?.stats?.followers ?? 0}', 'Followers'),
+                            _buildStatColumn(context, '${user?.stats?.following ?? 0}', 'Following'),
                           ],
                         ),
                         SizedBox(height: 15.h),
@@ -421,6 +349,24 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         },
       ),
+    );
+  Widget _buildStatColumn(BuildContext context, String count, String label) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        SizedBox(height: 5.h),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Provider.of<ThemeProvider>(context).isDarkMode
+                    ? Colors.grey
+                    : Colors.black,
+              ),
+        ),
+      ],
     );
   }
 }

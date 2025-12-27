@@ -5,6 +5,7 @@ import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class UserChatScreen extends StatefulWidget {
@@ -65,75 +66,123 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 icon: const Icon(Icons.arrow_back),
               ),
 
-              // Profile Picture + Online Dot
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 20.r,
-                    backgroundColor: Colors.grey[300],
-                    child: ClipOval(
-                      child: (widget.chat?.imageIcon != null && widget.chat!.imageIcon!.startsWith('http'))
-                      ? Image.network(
-                        widget.chat!.imageIcon!,
-                        fit: BoxFit.cover,
-                        width: 40.r,
-                        height: 40.r,
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
-                      )
-                      : SvgPicture.asset(
-                        "${widget.chat?.imageIcon}",
-                        fit: BoxFit.cover,
-                        placeholderBuilder: (_) =>
-                            const Icon(Icons.person, size: 24),
-                      ),
-                    ),
-                  ),
-                  // Online Dot
-                  Positioned(
-                    bottom: 2,
-                    right: 2,
-                    child: Container(
-                      height: 12.h,
-                      width: 12.w,
-                      decoration: BoxDecoration(
-                        color: widget.chat?.status == 'online'
-                            ? Colors.green
-                            : Colors.grey,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2.5),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(width: 12.w),
-
-              // Name + Status
+              // Profile Picture + Name (Clickable)
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "${widget.chat?.name}",
-                      style: TextStyle(
-                        fontSize: 14.sp.clamp(14, 16),
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
+                child: InkWell(
+                  onTap: () {
+                    final chatController = context.read<ChatController>();
+                    final profileController = context.read<ProfileController>();
+                    final myId = AuthController().userId ?? profileController.currentUser?.id;
+
+                    debugPrint("👆 Header Tap - MyID: $myId, OtherID in Chat: ${widget.chat?.otherUserId}");
+
+                    // Try to get ID from widget.chat, or fallback to finding it in messages
+                    String? targetId = widget.chat?.otherUserId;
+                    
+                    if (targetId == null && chatController.messageList.isNotEmpty) {
+                      // Find first message not sent by me
+                      for (var msg in chatController.messageList) {
+                        if (msg.sender != null && msg.sender.toString() != myId.toString()) {
+                          targetId = msg.sender.toString();
+                          break;
+                        }
+                      }
+                    }
+
+                    if (targetId != null) {
+                      Navigator.pushNamed(
+                        context,
+                        OtherUserProfileScreen.name,
+                        arguments: targetId,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(
+                           content: Text("ID ERROR - MyID: $myId\nOtherID: ${widget.chat?.otherUserId}\nChatID: ${widget.chat?.id}"),
+                           duration: const Duration(seconds: 5),
+                         ),
+                      );
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      // Profile Picture + Online Dot
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 20.r,
+                            backgroundColor: Colors.grey[300],
+                            child: ClipOval(
+                              child: (widget.chat?.imageIcon != null &&
+                                      widget.chat!.imageIcon!.startsWith('http'))
+                                  ? Image.network(
+                                      widget.chat!.imageIcon!,
+                                      fit: BoxFit.cover,
+                                      width: 40.r,
+                                      height: 40.r,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.person),
+                                    )
+                                  : SvgPicture.asset(
+                                      "${widget.chat?.imageIcon}",
+                                      fit: BoxFit.cover,
+                                      placeholderBuilder: (_) =>
+                                          const Icon(Icons.person, size: 24),
+                                    ),
+                            ),
+                          ),
+                          // Online Dot
+                          Positioned(
+                            bottom: 2,
+                            right: 2,
+                            child: Container(
+                              height: 12.h,
+                              width: 12.w,
+                              decoration: BoxDecoration(
+                                color: widget.chat?.status == 'online'
+                                    ? Colors.green
+                                    : Colors.grey,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2.5),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      widget.chat?.status == 'online' ? 'online' : 'offline',
-                      style: TextStyle(
-                        fontSize: 12.sp.clamp(12, 14),
-                        color: widget.chat?.status == 'online'
-                            ? Colors.green
-                            : Colors.grey,
+                      SizedBox(width: 12.w),
+                      // Name + Status
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "${widget.chat?.name}",
+                              style: TextStyle(
+                                fontSize: 14.sp.clamp(14, 16),
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.color,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              widget.chat?.status == 'online' ? 'online' : 'offline',
+                              style: TextStyle(
+                                fontSize: 12.sp.clamp(12, 14),
+                                color: widget.chat?.status == 'online'
+                                    ? Colors.green
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -274,7 +323,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     child: Container(
                       margin: const EdgeInsets.only(right: 5, left: 10),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(12),
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,

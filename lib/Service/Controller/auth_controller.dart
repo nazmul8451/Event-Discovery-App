@@ -14,8 +14,8 @@ class AuthController extends ChangeNotifier {
 
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
-  static const String _userIdKey = 'user_id';         // নতুন
-  static const String _userNameKey = 'user_name';     // নতুন
+  static const String _userIdKey = 'user_id';        
+  static const String _userNameKey = 'user_name';     
 
   String? _accessToken;
   String? _refreshToken;

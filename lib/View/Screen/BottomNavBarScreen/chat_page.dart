@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/ChatModel.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +21,14 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChatController>().getChats();
+      final auth = AuthController();
+      if (auth.userId == null) {
+         context.read<ProfileController>().fetchProfile(forceRefresh: false).then((_) {
+           context.read<ChatController>().getChats();
+         });
+      } else {
+        context.read<ChatController>().getChats();
+      }
     });
   }
 

@@ -141,16 +141,33 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(double.infinity, 48),
-                              backgroundColor: Colors.deepPurpleAccent,
+                              backgroundColor: (user.isFollowing ?? false) 
+                                  ? Colors.grey[800] 
+                                  : Colors.deepPurpleAccent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16.r),
                               ),
                             ),
-                            onPressed: () {},
-                            child: Text(
-                              'Follow',
-                              style: TextStyle(fontSize: 15.sp, color: Colors.white),
-                            ),
+                            onPressed: () {
+                              if (user.isFollowing ?? false) {
+                                _showUnfollowDialog(context, controller, user.name ?? 'User');
+                              } else {
+                                controller.toggleFollow(widget.userId);
+                              }
+                            },
+                            child: controller.followInProgress 
+                                ? const SizedBox(
+                                    height: 12,
+                                    width: 12,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    (user.isFollowing ?? false) ? 'Following' : 'Follow',
+                                    style: TextStyle(fontSize: 15.sp, color: Colors.white),
+                                  ),
                           ),
                         ),
                         SizedBox(width: 10.w),
@@ -178,6 +195,7 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                       final user = controller.userProfile;
                                       final chat = ChatModel(
                                         id: chatId,
+                                        otherUserId: widget.userId,
                                         name: user?.name,
                                         imageIcon: user?.profileImageUrl,
                                         status: 'offline',
@@ -211,8 +229,14 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                     }
                                   },
                                   child: chatController.inProgress
-                                      ? CircularProgressIndicator(
-                                          color: Colors.white)
+                                      ? const SizedBox(
+                                          height: 12,
+                                          width: 12,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
                                       : Text(
                                           'Message',
                                           style: TextStyle(
@@ -283,6 +307,32 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
               ),
         ),
       ],
+    );
+  }
+
+  void _showUnfollowDialog(BuildContext context, OtherUserProfileController controller, String name) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          title: Text("Unfollow $name?"),
+          content: Text("Are you sure you want to unfollow this user?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                controller.toggleFollow(widget.userId);
+              },
+              child: const Text("Unfollow", style: TextStyle(color: Colors.redAccent)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

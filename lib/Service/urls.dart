@@ -47,4 +47,9 @@ class Urls {
   static  String getMessage(String chatId) => "$baseUrl/api/v1/message/${chatId}";
 
   static String sendMessage = "$baseUrl/api/v1/message";
+
+  // follow api
+  static String followUserUrl(String userId) => "$baseUrl/api/v1/follow/$userId";
+  static String unfollowUserUrl(String userId) => "$baseUrl/api/v1/follow/$userId/unfollow";
+  static String getFollowStatsUrl(String userId, String type) => "$baseUrl/api/v1/follow/$userId/followers?type=$type";
 }

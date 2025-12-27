@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
@@ -6,6 +7,7 @@ import 'package:gathering_app/Model/ChatModel.dart';
 
 import 'package:gathering_app/Model/MessageModel.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 
 class ChatController extends ChangeNotifier {
   bool _inProgress = false;
@@ -54,30 +56,63 @@ class ChatController extends ChangeNotifier {
     if (response.isSuccess) {
       final rawList = response.body!['data'] as List?;
       if (rawList != null) {
-        final currentUserId = AuthController().userId;
+        final authId = AuthController().userId;
+        String? currentUserId = authId;
+        if (currentUserId == null || currentUserId.isEmpty) {
+          final cachedProfile = GetStorage().read<Map<String, dynamic>>('cached_user_profile');
+          currentUserId = cachedProfile?['id']?.toString() ?? cachedProfile?['_id']?.toString();
+        }
+
+        debugPrint("🔍 getChats - MyID: $currentUserId");
+
         _chatList = rawList.map((chatData) {
-          // Find other participant
           final participants = chatData['participants'] as List?;
-          Map<String, dynamic>? otherUser;
+          Map<String, dynamic>? otherUserMap;
+          String? otherUserId;
           
-          if (participants != null) {
+          if (participants != null && participants.isNotEmpty) {
+              debugPrint("👥 Participants for ${chatData['_id']}: $participants");
               for (var p in participants) {
+                  String? pId;
                   if (p is Map<String, dynamic>) {
-                      if (p['_id'] != currentUserId) {
-                          otherUser = p;
-                          break;
-                      }
+                      pId = (p['_id'] ?? p['id'])?.toString();
+                  } else if (p is String) {
+                      pId = p;
                   }
+                  
+                  // Filter out MY ID to find the OTHER person
+                  if (pId != null && 
+                      currentUserId != null && 
+                      pId.toString().trim() != currentUserId.toString().trim()) {
+                      
+                      if (p is Map<String, dynamic>) otherUserMap = p;
+                      otherUserId = pId;
+                      break;
+                  }
+              }
+              
+              // Fallback: If still null (maybe I am the only one or ID mismatch), pick the first one anyway
+              if (otherUserId == null && participants.isNotEmpty) {
+                 final first = participants.first;
+                 if (first is Map<String, dynamic>) {
+                   otherUserMap = first;
+                   otherUserId = (first['_id'] ?? first['id'])?.toString();
+                 } else {
+                   otherUserId = first.toString();
+                 }
               }
           }
 
+          debugPrint("💬 Chat ${chatData['_id']} - OtherID: $otherUserId");
+
           return ChatModel(
-            id: chatData['_id'],
-            name: otherUser?['name'] ?? 'Unknown',
-            imageIcon: otherUser?['profileImage'] ?? otherUser?['image'], // Adjust key based on User model
+            id: chatData['_id'] ?? chatData['id'],
+            otherUserId: otherUserId,
+            name: otherUserMap?['name'] ?? 'User',
+            imageIcon: otherUserMap?['profileImage'] ?? otherUserMap?['image'] ?? otherUserMap?['avatar'], 
             currentMessage: chatData['lastMessage'] != null ? chatData['lastMessage']['content'] ?? 'Sent an attachment' : 'No messages yet', 
-            time: chatData['updatedAt'], // Format this later if needed
-            status: 'offline', // Default for now
+            time: chatData['updatedAt'], 
+            status: 'offline', 
             isGroup: false,
           );
         }).toList();

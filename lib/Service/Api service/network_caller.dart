@@ -163,10 +163,13 @@ class NetworkCaller {
   static Future<NetworkResponse> deleteRequest(
     String url, {
     Map<String, dynamic>? body,
-    bool requireAuth = false,
+    bool requireAuth = true,
   }) async {
     try {
-      final Map<String, String> headers = {'Content-Type': 'application/json'};
+      final Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
       if (requireAuth) {
         final String? resolvedToken = await _getToken();
@@ -176,9 +179,10 @@ class NetworkCaller {
       }
 
       final uri = Uri.parse(url);
+      
+      _logRequest('DELETE', url, body, headers);
 
       http.Response response;
-
       if (body != null) {
         response = await http.delete(
           uri,
@@ -189,29 +193,11 @@ class NetworkCaller {
         response = await http.delete(uri, headers: headers);
       }
 
-      // Response parse করো
-      dynamic responseBody;
-      try {
-        responseBody = jsonDecode(response.body);
-      } catch (e) {
-        responseBody = response.body;
-      }
+      _logResponse('DELETE', url, response);
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return NetworkResponse(
-          isSuccess: true,
-          statusCode: response.statusCode,
-          body: responseBody,
-        );
-      } else {
-        return NetworkResponse(
-          isSuccess: false,
-          statusCode: response.statusCode,
-          errorMessage: responseBody['message'] ?? 'Unknown error',
-          body: responseBody,
-        );
-      }
+      return _parseResponse(response);
     } catch (e) {
+      debugPrint('Network Error (DELETE): $e');
       return NetworkResponse(
         isSuccess: false,
         statusCode: -1,
