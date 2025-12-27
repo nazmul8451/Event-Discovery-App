@@ -411,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         .titleSmall!
                                         .copyWith(color: Colors.grey),
                                   ),
-                                  // description may be long — limit lines and allow ellipsis
+                          
                                   SizedBox(height: 4.h),
                                   Text(
                                     '${user?.description ?? ''}',
