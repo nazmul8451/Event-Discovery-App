@@ -4,6 +4,7 @@ import 'package:gathering_app/Service/Controller/liveStreamController.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
@@ -42,18 +43,50 @@ class _LiveStreamState extends State<LiveStream> {
     // Call getLiveStreamByEventId and wait for it to complete
     await controller.getLiveStreamByEventId(_eventId!);
     
-    if (!mounted) return;
+    if (!mounted || controller.errorMessage != null) return;
     
-    // After getting live stream data, extract streamId and call getAgoraToken
+    // After getting live stream data, extract stream IDs
     final streamData = controller.liveStreamData;
     
     if (streamData != null) {
-      final streamId = streamData['id']?.toString() ?? streamData['_id']?.toString();
-      if (streamId != null) {
-        await controller.getAgoraToken(streamId);
-        if (!mounted) return;
-        await controller.initializeAgora();
+      // Prioritize resource ID for token API, but keep others as fallback
+      final resourceId = streamData['id']?.toString() ?? streamData['_id']?.toString();
+      final alternateId = streamData['streamId']?.toString();
+      
+      final streamIdToGetToken = resourceId ?? alternateId;
+      
+      final streamerId = streamData['streamer']?.toString();
+      final isLive = streamData['isLive'] == true;
+      final streamStatus = streamData['streamStatus']?.toString().toLowerCase();
+      
+      // Get current user ID
+      final profileController = context.read<ProfileController>();
+      final currentUserId = profileController.currentUser?.id;
+      
+      print("👤 Streamer ID: $streamerId, Current User ID: $currentUserId, isLive: $isLive, Status: $streamStatus");
+      
+      final role = (streamerId != null && currentUserId != null && streamerId == currentUserId)
+          ? ClientRoleType.clientRoleBroadcaster
+          : ClientRoleType.clientRoleAudience;
+          
+      // 🔥 FIX: If stream is not live and user is audience, don't try to join Agora
+      if (role == ClientRoleType.clientRoleAudience && !isLive) {
+        print("ℹ️ Stream is not live. Skipping Agora join for audience member.");
+        return;
+      }
+
+      print("🔑 Using streamId for token: $streamIdToGetToken (ResourceID: $resourceId, AltID: $alternateId)");
+          
+      if (streamIdToGetToken != null) {
+        await controller.getAgoraToken(streamIdToGetToken);
+        if (!mounted || controller.errorMessage != null) return;
+        
+        await controller.initializeAgora(role: role);
+        if (!mounted || controller.errorMessage != null) return;
+        
         await controller.joinChannel();
+      } else {
+        print("⚠️ No valid stream ID found in stream data");
       }
     }
   }
@@ -168,55 +201,17 @@ class _LiveStreamState extends State<LiveStream> {
                 children: [
                   Text('Live chat'),
 
-                  SizedBox(height: 10.h),
-                  Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'brianna',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Color(0xFFFF006E)),
-                          ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            'this DJ is crazy rn',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 3.h),
-                      Row(
-                        children: [
-                          Text(
-                            'jayhou',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Color(0xFFFF006E)),
-                          ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            "pull up by 12 or it's packed",
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 3.h),
-                      Row(
-                        children: [
-                          Text(
-                            'kevo713',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Color(0xFFFF006E)),
-                          ),
+                  Text('Live chat (Coming Soon)'),
 
-                          SizedBox(width: 3.w),
-                          Text(
-                            'section by the bar looks lit',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
+                  SizedBox(height: 20.h),
+                  Center(
+                    child: Text(
+                      'Live chat will be available in the next update.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -232,11 +227,12 @@ class _LiveStreamState extends State<LiveStream> {
                         minLines: 1,
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
+                          enabled: false,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 10.w,
                             vertical: 10.h,
                           ),
-                          hintText: 'Type a message...',
+                          hintText: 'Chat disabled...',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50.r),
                           ),
@@ -287,62 +283,32 @@ class _LiveStreamState extends State<LiveStream> {
         child: Stack(
           children: [
             // Video player or placeholder
-            if (isLive && controller.remoteUid != null && controller.engine != null && (controller.agoraTokenData?['channelName']?.isNotEmpty ?? false))
-              // Show Agora remote video
-              AgoraVideoView(
-                controller: VideoViewController.remote(
-                  rtcEngine: controller.engine!,
-                  canvas: VideoCanvas(uid: controller.remoteUid),
-                  connection: RtcConnection(
-                    channelId: controller.agoraTokenData?['channelName'] ?? '',
+            if (controller.isJoined && controller.engine != null && (controller.agoraTokenData?['channelName']?.isNotEmpty ?? false))
+              if (controller.currentRole == ClientRoleType.clientRoleBroadcaster)
+                // Show Broadcaster's local video
+                AgoraVideoView(
+                  controller: VideoViewController(
+                    rtcEngine: controller.engine!,
+                    canvas: const VideoCanvas(uid: 0),
                   ),
-                ),
-              )
+                )
+              else if (controller.remoteUid != null)
+                // Show Audience's remote video
+                AgoraVideoView(
+                  controller: VideoViewController.remote(
+                    rtcEngine: controller.engine!,
+                    canvas: VideoCanvas(uid: controller.remoteUid),
+                    connection: RtcConnection(
+                      channelId: controller.agoraTokenData?['channelName'] ?? '',
+                    ),
+                  ),
+                )
+              else
+                // Audience is waiting for broadcaster to start
+                _buildWaitingPlaceholder(isLive, streamStatus, description)
             else
-              // Show placeholder when not live
-              Container(
-                color: Colors.grey[900],
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isLive ? Icons.videocam_off : Icons.schedule,
-                        size: 60.sp,
-                        color: Colors.white54,
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        isLive 
-                          ? 'Waiting for broadcaster...' 
-                          : streamStatus == 'scheduled'
-                            ? 'Stream Scheduled'
-                            : 'Stream Not Started',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      if (description.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: Text(
-                            description,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14.sp,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
+              // Not joined or not live
+              _buildWaitingPlaceholder(isLive, streamStatus, description),
 
             // Live indicator and info overlay
             Positioned(
@@ -455,6 +421,52 @@ class _LiveStreamState extends State<LiveStream> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaitingPlaceholder(bool isLive, String streamStatus, String description) {
+    return Container(
+      color: Colors.grey[900],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isLive ? Icons.videocam_off : Icons.schedule,
+              size: 60.sp,
+              color: Colors.white54,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              isLive
+                  ? 'Waiting for broadcaster...'
+                  : streamStatus == 'scheduled'
+                      ? 'Stream Scheduled'
+                      : 'Stream Not Started',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            if (description.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14.sp,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
           ],
         ),
       ),

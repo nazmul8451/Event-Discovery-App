@@ -28,6 +28,9 @@ class LiveStreamController extends ChangeNotifier {
   bool _isJoined = false;
   bool get isJoined => _isJoined;
 
+  ClientRoleType _currentRole = ClientRoleType.clientRoleAudience;
+  ClientRoleType get currentRole => _currentRole;
+
   // Agora App ID - Replace with your actual Agora App ID
   static const String _appId = "9476d1c9b94d48f3a6f312798aa6c3a6";
 
@@ -49,18 +52,20 @@ class LiveStreamController extends ChangeNotifier {
 
       if (response.isSuccess && response.body != null) {
         final Map<String, dynamic> body = response.body!;
-        if (body['success'] == true && body['data'] != null) {
-          _agoraTokenData = body['data'];
-          print("✅ Agora token data loaded successfully");
-          print("📊 Token: ${_agoraTokenData?['token']}");
-          print("📊 Channel Name: ${_agoraTokenData?['channelName']}");
-          print("📊 UID: ${_agoraTokenData?['uid']}");
-          print("📊 Role: ${_agoraTokenData?['role']}");
-          print("📊 Expire Time: ${_agoraTokenData?['expireTime']}");
-          print("📊 Streaming Mode: ${_agoraTokenData?['streamingMode']}");
+        if (body['success'] == true) {
+          final data = body['data'];
+          if (data != null && data is Map) {
+            _agoraTokenData = Map<String, dynamic>.from(data);
+            print("✅ Agora token data loaded successfully");
+            print("📊 Token length: ${_agoraTokenData?['token']?.toString()?.length}");
+            print("📊 Channel Name: ${_agoraTokenData?['channelName']}");
+          } else {
+            _errorMessage = 'Invalid token data format from server';
+            print("❌ Agora token API returned success but invalid data: $data");
+          }
         } else {
           _errorMessage = body['message'] ?? 'Failed to get Agora token';
-          print("❌ Agora token API returned error: $_errorMessage");
+          print("❌ Agora token API returned error body: $body");
         }
       } else {
         _errorMessage = response.errorMessage ?? 'Failed to get Agora token';
@@ -114,8 +119,9 @@ class LiveStreamController extends ChangeNotifier {
   }
 
   // Initialize Agora Engine
-  Future<void> initializeAgora() async {
-    print("🎙️ Initializing Agora Engine...");
+  Future<void> initializeAgora({required ClientRoleType role}) async {
+    print("🎙️ Initializing Agora Engine with role: $role");
+    _currentRole = role;
     
     try {
       // Request permissions
@@ -129,11 +135,15 @@ class LiveStreamController extends ChangeNotifier {
         channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
       ));
 
-      // Set client role to audience (viewer)
-      await _engine!.setClientRole(role: ClientRoleType.clientRoleAudience);
+      // Set client role
+      await _engine!.setClientRole(role: _currentRole);
 
       // Enable video
       await _engine!.enableVideo();
+
+      if (_currentRole == ClientRoleType.clientRoleBroadcaster) {
+        await _engine!.startPreview();
+      }
 
       // Register event handlers
       _engine!.registerEventHandler(
@@ -188,24 +198,36 @@ class LiveStreamController extends ChangeNotifier {
     }
 
     try {
-      final String token = _agoraTokenData!['token'] ?? '';
-      final String channelName = _agoraTokenData!['channelName'] ?? '';
-      final int uid = _agoraTokenData!['uid'] ?? 0;
+      final String token = _agoraTokenData!['token']?.toString() ?? '';
+      final String channelName = _agoraTokenData!['channelName']?.toString() ?? '';
+      
+      // Safe parsing of UID (could be int or string from API)
+      final dynamic rawUid = _agoraTokenData!['uid'];
+      final int uid = int.tryParse(rawUid?.toString() ?? '0') ?? 0;
 
-      print("🎙️ Joining channel: $channelName with UID: $uid");
+      if (token.isEmpty || channelName.isEmpty) {
+        _errorMessage = "Missing token or channel name in Agora data";
+        print("⚠️ Missing Agora parameters: token=$token, channel=$channelName");
+        notifyListeners();
+        return;
+      }
+
+      print("🎙️ Joining channel: $channelName with UID: $uid as $_currentRole");
 
       await _engine!.joinChannel(
         token: token,
         channelId: channelName,
         uid: uid,
-        options: const ChannelMediaOptions(
-          clientRoleType: ClientRoleType.clientRoleAudience,
+        options: ChannelMediaOptions(
+          clientRoleType: _currentRole,
           channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
           audienceLatencyLevel: AudienceLatencyLevelType.audienceLatencyLevelLowLatency,
+          publishMicrophoneTrack: _currentRole == ClientRoleType.clientRoleBroadcaster,
+          publishCameraTrack: _currentRole == ClientRoleType.clientRoleBroadcaster,
         ),
       );
     } catch (e) {
-      print("❌ Failed to join channel: $e");
+      print("❌ Error in joinChannel: $e");
       _errorMessage = "Failed to join channel: $e";
       notifyListeners();
     }
