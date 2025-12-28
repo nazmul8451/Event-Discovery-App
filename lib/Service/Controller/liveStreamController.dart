@@ -124,6 +124,15 @@ class LiveStreamController extends ChangeNotifier {
     _currentRole = role;
     
     try {
+      // 🧨 Release existing engine if it exists to avoid conflicts (Fixes error -17)
+      if (_engine != null) {
+        print("🎙️ Releasing existing Agora engine before re-initialization...");
+        await _engine!.leaveChannel();
+        await _engine!.release();
+        _engine = null;
+        _isJoined = false;
+      }
+
       // Request permissions
       await [Permission.microphone, Permission.camera].request();
 
@@ -192,6 +201,11 @@ class LiveStreamController extends ChangeNotifier {
       return;
     }
 
+    if (_isJoined) {
+      print("🎙️ Already joined channel. Skipping redundant join flow.");
+      return;
+    }
+
     if (_agoraTokenData == null) {
       print("⚠️ No Agora token data available");
       return;
@@ -229,6 +243,7 @@ class LiveStreamController extends ChangeNotifier {
     } catch (e) {
       print("❌ Error in joinChannel: $e");
       _errorMessage = "Failed to join channel: $e";
+      _isJoined = false; // Reset join status on failure
       notifyListeners();
     }
   }
