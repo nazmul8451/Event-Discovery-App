@@ -63,5 +63,6 @@ class Urls {
   static String getTicketByEventIdUrl(String eventId) => "$baseUrl/api/v1/ticket/$eventId";
 
    static String getLiveStreamByEventID(String eventId) => "$baseUrl/api/v1/livestream/event/$eventId";
+   static String getAgoraTokenUrl(String streamId) => "$baseUrl/api/v1/livestream/$streamId/token";
     
 }

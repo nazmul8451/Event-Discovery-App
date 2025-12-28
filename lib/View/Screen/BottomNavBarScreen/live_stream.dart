@@ -17,13 +17,36 @@ class _LiveStreamState extends State<LiveStream> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
       final eventId = args?['eventId']?.toString();
       
       if (eventId != null) {
         print("🎬 LiveStream screen received eventId: $eventId");
-        context.read<LiveStreamController>().getLiveStreamByEventId(eventId);
+        final controller = context.read<LiveStreamController>();
+        
+        // Call getLiveStreamByEventId and wait for it to complete
+        await controller.getLiveStreamByEventId(eventId);
+        
+        // After getting live stream data, extract streamId and call getAgoraToken
+        final streamData = controller.liveStreamData;
+        print("🎬 Live stream data: $streamData");
+        
+        if (streamData != null) {
+          // Try 'id' first, then fallback to '_id'
+          final streamId = streamData['id']?.toString() ?? streamData['_id']?.toString();
+          print("🎬 Extracted streamId: $streamId");
+          
+          if (streamId != null) {
+            print("🎬 Calling getAgoraToken with streamId: $streamId");
+            await controller.getAgoraToken(streamId);
+          } else {
+            print("⚠️ No streamId (id or _id) found in live stream data");
+            print("⚠️ Available keys in streamData: ${streamData.keys.toList()}");
+          }
+        } else {
+          print("⚠️ Live stream data is null");
+        }
       } else {
         print("⚠️ No eventId provided to LiveStream screen");
       }
