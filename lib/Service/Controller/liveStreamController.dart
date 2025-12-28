@@ -201,6 +201,7 @@ class LiveStreamController extends ChangeNotifier {
         options: const ChannelMediaOptions(
           clientRoleType: ClientRoleType.clientRoleAudience,
           channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+          audienceLatencyLevel: AudienceLatencyLevelType.audienceLatencyLevelLowLatency,
         ),
       );
     } catch (e) {

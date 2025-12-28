@@ -194,26 +194,23 @@ class _HomePageState extends State<HomePage> {
                           builder: (context, controller, _) {
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: controller.categories.map((cat) {
-                                    bool isSelected =
-                                        controller.selectedCategory == cat;
-                                    return Padding(
-                                      padding: EdgeInsets.only(left: 16.0.w),
-                                      child: _buildCustomFilterChip(
-                                        label: cat,
-                                        icon: Icons.category,
-                                        isSelected: isSelected,
-                                        onTap: () {
-                                          controller.applyCategoryFilter(cat);
-                                        },
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: controller.categories.map((cat) {
+                                  bool isSelected =
+                                      controller.selectedCategory == cat;
+                                  return Padding(
+                                    padding: EdgeInsets.only(left: 16.0.w),
+                                    child: _buildCustomFilterChip(
+                                      label: cat,
+                                      icon: Icons.category,
+                                      isSelected: isSelected,
+                                      onTap: () {
+                                        controller.applyCategoryFilter(cat);
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             );
                           },

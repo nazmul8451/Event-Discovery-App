@@ -15,47 +15,47 @@ class LiveStream extends StatefulWidget {
 }
 
 class _LiveStreamState extends State<LiveStream> {
+  String? _eventId;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
-      final eventId = args?['eventId']?.toString();
+      _eventId = args?['eventId']?.toString();
       
-      if (eventId != null) {
-        print("🎬 LiveStream screen received eventId: $eventId");
-        final controller = context.read<LiveStreamController>();
-        
-        // Call getLiveStreamByEventId and wait for it to complete
-        await controller.getLiveStreamByEventId(eventId);
-        
-        // After getting live stream data, extract streamId and call getAgoraToken
-        final streamData = controller.liveStreamData;
-        print("🎬 Live stream data: $streamData");
-        
-        if (streamData != null) {
-          // Try 'id' first, then fallback to '_id'
-          final streamId = streamData['id']?.toString() ?? streamData['_id']?.toString();
-          print("🎬 Extracted streamId: $streamId");
-          
-          if (streamId != null) {
-            print("🎬 Calling getAgoraToken with streamId: $streamId");
-            await controller.getAgoraToken(streamId);
-            
-            // Initialize Agora and join channel
-            await controller.initializeAgora();
-            await controller.joinChannel();
-          } else {
-            print("⚠️ No streamId (id or _id) found in live stream data");
-            print("⚠️ Available keys in streamData: ${streamData.keys.toList()}");
-          }
-        } else {
-          print("⚠️ Live stream data is null");
-        }
+      if (_eventId != null) {
+        _loadStreamData();
       } else {
         print("⚠️ No eventId provided to LiveStream screen");
       }
     });
+  }
+
+  Future<void> _loadStreamData() async {
+    if (_eventId == null) return;
+    print("🎬 Loading live stream data for eventId: $_eventId");
+    
+    if (!mounted) return;
+    final controller = context.read<LiveStreamController>();
+    
+    // Call getLiveStreamByEventId and wait for it to complete
+    await controller.getLiveStreamByEventId(_eventId!);
+    
+    if (!mounted) return;
+    
+    // After getting live stream data, extract streamId and call getAgoraToken
+    final streamData = controller.liveStreamData;
+    
+    if (streamData != null) {
+      final streamId = streamData['id']?.toString() ?? streamData['_id']?.toString();
+      if (streamId != null) {
+        await controller.getAgoraToken(streamId);
+        if (!mounted) return;
+        await controller.initializeAgora();
+        await controller.joinChannel();
+      }
+    }
   }
 
   @override
@@ -121,6 +121,28 @@ class _LiveStreamState extends State<LiveStream> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Image.asset('assets/images/cross_icon.png'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Consumer<ThemeProvider>(
+                    builder: (context, controller, child) => GestureDetector(
+                      onTap: () => _loadStreamData(),
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: controller.isDarkMode
+                              ? Color(0xFF3E043F)
+                              : Color(0xFF686868),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
@@ -265,7 +287,7 @@ class _LiveStreamState extends State<LiveStream> {
         child: Stack(
           children: [
             // Video player or placeholder
-            if (isLive && controller.remoteUid != null && controller.engine != null)
+            if (isLive && controller.remoteUid != null && controller.engine != null && (controller.agoraTokenData?['channelName']?.isNotEmpty ?? false))
               // Show Agora remote video
               AgoraVideoView(
                 controller: VideoViewController.remote(
