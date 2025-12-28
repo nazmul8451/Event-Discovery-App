@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/urls.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CustomCarousel extends StatefulWidget {
-  const CustomCarousel({super.key});
+  final List<String> images;
+  const CustomCarousel({super.key, required this.images});
 
   @override
   State<CustomCarousel> createState() => _CustomCarouselState();
@@ -12,15 +16,26 @@ class CustomCarousel extends StatefulWidget {
 class _CustomCarouselState extends State<CustomCarousel> {
   int _currentIndex = 0;
 
-  final List<String> images = [
-    "assets/images/home_img1.png",
-    "assets/images/home_img1.png",
-    "assets/images/home_img1.png",
-    "assets/images/home_img1.png",
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Fallback if no images provided
+    final List<String> displayImages =
+        widget.images.isNotEmpty ? widget.images : [];
+
+    if (displayImages.isEmpty) {
+      return Container(
+        height: 200.h,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.r),
+          color: Colors.grey.shade300,
+        ),
+        child: Center(
+          child: Icon(Icons.image_not_supported, color: Colors.grey),
+        ),
+      );
+    }
+
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -30,14 +45,28 @@ class _CustomCarouselState extends State<CustomCarousel> {
             Stack(
               children: [
                 CarouselSlider.builder(
-                  itemCount: images.length,
+                  itemCount: displayImages.length,
                   itemBuilder: (context, index, realIndex) {
+                    final String imgUrl = "${Urls.baseUrl}${displayImages[index]}";
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.r),
-                        image: DecorationImage(
-                          image: AssetImage(images[index]),
+                      ),
+                      child: ClipRRect(
+                         borderRadius: BorderRadius.circular(20.r),
+                        child: CachedNetworkImage(
+                          imageUrl: imgUrl,
                           fit: BoxFit.cover,
+                          width: double.infinity,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade100,
+                            child: Container(color: Colors.white),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey.shade200,
+                            child: Icon(Icons.error, color: Colors.red),
+                          ),
                         ),
                       ),
                     );
@@ -55,17 +84,22 @@ class _CustomCarouselState extends State<CustomCarousel> {
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentIndex = index;
-
                       });
                     },
                   ),
                 ),
                 Positioned(
-                  top: 3,
-                  right: 3,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.favorite_border),
+                  top: 10.h,
+                  right: 10.w,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.favorite_border, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -75,7 +109,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
               width: MediaQuery.of(context).size.width,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: images.asMap().entries.map((entry) {
+                children: displayImages.asMap().entries.map((entry) {
                   int index = entry.key;
                   bool isActive = _currentIndex == index;
 
@@ -107,9 +141,6 @@ class _CustomCarouselState extends State<CustomCarousel> {
             ),
           ],
         ),
-
-        // Beautiful Dot Indicator (নিচে)
-        // তোমার Stack এর মধ্যে শুধু এই Positioned টা রাখো (ডটের জায়গায়)
       ],
     );
   }

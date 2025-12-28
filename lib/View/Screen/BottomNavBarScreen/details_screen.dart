@@ -847,7 +847,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
                 SizedBox(height: 20.h),
 
-                SizedBox(width: double.infinity, child: CustomCarousel()),
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomCarousel(
+                    images: singleEvent?.data?.images ?? [],
+                  ),
+                ),
 
                 SizedBox(height: 20.h),
 

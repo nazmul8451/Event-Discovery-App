@@ -30,6 +30,26 @@ class _ProfilePageState extends State<ProfilePage> {
     {"label": "Concerts", "icon": Icons.mic_none_outlined},
     {"label": "Food & Drinks", "icon": Icons.local_drink_outlined},
   ];
+
+  Widget _buildStatColumn(BuildContext context, String count, String label) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        SizedBox(height: 5.h),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: Provider.of<ThemeProvider>(context).isDarkMode
+                    ? Colors.grey
+                    : Colors.black,
+              ),
+        ),
+      ],
+    );
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -350,24 +370,6 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       ),
     );
-  Widget _buildStatColumn(BuildContext context, String count, String label) {
-    return Column(
-      children: [
-        Text(
-          count,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        SizedBox(height: 5.h),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Provider.of<ThemeProvider>(context).isDarkMode
-                    ? Colors.grey
-                    : Colors.black,
-              ),
-        ),
-      ],
-    );
-  }
+//
 }
-
+}
