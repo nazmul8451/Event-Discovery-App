@@ -362,9 +362,9 @@ class _HomePageState extends State<HomePage> {
                     },
                     icon: Icon(
                       isSaved ? Icons.bookmark : Icons.bookmark_border,
-                      color: controller.isDarkMode
-                          ? Colors.white
-                          : Colors.black,
+                      color: isSaved
+                          ? const Color(0xFFFF006E)
+                          : (controller.isDarkMode ? Colors.white : Color(0xFFFF006E)),
                       size: 25.sp.clamp(25, 26),
                     ),
                   );

@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
@@ -849,9 +850,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                 SizedBox(
                   width: double.infinity,
-                  child: CustomCarousel(
-                    images: singleEvent?.data?.images ?? [],
-                  ),
+                  child: singleEvent?.data != null
+                      ? CustomCarousel(
+                          event: EventData(
+                            id: singleEvent!.data!.sId,
+                            title: singleEvent!.data!.title,
+                            description: singleEvent!.data!.description,
+                            category: singleEvent!.data!.category,
+                            images: singleEvent!.data!.images,
+                            ticketPrice: singleEvent!.data!.ticketPrice,
+                            startDate: DateTime.tryParse(
+                                singleEvent!.data!.startDate ?? ""),
+                            address: singleEvent!.data!.address,
+                            favorites: singleEvent!.data!.favorites,
+                            // Map other necessary fields if needed by EventData
+                          ),
+                        )
+                      : SizedBox(),
                 ),
 
                 SizedBox(height: 20.h),

@@ -2,12 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CustomCarousel extends StatefulWidget {
-  final List<String> images;
-  const CustomCarousel({super.key, required this.images});
+  final EventData event;
+  const CustomCarousel({super.key, required this.event});
 
   @override
   State<CustomCarousel> createState() => _CustomCarouselState();
@@ -20,7 +23,9 @@ class _CustomCarouselState extends State<CustomCarousel> {
   Widget build(BuildContext context) {
     // Fallback if no images provided
     final List<String> displayImages =
-        widget.images.isNotEmpty ? widget.images : [];
+        (widget.event.images != null && widget.event.images!.isNotEmpty)
+            ? widget.event.images!
+            : [];
 
     if (displayImages.isEmpty) {
       return Container(
@@ -47,13 +52,14 @@ class _CustomCarouselState extends State<CustomCarousel> {
                 CarouselSlider.builder(
                   itemCount: displayImages.length,
                   itemBuilder: (context, index, realIndex) {
-                    final String imgUrl = "${Urls.baseUrl}${displayImages[index]}";
+                    final String imgUrl =
+                        "${Urls.baseUrl}${displayImages[index]}";
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: ClipRRect(
-                         borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: BorderRadius.circular(20.r),
                         child: CachedNetworkImage(
                           imageUrl: imgUrl,
                           fit: BoxFit.cover,
@@ -91,15 +97,38 @@ class _CustomCarouselState extends State<CustomCarousel> {
                 Positioned(
                   top: 10.h,
                   right: 10.w,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.favorite_border, color: Colors.white),
-                    ),
+                  child: Consumer<SavedEventController>(
+                    builder: (context, controller, _) {
+                      final isSaved = controller.isSaved(widget.event);
+                      return GestureDetector(
+                        onTap: () async {
+                          final result =
+                              await controller.toggleSave(widget.event);
+                          if (result != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                duration: const Duration(milliseconds: 800),
+                                content: Text(
+                                  result ? "Event saved" : "Removed from saved",
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(8.r),
+                          child: Icon(
+                            isSaved ? Icons.bookmark : Icons.bookmark_border,
+                            color: const Color(0xFFFF006E),
+                            size: 24.sp,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
