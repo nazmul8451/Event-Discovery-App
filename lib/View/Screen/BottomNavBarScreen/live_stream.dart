@@ -5,6 +5,7 @@ import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
 class LiveStream extends StatefulWidget {
   const LiveStream({super.key});
@@ -40,6 +41,10 @@ class _LiveStreamState extends State<LiveStream> {
           if (streamId != null) {
             print("🎬 Calling getAgoraToken with streamId: $streamId");
             await controller.getAgoraToken(streamId);
+            
+            // Initialize Agora and join channel
+            await controller.initializeAgora();
+            await controller.joinChannel();
           } else {
             print("⚠️ No streamId (id or _id) found in live stream data");
             print("⚠️ Available keys in streamData: ${streamData.keys.toList()}");
@@ -51,6 +56,13 @@ class _LiveStreamState extends State<LiveStream> {
         print("⚠️ No eventId provided to LiveStream screen");
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // Leave channel and cleanup Agora engine
+    context.read<LiveStreamController>().leaveChannel();
+    super.dispose();
   }
 
   @override
@@ -125,10 +137,7 @@ class _LiveStreamState extends State<LiveStream> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
-              _buildFeaturedEvent('Kickback', 'TONIGHT.House Party', [
-                '4.7',
-                'Party',
-              ]),
+              _buildVideoPlayer(streamData),
 
               SizedBox(height: 20.h),
 
@@ -236,114 +245,196 @@ class _LiveStreamState extends State<LiveStream> {
     );
   }
 
-  Widget _buildFeaturedEvent(String title, String subtitle, List<String> tags) {
+  Widget _buildVideoPlayer(Map<String, dynamic>? streamData) {
+    final controller = context.watch<LiveStreamController>();
+    final isLive = streamData?['isLive'] == true;
+    final title = streamData?['title'] ?? 'Live Stream';
+    final description = streamData?['description'] ?? '';
+    final currentViewers = streamData?['currentViewers'] ?? 0;
+    final streamStatus = streamData?['streamStatus'] ?? 'scheduled';
+
     return Container(
-      height: 197.h,
+      height: 250.h,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.r),
-        image: const DecorationImage(
-          image: AssetImage('assets/images/home_img1.png'),
-          fit: BoxFit.cover,
-        ),
+        color: Colors.black,
       ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Positioned(
-                  top: 8.h,
-                  left: 8.w,
-                  child: Container(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.r),
+        child: Stack(
+          children: [
+            // Video player or placeholder
+            if (isLive && controller.remoteUid != null && controller.engine != null)
+              // Show Agora remote video
+              AgoraVideoView(
+                controller: VideoViewController.remote(
+                  rtcEngine: controller.engine!,
+                  canvas: VideoCanvas(uid: controller.remoteUid),
+                  connection: RtcConnection(
+                    channelId: controller.agoraTokenData?['channelName'] ?? '',
+                  ),
+                ),
+              )
+            else
+              // Show placeholder when not live
+              Container(
+                color: Colors.grey[900],
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isLive ? Icons.videocam_off : Icons.schedule,
+                        size: 60.sp,
+                        color: Colors.white54,
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        isLive 
+                          ? 'Waiting for broadcaster...' 
+                          : streamStatus == 'scheduled'
+                            ? 'Stream Scheduled'
+                            : 'Stream Not Started',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      if (description.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: Text(
+                            description,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14.sp,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // Live indicator and info overlay
+            Positioned(
+              top: 12.h,
+              left: 12.w,
+              right: 12.w,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Live badge
+                  Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 12.w,
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFB2C36),
+                      color: isLive ? Color(0xFFFB2C36) : Colors.grey[700],
                       borderRadius: BorderRadius.circular(15.r),
                     ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          height: 10.h,
-                          width: 10.w,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFFFFFF),
-                            shape: BoxShape.circle,
+                        if (isLive)
+                          Container(
+                            height: 8.h,
+                            width: 8.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 5.w),
+                        if (isLive) SizedBox(width: 5.w),
                         Text(
-                          'Live',
-                          style: Theme.of(context).textTheme.bodySmall,
+                          isLive ? 'LIVE' : streamStatus.toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 16.h,
-                  right: 16.w,
-                  child: Consumer<SavedEventController>(
-                    builder: (context, provider, child) {
-                      final isSaved = false;
-                      return IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          isSaved ? Icons.bookmark : Icons.bookmark_border,
-                          color: Colors.white,
-                          size: 28.sp,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
 
-          Positioned(
-            bottom: 20.h,
-            left: 20.w,
-            right: 20.w,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+                  // Viewer count
+                  if (isLive)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.visibility,
+                            color: Colors.white,
+                            size: 16.sp,
+                          ),
+                          SizedBox(width: 5.w),
+                          Text(
+                            '$currentViewers',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Title overlay at bottom
+            Positioned(
+              bottom: 12.h,
+              left: 12.w,
+              right: 12.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.w,
+                  vertical: 8.h,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.7),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
                   title,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 22.sp,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 6.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                    ...tags.map(
-                      (tag) => Padding(
-                        padding: EdgeInsets.only(left: 8.w),
-                        child: _buildTag(tag),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
