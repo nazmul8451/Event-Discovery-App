@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/liveStreamController.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
-import 'package:provider/provider.dart' show Consumer;
+import 'package:provider/provider.dart';
 
 class LiveStream extends StatefulWidget {
   const LiveStream({super.key});
@@ -14,7 +15,47 @@ class LiveStream extends StatefulWidget {
 
 class _LiveStreamState extends State<LiveStream> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map?;
+      final eventId = args?['eventId']?.toString();
+      
+      if (eventId != null) {
+        print("🎬 LiveStream screen received eventId: $eventId");
+        context.read<LiveStreamController>().getLiveStreamByEventId(eventId);
+      } else {
+        print("⚠️ No eventId provided to LiveStream screen");
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return Consumer<LiveStreamController>(
+      builder: (context, liveStreamCtrl, child) {
+        if (liveStreamCtrl.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (liveStreamCtrl.errorMessage != null) {
+          return Scaffold(
+            body: Center(
+              child: Text('Error: ${liveStreamCtrl.errorMessage}'),
+            ),
+          );
+        }
+
+        final streamData = liveStreamCtrl.liveStreamData;
+
+        return _buildLiveStreamUI(context, streamData);
+      },
+    );
+  }
+
+  Widget _buildLiveStreamUI(BuildContext context, Map<String, dynamic>? streamData) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),

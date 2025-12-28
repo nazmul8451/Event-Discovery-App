@@ -61,5 +61,7 @@ class Urls {
   // static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
 
   static String getTicketByEventIdUrl(String eventId) => "$baseUrl/api/v1/ticket/$eventId";
+
+   static String getLiveStreamByEventID(String eventId) => "$baseUrl/api/v1/livestream/event/$eventId";
     
 }

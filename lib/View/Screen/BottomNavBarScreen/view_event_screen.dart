@@ -233,13 +233,40 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                       print("📱 Check-in button tapped. TicketId: ${widget.ticketId}");
                       if (widget.ticketId != null) {
                         final provider = context.read<EventTicketProvider>();
-                        final success = await provider.checkIn(widget.ticketId!);
-                        if (success) {
+                        final ticketData = await provider.checkIn(widget.ticketId!);
+                        
+                        print("🎫 Full ticket data received: $ticketData");
+                        
+                        if (ticketData != null) {
                           print("🚀 Check-in success! Navigating to Live Stream...");
+                          // Extract eventId from ticket data
+                          String? extractedEventId;
+                          final eventObj = ticketData['eventId'] ?? ticketData['event'];
+                          
+                          print("🔍 Event object from ticket: $eventObj");
+                          print("🔍 Event object type: ${eventObj.runtimeType}");
+                          
+                          if (eventObj is Map) {
+                            extractedEventId = eventObj['_id']?.toString() ?? eventObj['id']?.toString();
+                            print("🔍 Extracted from Map - _id: ${eventObj['_id']}, id: ${eventObj['id']}");
+                          } else {
+                            extractedEventId = eventObj?.toString();
+                            print("🔍 Extracted as String: $extractedEventId");
+                          }
+                          
+                          print("🎬 Final extracted eventId: $extractedEventId");
+                          print("🎬 Fallback eventId from widget: ${widget.eventId}");
+                          
+                          final finalEventId = extractedEventId ?? widget.eventId;
+                          print("✅ Using eventId for LiveStream: $finalEventId");
+                          
                           Navigator.pushNamed(
                             context,
                             LiveStream.name,
-                            arguments: {'ticketId': widget.ticketId, 'eventId': widget.eventId},
+                            arguments: {
+                              'ticketId': widget.ticketId,
+                              'eventId': finalEventId,
+                            },
                           );
                         } else {
                           print("🚫 Check-in failed in UI.");

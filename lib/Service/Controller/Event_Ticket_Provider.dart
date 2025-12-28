@@ -54,7 +54,7 @@ class EventTicketProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkIn(String ticketId) async {
+  Future<Map<String, dynamic>?> checkIn(String ticketId) async {
     print("🎟️ Attempting check-in for ticketId: $ticketId");
     _setStatus(TicketStatus.loading);
     try {
@@ -66,19 +66,20 @@ class EventTicketProvider extends ChangeNotifier {
       print("🎟️ Check-in Response Status: ${response.statusCode}");
       print("🎟️ Check-in Response Body: ${response.body}");
 
-      if (response.isSuccess) {
+      if (response.isSuccess && response.body != null) {
         print("✅ Check-in successful!");
         _setStatus(TicketStatus.checkedIn);
-        return true;
+        final Map<String, dynamic> body = response.body!;
+        return body['data']; // Return the ticket data
       } else {
         print("❌ Check-in failed: ${response.errorMessage}");
         _setStatus(TicketStatus.purchased);
-        return false;
+        return null;
       }
     } catch (e) {
       print("⚠️ Check-in Exception: $e");
       _setStatus(TicketStatus.error);
-      return false;
+      return null;
     }
   }
 
