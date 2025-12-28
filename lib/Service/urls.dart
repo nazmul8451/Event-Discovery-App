@@ -58,5 +58,8 @@ class Urls {
   static String unfollowUserUrl(String userId) => "$baseUrl/api/v1/follow/$userId/unfollow";
   static String getFollowStatsUrl(String userId, String type) => "$baseUrl/api/v1/follow/$userId/followers?type=$type";
   // check in streaming
-  static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
+  // static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
+
+  static String getTicketByEventIdUrl(String eventId) => "$baseUrl/api/v1/ticket/$eventId";
+    
 }

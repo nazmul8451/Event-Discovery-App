@@ -12,7 +12,8 @@ import 'package:provider/provider.dart';
 class ViewEventScreen extends StatefulWidget {
   final bool hasTicket;
   final String? ticketId;
-  const ViewEventScreen({super.key, this.hasTicket = false, this.ticketId});
+  final String? eventId;
+  const ViewEventScreen({super.key, this.hasTicket = false, this.ticketId, this.eventId});
 
   static const String name = '/view-event-screen';
 
@@ -238,7 +239,7 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                           Navigator.pushNamed(
                             context,
                             LiveStream.name,
-                            arguments: {'ticketId': widget.ticketId},
+                            arguments: {'ticketId': widget.ticketId, 'eventId': widget.eventId},
                           );
                         } else {
                           print("🚫 Check-in failed in UI.");
@@ -248,10 +249,10 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                           );
                         }
                       } else {
-                        print("⚠️ No ticket ID available on this screen.");
+                        print("⚠️ No Ticket ID available on this screen.");
                         showCustomSnackBar(
                           context: context,
-                          message: 'No ticket ID found for check-in.',
+                          message: 'No Ticket ID found for check-in.',
                         );
                       }
                     },

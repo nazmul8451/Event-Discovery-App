@@ -889,6 +889,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               builder: (context) => ViewEventScreen(
                                 hasTicket: detailsCtrl.hasTicket,
                                 ticketId: detailsCtrl.userTicketId,
+                                eventId: eventId,
                               ),
                             ),
                           );

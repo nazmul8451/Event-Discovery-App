@@ -58,9 +58,8 @@ class EventTicketProvider extends ChangeNotifier {
     print("🎟️ Attempting check-in for ticketId: $ticketId");
     _setStatus(TicketStatus.loading);
     try {
-      final response = await NetworkCaller.postRequest(
-        url: Urls.checkInUrl,
-        body: {"_id": ticketId},
+      final response = await NetworkCaller.getRequest(
+        url: Urls.getTicketByEventIdUrl(ticketId),
         requireAuth: true,
       );
 
