@@ -404,34 +404,64 @@ class _LiveStreamState extends State<LiveStream> {
   Widget _buildChatInput(Map<String, dynamic>? streamData) {
     final streamId = streamData?['id']?.toString() ?? streamData?['_id']?.toString() ?? streamData?['streamId']?.toString();
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return Padding(
-      padding: EdgeInsets.all(16.r),
+    return Container(
+      padding: EdgeInsets.only(
+        left: 16.w,
+        right: 16.w,
+        top: 10.h,
+        bottom: bottomInset > 0 
+            ? 10.h 
+            : (bottomPadding > 0 ? bottomPadding : 16.h),
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+            width: 1,
+          ),
+        ),
+      ),
       child: Row(
         children: [
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey[900] : Colors.grey[100],
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.grey[100],
                 borderRadius: BorderRadius.circular(25.r),
+                border: Border.all(
+                  color: isDark ? Colors.white.withOpacity(0.1) : Colors.transparent,
+                  width: 1,
+                ),
               ),
               child: TextFormField(
                 controller: _chatMessageController,
                 maxLines: 5,
                 minLines: 1,
                 textAlignVertical: TextAlignVertical.center,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 14.sp,
+                ),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 20.w,
                     vertical: 10.h,
                   ),
                   hintText: 'Type a message...',
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.grey,
+                    fontSize: 14.sp,
+                  ),
                   border: InputBorder.none,
                 ),
               ),
             ),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 12.w),
           GestureDetector(
             onTap: () async {
               if (_chatMessageController.text.trim().isEmpty || streamId == null) return;
@@ -454,17 +484,24 @@ class _LiveStreamState extends State<LiveStream> {
               }
             },
             child: Container(
+              height: 44.h,
+              width: 44.h,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFB026FF).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              height: 48,
-              width: 48,
-              child: const Icon(Icons.send, color: Colors.white),
+              child: Icon(Icons.send, color: Colors.white, size: 20.sp),
             ),
           ),
         ],

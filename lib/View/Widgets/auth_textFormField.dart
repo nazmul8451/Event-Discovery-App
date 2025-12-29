@@ -11,6 +11,7 @@ class AuthTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final TextInputType? keyboardType;
+  final bool readOnly;
 
   const AuthTextField({
     super.key,
@@ -23,6 +24,7 @@ class AuthTextField extends StatefulWidget {
     this.onChanged,
     this.validator,
     this.isPassword = false,
+    this.readOnly = false,
   });
 
   @override
@@ -64,6 +66,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             obscureText: widget.isPassword
                 ? _obscureText
                 : widget.obscureText,
+            readOnly: widget.readOnly,
             keyboardType: widget.keyboardType,
             onChanged: widget.onChanged,
             validator: widget.validator,

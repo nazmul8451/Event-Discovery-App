@@ -339,7 +339,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     void GetTicketAlertDialogue(BuildContext context) {
       final String pricePerTicket =
-          singleEvent?.data?.ticketPrice?.toString() ?? "500";
+          singleEvent?.data?.ticketPrice?.toString() ?? "0";
+      
+      // Pre-set values for the user
+      qtyController.text = "1";
+      priceController.text = pricePerTicket;
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -377,7 +382,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               SizedBox(height: 4.h),
                               Text(
                                 textAlign: TextAlign.center,
-                                "Complete your booking for Live Jazz Night",
+                                "Complete your booking for ${singleEvent?.data?.title ?? 'this event'}",
                                 style: TextStyle(
                                   color: isDark ? Colors.white : Colors.black,
                                   fontSize: 15.sp,
@@ -394,15 +399,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           builder: (context, controller, child) => GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Container(
-                              margin: EdgeInsets.only(right: 10),
+                              margin: const EdgeInsets.only(right: 10),
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: controller.isDarkMode
-                                    ? Color(0xFF3E043F)
-                                    : Color(0xFF686868),
-                                // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                                    ? const Color(0xFF3E043F)
+                                    : const Color(0xFF686868),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
@@ -419,27 +423,28 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     AuthTextField(
                       controller: couponController,
                       hintText: 'Summer 25',
-                      labelText: 'Coupon',
+                      labelText: 'Coupon (Optional)',
                     ),
                     AuthTextField(
                       controller: qtyController,
-                      hintText: 'max 1',
+                      hintText: '1',
                       labelText: 'Number of Tickets',
+                      readOnly: true, // Fixed to 1
                     ),
                     AuthTextField(
                       controller: priceController,
-                      hintText: 'event price',
+                      hintText: 'Event price',
                       labelText: 'Price',
+                      readOnly: true, // Auto-populated and unchangeable
                     ),
 
                     SizedBox(height: 20.h),
-                    Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
+                    Divider(color: const Color(0xFFCC18CA).withOpacity(0.15)),
                     SizedBox(height: 20.h),
                     Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                           children: [
                             Text(
                               'Price per ticket',
@@ -447,7 +452,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ?.copyWith(color: Colors.grey),
                             ),
                             Text(
-                              '\$30',
+                              '\$$pricePerTicket',
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ],
@@ -461,9 +466,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(color: Colors.grey),
                             ),
-                            Text(
+                            const Text(
                               '1',
-                              style: Theme.of(context).textTheme.titleSmall,
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -476,9 +481,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(
-                              '\$30',
+                              '\$$pricePerTicket',
                               style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(color: Color(0xFFCC18CA)),
+                                  ?.copyWith(color: const Color(0xFFCC18CA)),
                             ),
                           ],
                         ),
@@ -486,11 +491,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                     SizedBox(height: 20.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                      ), // দু’পাশে gap
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: SizedBox(
-                        width: double.infinity, // full width inside dialog
+                        width: double.infinity,
                         height: 55.h,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -501,7 +504,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r),
                             ),
-                            padding: EdgeInsets.zero, // overflow রোধ
+                            padding: EdgeInsets.zero,
                           ),
                           onPressed: () async {
                             final provider = Provider.of<EventTicketProvider>(
@@ -509,31 +512,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               listen: false,
                             );
 
-                            final String coupon = couponController.text.trim();
-                            final int quantity =
-                                int.tryParse(qtyController.text.trim()) ?? 1;
-                            final int price =
-                                int.tryParse(priceController.text.trim()) ?? 0;
-                            final int totalPrice = price * quantity;
+                            final int quantity = 1;
+                            final int price = int.tryParse(pricePerTicket) ?? 0;
+                            final int totalPrice = price;
 
                             final bool success = await provider.createTicket(
                               eventId: eventId,
                               promotionCode: couponController.text.trim(),
-                              quantity: 1,
+                              quantity: quantity,
                               price: price,
                             );
 
                             if (success) {
+                              if (!context.mounted) return;
                               Navigator.pop(context); // dialog close
-                              // get ticket id from provider (backend response)
-                              // Debug: print ticketData to help diagnose missing id
-                              try {
-                                // ignore: avoid_print
-                                print(
-                                  'DEBUG ticketData: ${jsonEncode(provider.ticketData)}',
-                                );
-                              } catch (_) {}
-
+                              
                               final ticketId = provider.ticketData != null
                                   ? (provider.ticketData!['id'] ??
                                         provider.ticketData!['_id'] ??
@@ -541,26 +534,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         provider.ticketData!['ticket']?['id'])
                                   : null;
 
-                              // update event details controller so UI updates (user now has a ticket)
                               try {
                                 await context
                                     .read<EventDetailsController>()
                                     .checkIfUserHasTicket(eventId);
                               } catch (_) {}
 
-                              if (ticketId == null) {
-                                final debugStr = provider.ticketData != null
-                                    ? jsonEncode(provider.ticketData)
-                                    : 'null';
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Ticket ID missing — data: $debugStr',
-                                    ),
-                                  ),
-                                );
-                              }
-
+                              if (!context.mounted) return;
+                              
                               Navigator.pushNamed(
                                 context,
                                 OrderSummeryScreen.name,
@@ -586,8 +567,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   if (ticketId != null) "ticketId": ticketId,
                                 },
                               );
-                              print(singleEvent.data?.images);
                             } else {
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Ticket booking failed"),
@@ -595,7 +576,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               );
                             }
                           },
-
                           child: Text(
                             'Confirm Booking',
                             style: TextStyle(
