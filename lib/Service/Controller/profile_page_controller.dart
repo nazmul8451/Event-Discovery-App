@@ -56,12 +56,8 @@ Future<bool> fetchProfile({required bool forceRefresh}) async {
     if (response.isSuccess && response.body != null) {
       final userData = response.body!['data'] as Map<String, dynamic>;
 
-      print("Full API Response: ${response.body}");
-      print("User Data: $userData");
-
       _currentUser = UserProfileModel.fromJson(userData);
 
-      print("✅ Profile Fetched & Parsed Successfully");
       await _storage.write('cached_user_profile', userData);
 
       _inProgress = false;
@@ -167,18 +163,12 @@ Future<bool> updateProfile({
         requireAuth: true,
       );
 
-      print("📸 Image Upload Response Status: ${response.statusCode}");
-      print("📸 Image Upload Body: ${response.body}");
-
       if (response.isSuccess) {
-        print("✅ Image Upload Success. Refreshing Profile...");
         // Since response.body['data'] is a String message now, we must fetch the profile 
         // to get the updated image URL.
         await fetchProfile(forceRefresh: true);
-        print("✅ Profile Refresh Completed after Upload");
         return true;
       } else {
-        print("❌ Image Upload Failed: ${response.errorMessage}");
         _errorMessage = response.errorMessage ?? "Failed to upload image";
         _inProgress = false;
         notifyListeners();
