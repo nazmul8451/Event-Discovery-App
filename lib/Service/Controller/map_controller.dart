@@ -5,6 +5,7 @@ import 'package:gathering_app/Service/urls.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class MapController with ChangeNotifier {
   /// ================= MAP + ROUTE =================
@@ -28,6 +29,7 @@ class MapController with ChangeNotifier {
 
   /// ================= MAP CONTROLLER =================
   GoogleMapController? _mapController;
+  GoogleMapController? get mapController => _mapController;
 
   /// ================= MARKERS =================
   final Set<Marker> _markers = {};
@@ -38,6 +40,9 @@ class MapController with ChangeNotifier {
   /// ================= EVENTS =================
   List<EventData> _events = [];
   List<EventData> get events => _events;
+
+  EventData? _selectedEvent;
+  EventData? get selectedEvent => _selectedEvent;
 
   /// ================= INIT =================
   Future<void> init() async {
@@ -157,8 +162,10 @@ class MapController with ChangeNotifier {
             markerId: MarkerId('event_${event.id ?? event.iV}'),
             position: LatLng(lat, lng),
             icon: _eventIcon!,
-            infoWindow: InfoWindow(title: event.title),
+            // infoWindow: InfoWindow(title: event.title), // Remove default info window
             onTap: () {
+              _selectedEvent = event;
+              notifyListeners();
               showRouteToEvent(LatLng(lat, lng));
             },
           ),
@@ -218,5 +225,25 @@ Future<void> showRouteToEvent(LatLng eventLatLng) async {
   /// ================= MAP CONTROLLER =================
   void setMapController(GoogleMapController controller) {
     _mapController = controller;
+  }
+
+  Future<void> applyMapStyle(bool isDarkMode) async {
+    if (_mapController == null) return;
+    try {
+      final String stylePath = isDarkMode
+          ? 'assets/map_dark_style.json'
+          : 'assets/map_style.json';
+      final String style = await rootBundle.loadString(stylePath);
+      await _mapController!.setMapStyle(style);
+      print("🗺️ Map style applied: ${isDarkMode ? 'Dark' : 'Light'}");
+    } catch (e) {
+      debugPrint('Error applying map style: $e');
+    }
+  }
+
+  void clearSelectedEvent() {
+    _selectedEvent = null;
+    clearRoute();
+    notifyListeners();
   }
 }
