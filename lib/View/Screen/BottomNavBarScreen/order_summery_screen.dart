@@ -87,12 +87,15 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
           );
 
           await Stripe.instance.presentPaymentSheet();
+          
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payment successful')));
           // refresh ticket status on details controller so UI updates
           try {
             if (eventId.isNotEmpty) await context.read<EventDetailsController>().checkIfUserHasTicket(eventId);
           } catch (_) {}
 
+          if (!mounted) return;
           // Navigate to booking confirmed and pass event details
           Navigator.pushReplacementNamed(
             context,
@@ -111,7 +114,19 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
             },
           );
           return;
+        } on StripeException catch (e) {
+          if (e.error.code == FailureCode.Canceled) {
+            // User cancelled, do not show snackbar or error
+            debugPrint('User cancelled Stripe payment sheet');
+            return;
+          }
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Payment failed: ${e.error.localizedMessage}'),
+          ));
+          return;
         } catch (e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('PaymentSheet failed: $e — ensure flutter_stripe is configured and Stripe.publishableKey set'),
             duration: const Duration(seconds: 6),
@@ -143,6 +158,10 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
           'eventId': eventId,
         },
       );
+    } on StripeException catch (e) {
+      if (e.error.code != FailureCode.Canceled) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment failed: ${e.error.localizedMessage}')));
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
     } finally {
