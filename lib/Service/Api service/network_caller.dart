@@ -160,6 +160,65 @@ class NetworkCaller {
     }
   }
 
+  // Multi-part Request for file uploads
+  static Future<NetworkResponse> multipartRequest({
+    required String url,
+    required String method,
+    Map<String, String>? fields,
+    String? fileKey,
+    String? filePath,
+    bool requireAuth = true,
+  }) async {
+    try {
+      final Uri uri = Uri.parse(url);
+      final request = http.MultipartRequest(method, uri);
+
+      // Add headers
+      final Map<String, String> headers = {
+        'Accept': 'application/json',
+      };
+
+      if (requireAuth) {
+        final String? resolvedToken = await _getToken();
+        if (resolvedToken != null && resolvedToken.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $resolvedToken';
+        }
+      }
+      request.headers.addAll(headers);
+
+      // Add text fields
+      if (fields != null) {
+        request.fields.addAll(fields);
+      }
+
+      // Add file
+      if (fileKey != null && filePath != null) {
+        request.files.add(await http.MultipartFile.fromPath(fileKey, filePath));
+      }
+
+      debugPrint('==== MULTIPART $method REQUEST ====\n'
+          'URL: $url\n'
+          'HEADERS: $headers\n'
+          'FIELDS: $fields\n'
+          'FILE: $filePath\n'
+          '========================');
+
+      final http.StreamedResponse response = await request.send();
+      final http.Response httpResponse = await http.Response.fromStream(response);
+
+      _logResponse(method, url, httpResponse);
+
+      return _parseResponse(httpResponse);
+    } catch (e) {
+      debugPrint('Network Error (MULTIPART): $e');
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: -1,
+        errorMessage: 'No internet connection or server error',
+      );
+    }
+  }
+
   static Future<NetworkResponse> deleteRequest(
     String url, {
     Map<String, dynamic>? body,

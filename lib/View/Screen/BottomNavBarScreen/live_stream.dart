@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/liveStreamController.dart';
+import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
+import 'package:gathering_app/Model/live_chat_message_model.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class LiveStream extends StatefulWidget {
   const LiveStream({super.key});
@@ -17,6 +21,8 @@ class LiveStream extends StatefulWidget {
 
 class _LiveStreamState extends State<LiveStream> {
   String? _eventId;
+  final TextEditingController _chatMessageController = TextEditingController();
+  final ScrollController _chatScrollController = ScrollController();
 
   @override
   void initState() {
@@ -78,6 +84,9 @@ class _LiveStreamState extends State<LiveStream> {
       print("🔑 Using streamId for token: $streamIdToGetToken (ResourceID: $resourceId, AltID: $alternateId)");
           
       if (streamIdToGetToken != null) {
+        // Fetch chat messages
+        context.read<LiveChatController>().fetchMessages(streamIdToGetToken);
+
         await controller.getAgoraToken(streamIdToGetToken);
         if (!mounted || controller.errorMessage != null) return;
         
@@ -93,6 +102,8 @@ class _LiveStreamState extends State<LiveStream> {
 
   @override
   void dispose() {
+    _chatMessageController.dispose();
+    _chatScrollController.dispose();
     // Leave channel and cleanup Agora engine
     context.read<LiveStreamController>().leaveChannel();
     super.dispose();
@@ -187,78 +198,276 @@ class _LiveStreamState extends State<LiveStream> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            children: [
-              _buildVideoPlayer(streamData),
-
-              SizedBox(height: 20.h),
-
-              Column(
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _chatScrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Live chat'),
-
-                  Text('Live chat (Coming Soon)'),
-
+                  _buildVideoPlayer(streamData),
                   SizedBox(height: 20.h),
-                  Center(
-                    child: Text(
-                      'Live chat will be available in the next update.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey,
-                      ),
+                  Text(
+                    'Live chat',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  SizedBox(height: 10.h),
+                  _buildChatList(streamData),
+                  SizedBox(height: 20.h),
                 ],
               ),
-              SizedBox(height: 20.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width - 70,
-                      decoration: BoxDecoration(),
-                      child: TextFormField(
-                        maxLines: 5,
-                        minLines: 1,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          enabled: false,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 10.h,
-                          ),
-                          hintText: 'Chat disabled...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.r),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(right: 10, left: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
-                      ),
-                    ),
-                    height: 45,
-                    width: 45,
-                    child: Icon(Icons.send),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          _buildChatInput(streamData),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChatList(Map<String, dynamic>? streamData) {
+    final streamId = streamData?['id']?.toString() ?? streamData?['_id']?.toString() ?? streamData?['streamId']?.toString();
+    
+    return Consumer<LiveChatController>(
+      builder: (context, chatCtrl, child) {
+        if (chatCtrl.isLoading && chatCtrl.messages.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (chatCtrl.messages.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: Text(
+                'No messages yet. Say hi!',
+                style: TextStyle(color: Colors.grey, fontSize: 14.sp),
+              ),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: chatCtrl.messages.length,
+          itemBuilder: (context, index) {
+            final message = chatCtrl.messages[index];
+            final profileController = context.read<ProfileController>();
+            final currentUser = profileController.currentUser;
+            final currentUserId = currentUser?.id;
+            final isMyMessage = message.userId == currentUserId;
+
+            // Use latest data from ProfileController if it's my message
+            final avatarUrl = isMyMessage 
+                ? (currentUser?.profileImageUrl ?? message.userProfile?.avatar)
+                : message.userProfile?.avatar;
+            
+            final displayName = isMyMessage
+                ? (currentUser?.name ?? message.userProfile?.name ?? 'Guest')
+                : (message.userProfile?.name ?? 'Guest');
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: 20.h), // Increased spacing
+              child: GestureDetector(
+                onLongPress: isMyMessage 
+                    ? () => _showDeleteDialog(context, chatCtrl, message.id!, streamId)
+                    : null,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (message.userId != null) {
+                          Navigator.pushNamed(
+                            context,
+                            OtherUserProfileScreen.name,
+                            arguments: message.userId,
+                          );
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 18.r,
+                        backgroundImage: avatarUrl != null
+                            ? CachedNetworkImageProvider(avatarUrl)
+                            : const AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (message.userId != null) {
+                                Navigator.pushNamed(
+                                  context,
+                                  OtherUserProfileScreen.name,
+                                  arguments: message.userId,
+                                );
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  displayName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  message.formattedTime ?? '',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 11.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            message.message ?? '',
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (streamId != null && message.id != null) {
+                          chatCtrl.likeMessage(message.id!, streamId);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Icon(
+                            message.hasLiked == true ? Icons.favorite : Icons.favorite_border,
+                            size: 18.sp,
+                            color: message.hasLiked == true ? Colors.red : Colors.grey,
+                          ),
+                          if ((message.likes ?? 0) > 0)
+                            Text(
+                              '${message.likes}',
+                              style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, LiveChatController chatCtrl, String messageId, String? streamId) {
+    if (streamId == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Message'),
+        content: const Text('Are you sure you want to delete this message?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await chatCtrl.deleteMessage(messageId, streamId);
+              if (success && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Message deleted')),
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChatInput(Map<String, dynamic>? streamData) {
+    final streamId = streamData?['id']?.toString() ?? streamData?['_id']?.toString() ?? streamData?['streamId']?.toString();
+    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+
+    return Padding(
+      padding: EdgeInsets.all(16.r),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(25.r),
+              ),
+              child: TextFormField(
+                controller: _chatMessageController,
+                maxLines: 5,
+                minLines: 1,
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
+                  ),
+                  hintText: 'Type a message...',
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 10.w),
+          GestureDetector(
+            onTap: () async {
+              if (_chatMessageController.text.trim().isEmpty || streamId == null) return;
+              
+              final msg = _chatMessageController.text.trim();
+              _chatMessageController.clear();
+              
+              final success = await context.read<LiveChatController>().sendMessage(streamId, msg);
+              if (success) {
+                // Auto scroll to bottom
+                Future.delayed(const Duration(milliseconds: 300), () {
+                  if (_chatScrollController.hasClients) {
+                    _chatScrollController.animateTo(
+                      _chatScrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  }
+                });
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
+                ),
+              ),
+              height: 48,
+              width: 48,
+              child: const Icon(Icons.send, color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

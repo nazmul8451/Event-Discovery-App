@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gathering_app/Model/userModel.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends ChangeNotifier {
   final GetStorage _storage = GetStorage();
@@ -142,6 +144,48 @@ Future<bool> updateProfile({
   }
 }
 
+  Future<bool> uploadProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return false;
+
+    _inProgress = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await NetworkCaller.multipartRequest(
+        url: Urls.updateProfileUrl,
+        method: 'PATCH',
+        fileKey: 'profile', // Backend profile field expect kore as per JSON
+        filePath: image.path,
+        requireAuth: true,
+      );
+
+      if (response.isSuccess && response.body != null) {
+        final userData = response.body!['data'] as Map<String, dynamic>;
+        _currentUser = UserProfileModel.fromJson(userData);
+
+        // Update cache
+        await _storage.write('cached_user_profile', userData);
+
+        _inProgress = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.errorMessage ?? "Failed to upload image";
+        _inProgress = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = "Upload error: $e";
+      _inProgress = false;
+      notifyListeners();
+      return false;
+    }
+  }
 
   // ================== SETTINGS FUNCTIONS START ==================
 

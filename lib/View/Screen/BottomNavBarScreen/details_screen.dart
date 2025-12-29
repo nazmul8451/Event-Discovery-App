@@ -743,7 +743,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
                 SizedBox(height: 20.h),
                 CircularPercentIndicator(
-                  radius: 80.r,
+                  radius: 100.r,
                   lineWidth: 16,
                   percent: 82 / 100,
                   center: Column(

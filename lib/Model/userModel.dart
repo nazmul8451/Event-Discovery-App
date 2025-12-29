@@ -63,7 +63,7 @@ class UserProfileModel {
       updatedAt: _parseDate(json['updatedAt']),
       // ✅ এটা যোগ করো
       profileImageUrl:
-          json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'],
+          json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'] ?? json['profile'] ?? json['image'],
       stats: json['stats'] != null
           ? Stats.fromJson(json['stats'])
           : Stats(

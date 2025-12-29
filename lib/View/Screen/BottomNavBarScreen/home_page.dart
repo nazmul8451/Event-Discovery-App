@@ -14,7 +14,6 @@ import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
-import 'package:gathering_app/View/Widgets/trending_event_card.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -294,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                                   final gridEvent =
                                       controller.remainingEvents[index];
 
-                                  return TrendingEventCard(
+                                  return Custom_item_container(
                                     event: gridEvent,
                                     onTap: () => Navigator.pushNamed(
                                       context,
@@ -336,8 +335,12 @@ class _HomePageState extends State<HomePage> {
         height: 197.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: controller.isDarkMode ? const Color(0xFF2D2D2D) : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: const Color(0xFFCC18CA),
+            width: 1.w,
+          ),
           image: DecorationImage(
             image: NetworkImage(imageUrl),
             fit: BoxFit.cover,

@@ -11,6 +11,7 @@ import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -368,30 +369,82 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Row(
                           children: [
-                            Container(
-                              height: 100.h,
-                              width: 100.h,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color:
-                                    Provider.of<ThemeProvider>(
-                                      context,
-                                    ).isDarkMode
-                                    ? Colors.grey[500]
-                                    : Colors.grey[200],
-                                border: Border.all(
-                                  width: 2,
-                                  color: Colors.black,
+                            Stack(
+                              children: [
+                                Container(
+                                  height: 100.h,
+                                  width: 100.h,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Provider.of<ThemeProvider>(context).isDarkMode
+                                        ? Colors.grey[500]
+                                        : Colors.grey[200],
+                                    border: Border.all(
+                                      width: 2,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  child: user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty
+                                      ? CachedNetworkImage(
+                                          imageUrl: user.profileImageUrl!,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) => const Center(
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                          errorWidget: (context, url, error) => Icon(
+                                            Icons.person,
+                                            size: 50.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        )
+                                      : Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            size: 50.sp,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
                                 ),
-                              ),
-                              child: Center(
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.camera_alt),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final success = await profileController.uploadProfileImage();
+                                      if (success && context.mounted) {
+                                        showCustomSnackBar(context: context, message: 'Profile image updated successfully', isError: false);
+                                      } else if (profileController.errorMessage != null && context.mounted) {
+                                        showCustomSnackBar(context: context, message: profileController.errorMessage!, isError: true);
+                                      }
+                                    },
+                                    child: Container(
+                                      height: 35.r,
+                                      width: 35.r,
+                                      decoration: BoxDecoration(
+                                        color: Colors.deepPurpleAccent,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      child: Icon(Icons.camera_alt, size: 18.sp, color: Colors.white),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                if (profileController.inProgress)
+                                  Positioned.fill(
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.black26,
+                                      ),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                            SizedBox(width: 10.w),
+                            SizedBox(width: 15.w),
                             // make the right column flexible so long text wraps instead of overflowing
                             Expanded(
                               child: Column(

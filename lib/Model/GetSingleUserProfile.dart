@@ -48,6 +48,7 @@ class UserData {
   final bool isOnboardingComplete;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? profile;
   final Stats stats;
 
   UserData({
@@ -66,6 +67,7 @@ class UserData {
     required this.isOnboardingComplete,
     required this.createdAt,
     required this.updatedAt,
+    this.profile,
     required this.stats,
   });
 
@@ -86,6 +88,7 @@ class UserData {
       isOnboardingComplete: json['isOnboardingComplete'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      profile: json['profile'],
       stats: Stats.fromJson(json['stats']),
     );
   }
@@ -106,6 +109,7 @@ class UserData {
         'isOnboardingComplete': isOnboardingComplete,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
+        'profile': profile,
         'stats': stats.toJson(),
       };
 }

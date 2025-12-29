@@ -64,5 +64,16 @@ class Urls {
 
    static String getLiveStreamByEventID(String eventId) => "$baseUrl/api/v1/livestream/event/$eventId";
    static String getAgoraTokenUrl(String streamId) => "$baseUrl/api/v1/livestream/$streamId/token";
+
+   //live chat message api 
+   static String sentMessageUrl(String streamId) => "$baseUrl/api/v1/chatmessage/$streamId/messages";
+
+   static String getLiveMessageUrl(String streamId)=> "$baseUrl/api/v1/chatmessage/$streamId/messages?limit=50"; 
+
+   //like message api
+   static String likeMessageUrl(String messageId) => "$baseUrl/api/v1/chatmessage/messages/$messageId/like";
+
+   //delete message 
+   static String deleteMessageUrl(String messageId) => "$baseUrl/api/v1/chatmessage/messages/$messageId";
     
 }

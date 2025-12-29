@@ -16,6 +16,7 @@ import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/Service/Controller/liveStreamController.dart';
+import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatController()),
         ChangeNotifierProvider(create: (_) => BottomNavController()),
         ChangeNotifierProvider(create: (_) => LiveStreamController()),
+        ChangeNotifierProvider(create: (_) => LiveChatController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),
