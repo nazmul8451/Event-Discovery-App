@@ -6,6 +6,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+
+
 
 class MapController with ChangeNotifier {
   /// ================= MAP + ROUTE =================
@@ -71,16 +75,65 @@ class MapController with ChangeNotifier {
   /// ================= ICON =================
   Future<void> _loadEventIcon() async {
     try {
-      _eventIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(64, 64)),
-        'assets/images/event_marker.png',
-      );
+      _eventIcon = await _createCustomMarkerBitmap(80, 110);
     } catch (_) {
       _eventIcon = BitmapDescriptor.defaultMarkerWithHue(
         BitmapDescriptor.hueRed,
       );
     }
   }
+
+  Future<BitmapDescriptor> _createCustomMarkerBitmap(int size, int height) async {
+    // Increase canvas size to accommodate glow
+    final int canvasWidth = (size * 1.5).toInt();
+    final int canvasHeight = (height * 1.2).toInt();
+    
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint()..isAntiAlias = true;
+
+    final double centerX = canvasWidth / 2;
+    final double centerY = canvasWidth / 2;
+
+    // Draw a soft purple glow behind the pin
+    final glowPaint = Paint()
+      ..color = const Color(0xFFB026FF).withOpacity(0.4)
+      ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 15);
+    canvas.drawCircle(Offset(centerX, centerY), size / 2, glowPaint);
+
+    // Draw the main pin shape
+    final Path path = Path();
+    path.moveTo(centerX, canvasHeight.toDouble());
+    path.quadraticBezierTo(centerX - size / 2, centerY + size / 2, centerX - size / 2, centerY);
+    path.arcToPoint(Offset(centerX + size / 2, centerY), radius: Radius.circular(size / 2));
+    path.quadraticBezierTo(centerX + size / 2, centerY + size / 2, centerX, canvasHeight.toDouble());
+    path.close();
+
+    // Create gradient
+    paint.shader = ui.Gradient.linear(
+      Offset(centerX, canvasHeight.toDouble()),
+      Offset(centerX, 0),
+      [
+        const Color(0xFFB026FF), // Purple
+        const Color(0xFFFF5400), // Orange/Pink
+      ],
+    );
+    canvas.drawPath(path, paint);
+
+    // Draw inner circle
+    paint.shader = null;
+    paint.color = Colors.black.withOpacity(0.4);
+    canvas.drawCircle(Offset(centerX, centerY), size / 4, paint);
+
+    paint.color = Colors.black;
+    canvas.drawCircle(Offset(centerX, centerY), size / 6, paint);
+
+    final ui.Image image = await pictureRecorder.endRecording().toImage(canvasWidth, canvasHeight);
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
+  }
+
+
 
   /// ================= LOCATION =================
   Future<void> getCurrentLocation() async {
@@ -166,8 +219,15 @@ class MapController with ChangeNotifier {
             onTap: () {
               _selectedEvent = event;
               notifyListeners();
+              // Center camera on marker
+              if (_mapController != null) {
+                _mapController!.animateCamera(
+                  CameraUpdate.newLatLng(LatLng(lat, lng)),
+                );
+              }
               showRouteToEvent(LatLng(lat, lng));
             },
+
           ),
         );
       }

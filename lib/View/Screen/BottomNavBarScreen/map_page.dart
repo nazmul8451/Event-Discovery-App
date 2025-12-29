@@ -30,26 +30,46 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _updateUI() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    
+    if (mapCtrl.selectedEvent != null) {
+      if (mapCtrl.selectedEvent!.id != _lastSelectedEventId) {
+        _lastSelectedEventId = mapCtrl.selectedEvent!.id;
+        // Keep the old position if available for a smoother transition, 
+        // or clear it if you want it to pop in.
+        _updateOverlayPosition();
+      } else {
+        _updateOverlayPosition();
+      }
+    } else {
+      _lastSelectedEventId = null;
+      _overlayPosition = null;
+    }
+    setState(() {});
   }
+
+
+
+
+
+
+
+
 
   @override
   void dispose() {
     mapCtrl.removeListener(_updateUI);
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    if (mapCtrl.selectedEvent != null && mapCtrl.selectedEvent!.id != _lastSelectedEventId) {
-      _lastSelectedEventId = mapCtrl.selectedEvent!.id;
-      _overlayPosition = null; // Force recalculation for new event
-    }
-
     final isDark = context.watch<ThemeProvider>().isDarkMode;
 
     return Scaffold(
       backgroundColor: const Color(0xFF030303),
       body: Stack(
+
         children: [
           // --- Full Screen Map Area ---
           Consumer<ThemeProvider>(
@@ -74,12 +94,18 @@ class _MapPageState extends State<MapPage> {
                 onCameraMove: (position) {
                   _updateOverlayPosition();
                 },
+                onCameraIdle: () {
+                  _updateOverlayPosition();
+                },
                 onTap: (_) {
                   mapCtrl.clearSelectedEvent();
                   setState(() {
+                    _lastSelectedEventId = null;
                     _overlayPosition = null;
                   });
                 },
+
+
                 zoomControlsEnabled: false,
                 myLocationEnabled: false,
                 myLocationButtonEnabled: false,
@@ -145,6 +171,8 @@ class _MapPageState extends State<MapPage> {
           // --- Custom Info Card Above Marker ---
           if (mapCtrl.selectedEvent != null && _overlayPosition != null)
             _buildEventInfoOverlay(context, mapCtrl.selectedEvent!, context.read<ThemeProvider>()),
+
+
 
           // --- Map Tool Buttons (Zoom / Location) ---
           Positioned(
@@ -285,17 +313,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget _buildEventInfoOverlay(BuildContext context, EventData event, ThemeProvider themeProvider) {
-    // Trigger update if position is null
-    if (_overlayPosition == null) {
-      _updateOverlayPosition();
-      return const SizedBox.shrink();
-    }
+    if (_overlayPosition == null) return const SizedBox.shrink();
 
-    final cardWidth = 220.w;
+    final cardWidth = 240.w;
 
     return Positioned(
-      left: _overlayPosition!.dx - (cardWidth / 2),
-      top: _overlayPosition!.dy - 120.h, // Positioned above the marker
+      left: (_overlayPosition!.dx - (cardWidth / 2)).clamp(10.w, 1.sw - cardWidth - 10.w),
+      top: _overlayPosition!.dy - 170.h, 
       child: GestureDetector(
         onTap: () {
           Navigator.pushNamed(
@@ -306,17 +330,16 @@ class _MapPageState extends State<MapPage> {
         },
         child: Container(
           width: cardWidth,
-          padding: EdgeInsets.all(12.r),
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF121212),
+            color: const Color(0xFF0A0A0A), // Near black
             borderRadius: BorderRadius.circular(15.r),
-            border: Border.all(color: Colors.white12),
+            border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.7),
                 blurRadius: 15,
                 spreadRadius: 2,
-                offset: const Offset(0, 5),
               ),
             ],
           ),
@@ -326,39 +349,50 @@ class _MapPageState extends State<MapPage> {
             children: [
               Text(
                 event.title ?? 'Noir Lounge',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16.sp,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 0.2,
                 ),
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 14.h),
               Row(
                 children: [
-                  Icon(Icons.star, color: const Color(0xFFFF5400), size: 16.sp),
+                  Icon(Icons.star, color: const Color(0xFFFF5400), size: 18.sp),
                   SizedBox(width: 4.w),
                   Text(
-                    "4.0 Open",
+                    "4.0",
                     style: TextStyle(
                       color: const Color(0xFFFF5400),
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    "Open",
+                    style: TextStyle(
+                      color: const Color(0xFFFF5400),
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const Spacer(),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(15.r),
-                      border: Border.all(color: Colors.white12),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
                       "Not Cover",
                       style: TextStyle(
-                        color: Colors.grey.shade400,
+                        color: Colors.white.withOpacity(0.7),
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -370,4 +404,11 @@ class _MapPageState extends State<MapPage> {
       ),
     );
   }
+
+
+
+
+
+
+
 }
