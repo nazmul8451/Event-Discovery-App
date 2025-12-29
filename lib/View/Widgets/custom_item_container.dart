@@ -40,11 +40,11 @@ class Custom_item_container extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFFCC18CA) : Colors.white,
+          color: isDark ? const Color(0xFFCC18CA).withOpacity(0.1) : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             // width: 1.w,
-            color: const Color(0xFFCC18CA),
+            color: const Color(0xFFCC18CA).withOpacity(0.2),
           ),
         ),
         child: Column(

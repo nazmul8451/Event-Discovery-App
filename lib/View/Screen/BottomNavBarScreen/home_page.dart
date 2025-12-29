@@ -69,6 +69,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
            Stack(
               children: [
@@ -149,6 +150,7 @@ class _HomePageState extends State<HomePage> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 120.0),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -191,25 +193,28 @@ class _HomePageState extends State<HomePage> {
 
                         Consumer<GetAllEventController>(
                           builder: (context, controller, _) {
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: controller.categories.map((cat) {
-                                  bool isSelected =
-                                      controller.selectedCategory == cat;
-                                  return Padding(
-                                    padding: EdgeInsets.only(left: 16.0.w),
-                                    child: _buildCustomFilterChip(
-                                      label: cat,
-                                      icon: Icons.category,
-                                      isSelected: isSelected,
-                                      onTap: () {
-                                        controller.applyCategoryFilter(cat);
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: controller.categories.map((cat) {
+                                    bool isSelected =
+                                        controller.selectedCategory == cat;
+                                    return Padding(
+                                      padding: EdgeInsets.only(left: 16.0.w),
+                                      child: _buildCustomFilterChip(
+                                        label: cat,
+                                        icon: Icons.category,
+                                        isSelected: isSelected,
+                                        onTap: () {
+                                          controller.applyCategoryFilter(cat);
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                             );
                           },
@@ -338,7 +343,7 @@ class _HomePageState extends State<HomePage> {
           color: controller.isDarkMode ? const Color(0xFF2D2D2D) : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: const Color(0xFFCC18CA),
+            color: const Color(0xFFCC18CA).withOpacity(0.2),
             width: 1.w,
           ),
           image: DecorationImage(
