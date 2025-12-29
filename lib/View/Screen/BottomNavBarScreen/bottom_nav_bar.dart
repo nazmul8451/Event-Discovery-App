@@ -82,7 +82,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     final List<String> icons = [
                       'assets/images/home.png',
                       'assets/images/location.png',
-                      'assets/images/plus.png',
+                      'assets/images/saved_icon.png',
                       'assets/images/chat.png',
                       'assets/images/profile_icon.png',
                     ];
@@ -90,7 +90,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     final List<String> labels = [
                       'Home',
                       'Map',
-                      'Create',
+                      'Saved',
                       'Chat',
                       'Profile',
                     ];
