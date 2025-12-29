@@ -50,7 +50,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           Text(
             widget.labelText,
             style: TextStyle(
-              fontSize: 14.sp, // ← clamp মুছে দিলাম
+              fontSize: 14.sp,
               fontWeight: FontWeight.w500,
               color: isDark ? Colors.white70 : Colors.black87,
             ),
