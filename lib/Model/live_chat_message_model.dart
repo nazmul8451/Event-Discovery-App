@@ -47,7 +47,7 @@ class LiveChatSender {
   factory LiveChatSender.fromJson(Map<String, dynamic> json) {
     return LiveChatSender(
       name: json['name'] ?? 'Guest',
-      avatar: json['avatar'] ?? json['profileImageUrl'] ?? json['profileImage'],
+      avatar: json['avatar'] ?? json['profile'] ?? json['profileImageUrl'] ?? json['profileImage'],
     );
   }
 }

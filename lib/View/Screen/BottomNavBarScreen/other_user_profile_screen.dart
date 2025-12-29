@@ -7,6 +7,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.da
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:gathering_app/Service/urls.dart';
 
 class OtherUserProfileScreen extends StatefulWidget {
   final String userId;
@@ -83,16 +84,18 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                 ? Colors.grey[500]
                                 : Colors.grey[200],
                             border: Border.all(width: 2, color: Colors.black),
-                            image: user.profileImageUrl != null &&
-                                    user.profileImageUrl!.isNotEmpty
+                            image: user.profile != null &&
+                                    user.profile!.isNotEmpty
                                 ? DecorationImage(
-                                    image: NetworkImage(user.profileImageUrl!),
+                                    image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
+                                        ? user.profile!
+                                        : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: user.profileImageUrl == null ||
-                                  user.profileImageUrl!.isEmpty
+                          child: user.profile == null ||
+                                  user.profile!.isEmpty
                               ? Icon(Icons.person, size: 50.sp, color: Colors.grey[800])
                               : null,
                         ),
@@ -201,7 +204,7 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                         id: chatId,
                                         otherUserId: widget.userId,
                                         name: user?.name,
-                                        imageIcon: user?.profileImageUrl,
+                                        imageIcon: user?.profile,
                                         status: 'offline',
                                       );
 

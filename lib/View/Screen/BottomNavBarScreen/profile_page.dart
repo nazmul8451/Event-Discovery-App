@@ -385,9 +385,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       color: Colors.black,
                                     ),
                                   ),
-                                  child: user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty
+                                  child: user?.profile != null && user!.profile!.isNotEmpty
                                       ? CachedNetworkImage(
-                                          imageUrl: user.profileImageUrl!,
+                                          imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
+                                              ? user.profile!
+                                              : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) => const Center(
                                             child: CircularProgressIndicator(strokeWidth: 2),

@@ -263,7 +263,7 @@ class _LiveStreamState extends State<LiveStream> {
 
             // Use latest data from ProfileController if it's my message
             final avatarUrl = isMyMessage 
-                ? (currentUser?.profileImageUrl ?? message.userProfile?.avatar)
+                ? (currentUser?.profile ?? message.userProfile?.avatar)
                 : message.userProfile?.avatar;
             
             final displayName = isMyMessage

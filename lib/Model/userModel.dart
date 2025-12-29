@@ -14,7 +14,7 @@ class UserProfileModel {
   bool? isOnboardingComplete;
   DateTime? createdAt;
   DateTime? updatedAt;
-  String? profileImageUrl;
+  String? profile;
   Stats? stats;
   bool? isFollowing;
 
@@ -34,7 +34,7 @@ class UserProfileModel {
     this.isOnboardingComplete,
     this.createdAt,
     this.updatedAt,
-    this.profileImageUrl,
+    this.profile,
     this.stats,
     this.isFollowing,
   });
@@ -61,9 +61,7 @@ class UserProfileModel {
       isOnboardingComplete: json['isOnboardingComplete'] ?? false,
       createdAt: _parseDate(json['createdAt']),
       updatedAt: _parseDate(json['updatedAt']),
-      // ✅ এটা যোগ করো
-      profileImageUrl:
-          json['profileImageUrl'] ?? json['avatar'] ?? json['profileImage'] ?? json['profile'] ?? json['image'],
+      profile: json['profile'] ?? '',
       stats: json['stats'] != null
           ? Stats.fromJson(json['stats'])
           : Stats(
@@ -91,7 +89,7 @@ Map<String, dynamic> toJson() {
     "isOnboardingComplete": isOnboardingComplete,
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
-    "profileImageUrl": profileImageUrl,       // এটাও যোগ করো
+    "profile": profile,
     "stats": stats?.toJson(),
     "isFollowing": isFollowing,
   };

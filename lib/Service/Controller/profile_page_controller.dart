@@ -61,7 +61,6 @@ Future<bool> fetchProfile({required bool forceRefresh}) async {
 
       _currentUser = UserProfileModel.fromJson(userData);
 
-      // ক্যাশে সেভ করো (এবার মুছবে না!)
       await _storage.write('cached_user_profile', userData);
 
       _inProgress = false;
@@ -85,7 +84,7 @@ Future<bool> updateProfile({
   String? description,
 }) async {
   if (_currentUser == null) return false;
-
+  
   _inProgress = true;
   _errorMessage = null;
   notifyListeners();
@@ -187,7 +186,7 @@ Future<bool> updateProfile({
     }
   }
 
-  // ================== SETTINGS FUNCTIONS START ==================
+  // ================== SETTINGS FUCTIONS START ==================
 
   void updateSettingsLocally({
     bool? pushNotification,
@@ -220,7 +219,7 @@ Future<bool> updateProfile({
       isOnboardingComplete: _currentUser!.isOnboardingComplete,
       createdAt: _currentUser!.createdAt,
       updatedAt: _currentUser!.updatedAt,
-      profileImageUrl: _currentUser!.profileImageUrl,
+      profile: _currentUser!.profile,
       stats: _currentUser!.stats,
       isFollowing: _currentUser!.isFollowing,
     );
