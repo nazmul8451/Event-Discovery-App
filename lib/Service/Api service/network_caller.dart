@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:gathering_app/Service/Controller/auth_controller.dart'; // এটা ইম্পোর্ট করো
@@ -193,7 +195,19 @@ class NetworkCaller {
 
       // Add file
       if (fileKey != null && filePath != null) {
-        request.files.add(await http.MultipartFile.fromPath(fileKey, filePath));
+        // Detect MIME type based on extension
+        MediaType? mediaType;
+        if (filePath.toLowerCase().endsWith('.png')) {
+          mediaType = MediaType('image', 'png');
+        } else if (filePath.toLowerCase().endsWith('.jpg') || filePath.toLowerCase().endsWith('.jpeg')) {
+          mediaType = MediaType('image', 'jpeg');
+        }
+
+        request.files.add(await http.MultipartFile.fromPath(
+          fileKey,
+          filePath,
+          contentType: mediaType,
+        ));
       }
 
       debugPrint('==== MULTIPART $method REQUEST ====\n'
@@ -203,18 +217,25 @@ class NetworkCaller {
           'FILE: $filePath\n'
           '========================');
 
-      final http.StreamedResponse response = await request.send();
+      final http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 5));
       final http.Response httpResponse = await http.Response.fromStream(response);
 
       _logResponse(method, url, httpResponse);
 
       return _parseResponse(httpResponse);
+    } on TimeoutException {
+      debugPrint('Network Error (MULTIPART): Request Timed out');
+      return NetworkResponse(
+        isSuccess: false,
+        statusCode: 408,
+        errorMessage: 'Request timed out (5s limit)',
+      );
     } catch (e) {
       debugPrint('Network Error (MULTIPART): $e');
       return NetworkResponse(
         isSuccess: false,
         statusCode: -1,
-        errorMessage: 'No internet connection or server error',
+        errorMessage: 'Connection failed: $e',
       );
     }
   }

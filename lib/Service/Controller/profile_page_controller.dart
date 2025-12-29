@@ -61,6 +61,7 @@ Future<bool> fetchProfile({required bool forceRefresh}) async {
 
       _currentUser = UserProfileModel.fromJson(userData);
 
+      print("✅ Profile Fetched & Parsed Successfully");
       await _storage.write('cached_user_profile', userData);
 
       _inProgress = false;
@@ -145,7 +146,11 @@ Future<bool> updateProfile({
 
   Future<bool> uploadProfileImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50, // Compress image to reduce size
+      maxWidth: 600,    // Resize image used for profile
+    );
 
     if (image == null) return false;
 
@@ -157,22 +162,23 @@ Future<bool> updateProfile({
       final response = await NetworkCaller.multipartRequest(
         url: Urls.updateProfileUrl,
         method: 'PATCH',
-        fileKey: 'profile', // Backend profile field expect kore as per JSON
+        fileKey: 'images', // User requested change from 'profile' to 'images'
         filePath: image.path,
         requireAuth: true,
       );
 
-      if (response.isSuccess && response.body != null) {
-        final userData = response.body!['data'] as Map<String, dynamic>;
-        _currentUser = UserProfileModel.fromJson(userData);
+      print("📸 Image Upload Response Status: ${response.statusCode}");
+      print("📸 Image Upload Body: ${response.body}");
 
-        // Update cache
-        await _storage.write('cached_user_profile', userData);
-
-        _inProgress = false;
-        notifyListeners();
+      if (response.isSuccess) {
+        print("✅ Image Upload Success. Refreshing Profile...");
+        // Since response.body['data'] is a String message now, we must fetch the profile 
+        // to get the updated image URL.
+        await fetchProfile(forceRefresh: true);
+        print("✅ Profile Refresh Completed after Upload");
         return true;
       } else {
+        print("❌ Image Upload Failed: ${response.errorMessage}");
         _errorMessage = response.errorMessage ?? "Failed to upload image";
         _inProgress = false;
         notifyListeners();
