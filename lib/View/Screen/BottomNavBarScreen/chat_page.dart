@@ -118,7 +118,9 @@ class _ChatPageState extends State<ChatPage> {
                                 style: TextStyle(
                                   fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.w600,
                                   fontSize: 14.sp,
-                                  color: userChat.isSeen == false ? Colors.black : Colors.black87,
+                                  color: userChat.isSeen == false 
+                                      ? Theme.of(context).textTheme.titleMedium?.color 
+                                      : Theme.of(context).textTheme.titleMedium?.color?.withOpacity(0.8),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -130,7 +132,9 @@ class _ChatPageState extends State<ChatPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: userChat.isSeen == false ? Colors.black : Colors.grey[600],
+                            color: userChat.isSeen == false 
+                                ? Theme.of(context).textTheme.bodyMedium?.color 
+                                : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
                             fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),

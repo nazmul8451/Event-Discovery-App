@@ -7,6 +7,8 @@ import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class UserChatScreen extends StatefulWidget {
   ChatModel? chat;
@@ -22,6 +24,30 @@ class UserChatScreen extends StatefulWidget {
 class _UserChatScreenState extends State<UserChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      if (widget.chat?.id != null) {
+        // You might want to show a loading indicator or a confirmation dialog here
+        // For now, we'll send it directly as per the request
+        await context.read<ChatController>().sendMessage(
+          widget.chat!.id!,
+          null, // No text for now, or you could prompt for a caption
+          imagePath: image.path,
+        );
+        
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -166,10 +192,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               style: TextStyle(
                                 fontSize: 14.sp.clamp(14, 16),
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.color,
+                                color: Theme.of(context).textTheme.titleLarge?.color,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -278,7 +301,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: _pickImage,
                     icon: Icon(Icons.image_outlined),
                   ),
                   Expanded(

@@ -34,6 +34,7 @@ class SocketService {
     socket!.onDisconnect((_) {
       debugPrint('❌ Disconnected from socket');
     });
+  
 
     socket!.onConnectError((data) {
       debugPrint('⚠️ Connection Error: $data');

@@ -76,4 +76,9 @@ class Urls {
    //delete message 
    static String deleteMessageUrl(String messageId) => "$baseUrl/api/v1/chatmessage/messages/$messageId";
    static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
+
+   //Notification api 
+   static const String getAllNotificationUrl = "$baseUrl/api/v1/notification";
+   
+
 }

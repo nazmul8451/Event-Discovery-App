@@ -307,17 +307,34 @@ void markChatAsSeenLocally(String chatId) {
     notifyListeners();
   }
 
-  Future<bool> sendMessage(String chatId, String text) async {
+  Future<bool> sendMessage(String chatId, String? text, {String? imagePath}) async {
     _inProgress = true; 
     notifyListeners();
 
-    final response = await NetworkCaller.postRequest(
-      url: Urls.sendMessage,
-      body: {
-        "chatId": chatId,
-        "text": text,
-      },
-    );
+    NetworkResponse response;
+
+    if (imagePath != null) {
+      // Send image and text via multipart request
+      response = await NetworkCaller.multipartRequest(
+        url: Urls.sendMessage,
+        method: 'POST',
+        fileKey: 'image',
+        filePath: imagePath,
+        fields: {
+          "chatId": chatId,
+          if (text != null && text.isNotEmpty) "text": text,
+        },
+      );
+    } else {
+      // Send text only via standard post request
+      response = await NetworkCaller.postRequest(
+        url: Urls.sendMessage,
+        body: {
+          "chatId": chatId,
+          if (text != null && text.isNotEmpty) "text": text,
+        },
+      );
+    }
 
     _inProgress = false;
 
