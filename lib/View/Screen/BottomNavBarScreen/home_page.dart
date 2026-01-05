@@ -16,6 +16,7 @@ import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -225,36 +226,42 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Consumer<GetAllEventController>(
-                            builder: (context, controller, child) =>
-                                ListView.builder(
-                                  itemCount: controller.topTwoEvents.length,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    final listEvent =
-                                        controller.topTwoEvents[index];
-                                    return Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => Navigator.pushNamed(
-                                            context,
-                                            DetailsScreen.name,
-                                            arguments: listEvent.id,
-                                          ),
-
-                                          child: _buildFeaturedEvent(
-                                            listEvent.title ?? " ",
-                                            listEvent.description ?? " ",
-                                            listEvent.tags,
-                                            listEvent.images,
-                                            listEvent,
-                                          ),
+                            builder: (context, controller, child) {
+                              if (controller.inProgress && controller.events.isEmpty) {
+                                return _buildFeaturedShimmer();
+                              }
+                              if (controller.events.isEmpty) {
+                                return const SizedBox.shrink(); // Empty state handled below
+                              }
+                              return ListView.builder(
+                                itemCount: controller.topTwoEvents.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  final listEvent =
+                                      controller.topTwoEvents[index];
+                                  return Column(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () => Navigator.pushNamed(
+                                          context,
+                                          DetailsScreen.name,
+                                          arguments: listEvent.id,
                                         ),
-                                        SizedBox(height: 15.h),
-                                      ],
-                                    );
-                                  },
-                                ),
+                                        child: _buildFeaturedEvent(
+                                          listEvent.title ?? " ",
+                                          listEvent.description ?? " ",
+                                          listEvent.tags,
+                                          listEvent.images,
+                                          listEvent,
+                                        ),
+                                      ),
+                                      SizedBox(height: 15.h),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
 
@@ -279,6 +286,12 @@ class _HomePageState extends State<HomePage> {
 
                         Consumer<GetAllEventController>(
                           builder: (context, controller, _) {
+                            if (controller.inProgress && controller.events.isEmpty) {
+                              return _buildTrendingShimmer();
+                            }
+                            if (controller.events.isEmpty) {
+                              return _buildEmptyState();
+                            }
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8.0,
@@ -518,6 +531,91 @@ class _HomePageState extends State<HomePage> {
                 color: isSelected ? Colors.white : Colors.grey.shade600,
                 fontSize: 13.sp,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =========================
+  // ✨ Loading & Empty States
+  // =========================
+
+  Widget _buildFeaturedShimmer() {
+    return Column(
+      children: List.generate(2, (index) => Padding(
+        padding: EdgeInsets.only(bottom: 15.h),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 197.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+          ),
+        ),
+      )),
+    );
+  }
+
+  Widget _buildTrendingShimmer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 4,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16.w,
+          crossAxisSpacing: 16.w,
+          childAspectRatio: 0.80,
+        ),
+        itemBuilder: (context, index) => Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 40.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "🎫",
+              style: TextStyle(fontSize: 60.sp),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              "No events available ekhon available nei",
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              "Check back later for more adventures!",
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey[400],
               ),
             ),
           ],

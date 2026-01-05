@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart' show BottomNavBarScreen;
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
@@ -27,6 +28,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
     final int quantity = args?['quantity'] ?? 1;
     final dynamic totalPaid = args?['totalPaid'] ?? '';
     final String orderId = args?['orderId'] ?? args?['ticketId'] ?? 'ORD-UNKNOWN';
+    final String? eventId = args?['eventId'];
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -290,8 +292,21 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
             SizedBox(height: 20.h,),
 
             GestureDetector(
-              onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>BottomNavBarScreen())),
-              child: CustomButton(buttonName: 'Back To Events')),
+              onTap: () {
+                if (eventId != null && eventId.isNotEmpty) {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    DetailsScreen.name,
+                    arguments: eventId,
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BottomNavBarScreen()),
+                  );
+                }
+              },
+              child: const CustomButton(buttonName: 'Back To Events')),
               
               //close this body
             ],
