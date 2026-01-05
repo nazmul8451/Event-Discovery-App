@@ -8,6 +8,8 @@ import 'package:gathering_app/Model/get_single_event_model.dart';
 import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
+import 'package:gathering_app/Service/urls.dart' as app_urls;
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
@@ -284,8 +286,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     Navigator.pop(context); // dialog close
 
                                     if (success) {
-                                      _reviewController
-                                          .clear(); // text field clear
+                                      final reviewText = _reviewController.text.trim();
+                                      _reviewController.clear(); // text field clear
 
                                       showCustomSnackBar(
                                         context: context,
@@ -294,25 +296,27 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         isError: false,
                                       );
 
-                                      final currentUserName = "user_name";
+                                      final profileCtrl = context.read<ProfileController>();
+                                      final currentUserName = profileCtrl.currentUser?.name ?? "User";
+                                      final currentUserImage = profileCtrl.currentUser?.profile ?? "";
+                                      final currentUserId = profileCtrl.currentUser?.id ?? "";
+
                                       final newReview = AllReviewModelByEventId(
                                         id: "local_${DateTime.now().millisecondsSinceEpoch}",
                                         eventId: eventId as String,
                                         reviewerName: currentUserName,
-                                        reviewerId:
-                                            "current_user_id", // optional
+                                        reviewerId: currentUserId,
+                                        reviewerImage: currentUserImage,
                                         rating: _currentRating,
-                                        review: _reviewController.text.trim(),
+                                        review: reviewText,
                                         createdAt: DateTime.now(),
                                       );
 
                                       context
                                           .read<ReivewController>()
                                           .addReviewLocally(newReview);
-
-                                      // optional: text field clear
-                                      _reviewController.clear();
-                                    } else {
+                                    }
+ else {
                                       // error
                                     }
                                   },
@@ -396,6 +400,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         ),
                         SizedBox(width: 20.w),
                         Consumer<ThemeProvider>(
+                          
                           builder: (context, controller, child) => GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Container(
@@ -1418,17 +1423,38 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                 backgroundColor: const Color(
                                                   0xFFCC18CA,
                                                 ).withOpacity(0.3),
-                                                child: Text(
-                                                  review.reviewerName.isNotEmpty
-                                                      ? review.reviewerName[0]
-                                                            .toUpperCase()
-                                                      : '?',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18.sp,
-                                                  ),
-                                                ),
+                                              child: review.reviewerImage.isNotEmpty
+                                                  ? ClipOval(
+                                                      child: Image.network(
+                                                        review.reviewerImage.startsWith('http')
+                                                            ? review.reviewerImage
+                                                            : '${app_urls.Urls.baseUrl}${review.reviewerImage.startsWith('/') ? '' : '/'}${review.reviewerImage}',
+                                                        width: 44.r,
+                                                        height: 44.r,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) => 
+                                                          Text(
+                                                            review.reviewerName.isNotEmpty
+                                                                ? review.reviewerName[0].toUpperCase()
+                                                                : '?',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18.sp,
+                                                            ),
+                                                          ),
+                                                      ),
+                                                    )
+                                                  : Text(
+                                                      review.reviewerName.isNotEmpty
+                                                          ? review.reviewerName[0].toUpperCase()
+                                                          : '?',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18.sp,
+                                                      ),
+                                                    ),
                                               ),
                                             ),
                                             SizedBox(width: 12.w),
