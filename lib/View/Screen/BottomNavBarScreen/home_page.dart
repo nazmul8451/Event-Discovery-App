@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
+import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
@@ -39,6 +40,8 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GetAllEventController>(context, listen: false).getAllEvents();
       context.read<SavedEventController>().loadMySavedEvents();
+      Provider.of<NotificationController>(context, listen: false)
+          .fetchNotifications();
     });
   }
 
@@ -92,30 +95,35 @@ class _HomePageState extends State<HomePage> {
                   alignment: Alignment.centerRight,
                   child: Padding(
                     padding: const EdgeInsets.only(right: 16.0),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, NotificationScreen.name);
-                          },
-                          icon: const Icon(Icons.notifications_none),
-                        ),
-                        const Positioned(
-                          right: 4,
-                          top: 4,
-                          child: CircleAvatar(
-                            radius: 9,
-                            backgroundColor: Color(0xFFFF006E),
-                            child: Text(
-                              '5',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 10),
+                    child: Consumer<NotificationController>(
+                      builder: (context, notificationController, child) {
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, NotificationScreen.name);
+                              },
+                              icon: const Icon(Icons.notifications_none),
                             ),
-                          ),
-                        ),
-                      ],
+                            if (notificationController.unreadCount > 0)
+                              Positioned(
+                                right: 4,
+                                top: 4,
+                                child: CircleAvatar(
+                                  radius: 9,
+                                  backgroundColor: const Color(0xFFFF006E),
+                                  child: Text(
+                                    '${notificationController.unreadCount}',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 10),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),

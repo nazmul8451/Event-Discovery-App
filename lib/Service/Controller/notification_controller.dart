@@ -14,6 +14,8 @@ class NotificationController extends ChangeNotifier {
   NotificationModel? get notificationModel => _notificationModel;
   List<NotificationData> get notifications => _notifications;
 
+  int get unreadCount => _notifications.where((n) => n.isRead == false).length;
+
   Future<void> fetchNotifications() async {
     _inProgress = true;
     _errorMessage = null;
@@ -62,11 +64,42 @@ class NotificationController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Adding Mark All As Read as requested by the UI
+  // Method to mark all notifications as read
   Future<bool> markAllAsRead() async {
-    // Assuming there's an endpoint for this, but for now just a placeholder
-    // If there's no endpoint, we can just update locally if needed
-    // Usually, this would be a POST request
-    return true; 
+    _inProgress = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    final response =
+        await NetworkCaller.patchRequest(url: Urls.readAllNotificationUrl);
+
+    _inProgress = false;
+
+    if (response.isSuccess) {
+      await fetchNotifications();
+      return true;
+    } else {
+      _errorMessage = response.errorMessage ?? 'Failed to mark all as read';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Method to mark a single notification as read
+  Future<bool> markAsRead(String id) async {
+    // We don't necessarily need a full page loader for this, maybe just local update
+    final response =
+        await NetworkCaller.patchRequest(url: Urls.readNotificationUrl(id));
+
+    if (response.isSuccess) {
+      // Find and update locally for immediate feedback
+      int index = _notifications.indexWhere((n) => n.sId == id);
+      if (index != -1) {
+        _notifications[index].isRead = true;
+        notifyListeners();
+      }
+      return true;
+    }
+    return false;
   }
 }

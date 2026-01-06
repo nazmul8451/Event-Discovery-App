@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
@@ -349,7 +351,35 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Image(image: AssetImage('assets/images/instagram.png')),
             ),
           ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none)),
+          Consumer<NotificationController>(
+            builder: (context, notificationController, child) => Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, NotificationScreen.name);
+                  },
+                  icon: const Icon(Icons.notifications_none),
+                ),
+                if (notificationController.unreadCount > 0)
+                  Positioned(
+                    right: 4,
+                    top: 4,
+                    child: CircleAvatar(
+                      radius: 9,
+                      backgroundColor: const Color(0xFFFF006E),
+                      child: Text(
+                        '${notificationController.unreadCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

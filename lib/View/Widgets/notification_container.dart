@@ -16,6 +16,7 @@ class NotificationContainer extends StatelessWidget {
           GestureDetector(
         onTap: () {
           if (notification.sId != null) {
+            notificationController.markAsRead(notification.sId!);
             notificationController.fetchNotificationById(notification.sId!);
           }
         },
