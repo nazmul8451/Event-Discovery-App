@@ -5,6 +5,7 @@ import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:gathering_app/Service/urls.dart';
 import 'package:provider/provider.dart';
 
 import '../../Widgets/serch_textfield.dart';
@@ -103,10 +104,12 @@ class _ChatPageState extends State<ChatPage> {
                         leading: CircleAvatar(
                           radius: 26.r,
                           backgroundColor: Colors.grey[200],
-                          backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.startsWith('http'))
-                              ? NetworkImage(userChat.imageIcon!)
+                          backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.isNotEmpty)
+                              ? NetworkImage(userChat.imageIcon!.startsWith('http') 
+                                  ? userChat.imageIcon! 
+                                  : '${Urls.baseUrl}${userChat.imageIcon!.startsWith('/') ? '' : '/'}${userChat.imageIcon!}')
                               : null,
-                          child: (userChat.imageIcon == null || !userChat.imageIcon!.startsWith('http'))
+                          child: (userChat.imageIcon == null || userChat.imageIcon!.isEmpty)
                               ? const Icon(Icons.person, color: Colors.grey)
                               : null,
                         ),

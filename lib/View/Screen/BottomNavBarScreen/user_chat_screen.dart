@@ -6,6 +6,7 @@ import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
+import 'package:gathering_app/Service/urls.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -143,23 +144,18 @@ class _UserChatScreenState extends State<UserChatScreen> {
                             radius: 20.r,
                             backgroundColor: Colors.grey[300],
                             child: ClipOval(
-                              child: (widget.chat?.imageIcon != null &&
-                                      widget.chat!.imageIcon!.startsWith('http'))
+                                child: (widget.chat?.imageIcon != null && widget.chat!.imageIcon!.isNotEmpty)
                                   ? Image.network(
-                                      widget.chat!.imageIcon!,
+                                      widget.chat!.imageIcon!.startsWith('http')
+                                          ? widget.chat!.imageIcon!
+                                          : '${Urls.baseUrl}${widget.chat!.imageIcon!.startsWith('/') ? '' : '/'}${widget.chat!.imageIcon!}',
                                       fit: BoxFit.cover,
                                       width: 40.r,
                                       height: 40.r,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const Icon(Icons.person),
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          const Icon(Icons.person),
                                     )
-                                  : SvgPicture.asset(
-                                      "${widget.chat?.imageIcon}",
-                                      fit: BoxFit.cover,
-                                      placeholderBuilder: (_) =>
-                                          const Icon(Icons.person, size: 24),
-                                    ),
+                                  : const Icon(Icons.person, size: 24),
                             ),
                           ),
                           // Online Dot

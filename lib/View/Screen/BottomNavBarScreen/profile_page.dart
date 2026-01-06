@@ -812,7 +812,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: Image.asset(
                                                 height: 20,
                                                 width: 20,
-                                                'assets/images/calender_icon.png',
+                                                'assets/images/review_icon.png',
                                                 color: Color(0xFFB026FF),
                                               ),
                                             ),
@@ -859,7 +859,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: Image.asset(
                                                 height: 20,
                                                 width: 20,
-                                                'assets/images/calender_icon.png',
+                                                'assets/images/fav_icon.png',
                                                 color: Color(0xFFB026FF),
                                               ),
                                             ),

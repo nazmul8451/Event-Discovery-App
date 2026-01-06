@@ -182,24 +182,18 @@ Future<void> getChats() async {
 
       debugPrint("🔍 getChats - MyID: $currentUserId");
 
-      _chatList = rawList.map((chatData) {
+      _chatList = rawList.map<ChatModel>((chatData) {
         final participants = chatData['participants'] as List?;
         Map<String, dynamic>? otherUserMap;
         String? otherUserId;
         String? otherUserName;
         
         if (participants != null && participants.isNotEmpty) {
-          debugPrint("👥 Participants for ${chatData['_id']}: $participants");
-          
           // Find the other user (not current user)
           for (var p in participants) {
             if (p is Map<String, dynamic>) {
               String? pId = (p['_id'] ?? p['id'])?.toString();
-              
-              // Check if this participant is NOT the current user
-              if (pId != null && 
-                  currentUserId != null && 
-                  pId != currentUserId) {
+              if (pId != null && currentUserId != null && pId != currentUserId) {
                 otherUserMap = p;
                 otherUserId = pId;
                 otherUserName = p['name']?.toString();
@@ -208,8 +202,6 @@ Future<void> getChats() async {
             }
           }
           
-          // If we couldn't find other user (maybe group chat or only one participant)
-          // Use the first participant
           if (otherUserId == null && participants.isNotEmpty) {
             final first = participants.first;
             if (first is Map<String, dynamic>) {
@@ -226,20 +218,31 @@ Future<void> getChats() async {
         final lastMessage = chatData['lastMessage'];
         if (lastMessage != null && lastMessage is Map) {
           lastMessageText = lastMessage['text']?.toString() ?? 'Sent a message';
-          lastMessageSeen = lastMessage['seen'] == true; // If false or null, it's false
+          lastMessageSeen = lastMessage['seen'] == true;
         } else {
           lastMessageText = 'No messages yet';
         }
 
-        debugPrint("💬 Chat ${chatData['_id']} - Other: $otherUserName ($otherUserId), seen: $lastMessageSeen");
+        // Robust profile image parsing
+        String? finalImageIcon;
+        String? rawImageIcon = otherUserMap?['profile']?.toString() ??
+                          otherUserMap?['profileImage']?.toString() ?? 
+                          otherUserMap?['image']?.toString() ?? 
+                          otherUserMap?['avatar']?.toString();
+        
+        if (rawImageIcon != null && rawImageIcon.isNotEmpty) {
+          if (rawImageIcon.startsWith('http')) {
+            finalImageIcon = rawImageIcon;
+          } else {
+            finalImageIcon = "${Urls.baseUrl}${rawImageIcon.startsWith('/') ? '' : '/'}$rawImageIcon";
+          }
+        }
 
         return ChatModel(
           id: chatData['_id']?.toString(),
           otherUserId: otherUserId,
           name: otherUserName ?? 'Unknown User',
-          imageIcon: otherUserMap?['profileImage']?.toString() ?? 
-                    otherUserMap?['image']?.toString() ?? 
-                    otherUserMap?['avatar']?.toString(),
+          imageIcon: finalImageIcon,
           currentMessage: lastMessageText,
           time: chatData['updatedAt']?.toString() ?? '',
           status: 'offline', 
