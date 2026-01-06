@@ -142,7 +142,7 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                         ),
                         trailing: Text(
-                          userChat.time != null ? userChat.time!.toString() : '', // Simplify formatting for now
+                          _formatTime(userChat.time),
                           style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                         ),
                         onTap: () async {
@@ -162,5 +162,24 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+
+  String _formatTime(String? timeStr) {
+    if (timeStr == null || timeStr.isEmpty) return '';
+    try {
+      final DateTime date = DateTime.parse(timeStr).toLocal();
+      final DateTime now = DateTime.now();
+      final Duration difference = now.difference(date);
+
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} minutes ago';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} hours ago';
+      } else {
+        return '${difference.inDays} days ago';
+      }
+    } catch (e) {
+      return '';
+    }
   }
 }

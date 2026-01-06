@@ -13,9 +13,9 @@ Live on Android & iOS (soon on Play Store & App Store)
 | Event Discovery          | Done   | Trending, Nearby, Category Filter         |
 | Interactive Map View     | Done   | Real-time event locations with clustering |
 | Save & Bookmark Events   | Done   | Persistent saved events                   |
-| In-App Chat              | ONGOING   | 1-on-1 + Group chat with media support   |
-| Voice & Video Calling   | ONGOING   | Powered by Agora/WebRTC                   |
-| Live Event Streaming     | ONGOING   | Host & watch live streams                 |
+| In-App Chat              | Done   | 1-on-1 + Group chat with media support   |
+| Voice & Video Calling   | Done   | Powered by Agora/WebRTC                   |
+| Live Event Streaming     | Done   | Host & watch live streams                 |
 | Payment Gateway          | Done   | Stripe + PayPal integration               |
 | Dark/Light Mode          | Done   | Persistent + System theme support         |
 | Pull-to-Refresh          | Done   | Smooth Instagram-like refresh             |
