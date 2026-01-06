@@ -21,6 +21,7 @@ import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BottomNavController()),
         ChangeNotifierProvider(create: (_) => LiveStreamController()),
         ChangeNotifierProvider(create: (_) => LiveChatController()),
+        ChangeNotifierProvider(create: (_) => NotificationController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

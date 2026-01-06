@@ -78,7 +78,8 @@ class Urls {
    static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
 
    //Notification api 
-   static const String getAllNotificationUrl = "$baseUrl/api/v1/notification";
+   static const String getAllNotificationUrl = "$baseUrl/api/v1/notifications";
+   static String getNotificationByIdUrl(String id) => "$baseUrl/api/v1/notifications/$id";
    
 
 }
