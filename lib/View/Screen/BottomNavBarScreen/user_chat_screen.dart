@@ -26,27 +26,14 @@ class _UserChatScreenState extends State<UserChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
+  XFile? _selectedImage;
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      if (widget.chat?.id != null) {
-        // You might want to show a loading indicator or a confirmation dialog here
-        // For now, we'll send it directly as per the request
-        await context.read<ChatController>().sendMessage(
-          widget.chat!.id!,
-          null, // No text for now, or you could prompt for a caption
-          imagePath: image.path,
-        );
-        
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            0.0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      }
+      setState(() {
+        _selectedImage = image;
+      });
     }
   }
 
@@ -289,77 +276,131 @@ class _UserChatScreenState extends State<UserChatScreen> {
             ),
           ),
           SafeArea(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: _pickImage,
-                    icon: Icon(Icons.image_outlined),
-                  ),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        // color: Colors.grey[200], 
-                        borderRadius: BorderRadius.circular(50.r),
-                      ),
-                      child: TextFormField(
-                        controller: _textController,
-                        maxLines: 5,
-                        minLines: 1,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 15.w,
-                              vertical: 10.h
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_selectedImage != null)
+                  Container(
+                    padding: EdgeInsets.all(8.r),
+                    margin: EdgeInsets.symmetric(horizontal: 16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Image.file(
+                            File(_selectedImage!.path),
+                            height: 100.h,
+                            width: 100.w,
+                            fit: BoxFit.cover,
                           ),
-                          hintText: 'Type a message...',
-                          border: InputBorder.none, 
                         ),
-                      ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImage = null;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(4.r),
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.close, size: 16.r, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  InkWell(
-                    onTap: () async {
-                      if (_textController.text.trim().isEmpty) return;
-                      
-                      final text = _textController.text.trim();
-                      _textController.clear();
-                      
-                      if (widget.chat?.id != null) {
-                       bool success = await context.read<ChatController>().sendMessage(widget.chat!.id!, text);
-                       if(success) {
-                         // Scroll to bottom
-                         if (_scrollController.hasClients) {
-                            _scrollController.animateTo(
-                              0.0, // Scroll to 'bottom' (start of list in reverse)
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: _pickImage,
+                        icon: Icon(Icons.image_outlined),
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            // color: Colors.grey[200], 
+                            borderRadius: BorderRadius.circular(50.r),
+                          ),
+                          child: TextFormField(
+                            controller: _textController,
+                            maxLines: 5,
+                            minLines: 1,
+                            textAlignVertical: TextAlignVertical.center,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 15.w,
+                                  vertical: 10.h
+                              ),
+                              hintText: 'Type a message...',
+                              border: InputBorder.none, 
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          final text = _textController.text.trim();
+                          final imagePath = _selectedImage?.path;
+                          
+                          if (text.isEmpty && imagePath == null) return;
+                          
+                          _textController.clear();
+                          setState(() {
+                            _selectedImage = null;
+                          });
+                          
+                          if (widget.chat?.id != null) {
+                            bool success = await context.read<ChatController>().sendMessage(
+                              widget.chat!.id!, 
+                              text.isEmpty ? null : text,
+                              imagePath: imagePath,
                             );
-                         }
-                       }
-                      }
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 5, left: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
+                            if(success) {
+                              if (_scrollController.hasClients) {
+                                  _scrollController.animateTo(
+                                    0.0, 
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                              }
+                            }
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 5, left: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Color(0xFFB026FF), Color(0xFFFF006E)],
+                            ),
+                          ),
+                          height: 45,
+                          width: 45,
+                          child: Icon(Icons.send, color: Colors.white, size: 20),
                         ),
                       ),
-                      height: 45,
-                      width: 45,
-                      child: Icon(Icons.send, color: Colors.white, size: 20),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
