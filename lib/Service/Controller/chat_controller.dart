@@ -201,7 +201,7 @@ Future<void> getChats() async {
               }
             }
           }
-          
+          //close this model
           if (otherUserId == null && participants.isNotEmpty) {
             final first = participants.first;
             if (first is Map<String, dynamic>) {
