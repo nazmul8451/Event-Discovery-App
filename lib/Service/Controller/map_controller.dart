@@ -114,8 +114,8 @@ class MapController with ChangeNotifier {
       Offset(centerX, canvasHeight.toDouble()),
       Offset(centerX, 0),
       [
-        const Color(0xFFB026FF), // Purple
-        const Color(0xFFFF5400), // Orange/Pink
+        const Color(0xFFB026FF), 
+        const Color(0xFFFF5400), 
       ],
     );
     canvas.drawPath(path, paint);

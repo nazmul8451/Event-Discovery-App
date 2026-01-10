@@ -282,7 +282,7 @@ void markChatAsSeenLocally(String chatId) {
     notifyListeners();
     
     final response = await NetworkCaller.getRequest(url: Urls.getMessage(chatId));
-    
+    //progress false 
     _inProgress = false;
 
     if (response.isSuccess) {
