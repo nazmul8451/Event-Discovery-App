@@ -63,25 +63,23 @@ class _AuthTextFieldState extends State<AuthTextField> {
           TextFormField(
             textInputAction: TextInputAction.next,
             controller: widget.controller,
-            obscureText: widget.isPassword
-                ? _obscureText
-                : widget.obscureText,
+            obscureText: widget.isPassword ? _obscureText : widget.obscureText,
             readOnly: widget.readOnly,
             keyboardType: widget.keyboardType,
             onChanged: widget.onChanged,
             validator: widget.validator,
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black87,
-              fontSize: 16.sp, 
+              fontSize: 16.sp,
             ),
             cursorColor: const Color(0xFFCC18CA),
             decoration: InputDecoration(
-              fillColor: isDark? Color(0xFF250143): Colors.grey[30],
+              fillColor: isDark ? Color(0xFF250143) : Colors.grey[30],
               filled: true,
               hintText: widget.hintText,
               hintStyle: TextStyle(
                 color: isDark ? Colors.white60 : const Color(0xFF515151),
-                fontSize: 14.sp, 
+                fontSize: 14.sp,
               ),
               suffixIcon: widget.isPassword
                   ? IconButton(

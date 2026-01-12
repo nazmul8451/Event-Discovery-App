@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
-import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
-import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
-import 'package:gathering_app/Service/urls.dart' as app_urls;
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
@@ -20,6 +18,7 @@ import 'package:gathering_app/View/Widgets/details_event_highlightMessage.dart';
 import 'package:gathering_app/View/Widgets/orgenizer_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
@@ -286,8 +285,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     Navigator.pop(context); // dialog close
 
                                     if (success) {
-                                      final reviewText = _reviewController.text.trim();
-                                      _reviewController.clear(); // text field clear
+                                      _reviewController
+                                          .clear(); // text field clear
 
                                       showCustomSnackBar(
                                         context: context,
@@ -296,27 +295,29 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                         isError: false,
                                       );
 
-                                      final profileCtrl = context.read<ProfileController>();
-                                      final currentUserName = profileCtrl.currentUser?.name ?? "User";
-                                      final currentUserImage = profileCtrl.currentUser?.profile ?? "";
-                                      final currentUserId = profileCtrl.currentUser?.id ?? "";
+                                      final userProfile = context.read<ProfileController>().currentUser;
+                                      final currentUserName = userProfile?.name ?? "user_name";
+                                      final currentUserImage = userProfile?.profile ?? "";
+                                      final currentUserId = userProfile?.id ?? "current_user_id";
 
                                       final newReview = AllReviewModelByEventId(
                                         id: "local_${DateTime.now().millisecondsSinceEpoch}",
                                         eventId: eventId as String,
                                         reviewerName: currentUserName,
-                                        reviewerId: currentUserId,
                                         reviewerImage: currentUserImage,
+                                        reviewerId: currentUserId,
                                         rating: _currentRating,
-                                        review: reviewText,
+                                        review: _reviewController.text.trim(),
                                         createdAt: DateTime.now(),
                                       );
 
                                       context
                                           .read<ReivewController>()
                                           .addReviewLocally(newReview);
-                                    }
- else {
+
+                                      // optional: text field clear
+                                      _reviewController.clear();
+                                    } else {
                                       // error
                                     }
                                   },
@@ -342,262 +343,237 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
 
     void GetTicketAlertDialogue(BuildContext context) {
-      final String pricePerTicket =
-          singleEvent?.data?.ticketPrice?.toString() ?? "0";
-      
-      // Pre-set values for the user
-      qtyController.text = "1";
-      priceController.text = pricePerTicket;
+      final int ticketPrice = singleEvent?.data?.ticketPrice ?? 0;
+      final TextEditingController couponController = TextEditingController();
+      final TextEditingController qtyController = TextEditingController(text: "1");
+      final TextEditingController priceController =
+          TextEditingController(text: ticketPrice.toString());
 
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: SingleChildScrollView(
-            child: SizedBox(
-              width: double.maxFinite,
-              child: Padding(
-                padding: EdgeInsets.all(24.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+        builder: (_) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              // quantity logic
+              int quantity = int.tryParse(qtyController.text) ?? 1;
+              int total = quantity * ticketPrice;
+
+              return AlertDialog(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                contentPadding: EdgeInsets.zero,
+                content: SingleChildScrollView(
+                  child: SizedBox(
+                    width: double.maxFinite,
+                    child: Padding(
+                      padding: EdgeInsets.all(24.w),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Header
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Book Tickets',
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Book Tickets',
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white : Colors.black,
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      textAlign: TextAlign.center,
+                                      "Complete your booking for ${singleEvent?.data?.title ?? 'Event'}",
+                                      style: TextStyle(
+                                        color: isDark ? Colors.white : Colors.black,
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                textAlign: TextAlign.center,
-                                "Complete your booking for ${singleEvent?.data?.title ?? 'this event'}",
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w400,
+                              SizedBox(width: 20.w),
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 10),
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: isDark
+                                        ? const Color(0xFF3E043F)
+                                        : const Color(0xFF686868),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Image.asset(
+                                      'assets/images/cross_icon.png',
+                                    ),
+                                  ),
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(width: 20.w),
-                        Consumer<ThemeProvider>(
-                          
-                          builder: (context, controller, child) => GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 10),
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: controller.isDarkMode
-                                    ? const Color(0xFF3E043F)
-                                    : const Color(0xFF686868),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Image.asset(
-                                  'assets/images/cross_icon.png',
-                                ),
-                              ),
-                            ),
+                          SizedBox(height: 24.h),
+                          AuthTextField(
+                            controller: couponController,
+                            hintText: 'Enter Coupon (Optional)',
+                            labelText: 'Coupon',
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24.h),
-                    AuthTextField(
-                      controller: couponController,
-                      hintText: 'Summer 25',
-                      labelText: 'Coupon (Optional)',
-                    ),
-                    AuthTextField(
-                      controller: qtyController,
-                      hintText: '1',
-                      labelText: 'Number of Tickets',
-                      readOnly: true, // Fixed to 1
-                    ),
-                    AuthTextField(
-                      controller: priceController,
-                      hintText: 'Event price',
-                      labelText: 'Price',
-                      readOnly: true, // Auto-populated and unchangeable
-                    ),
+                          AuthTextField(
+                            controller: qtyController,
+                            hintText: '1',
+                            labelText: 'Number of Tickets',
+                            keyboardType: TextInputType.number,
+                            onChanged: (val) {
+                              setDialogState(() {});
+                            },
+                          ),
+                          AuthTextField(
+                            controller: priceController,
+                            hintText: ticketPrice.toString(),
+                            labelText: 'Price',
+                            readOnly: true, // User cannot edit price
+                          ),
 
-                    SizedBox(height: 20.h),
-                    Divider(color: const Color(0xFFCC18CA).withOpacity(0.15)),
-                    SizedBox(height: 20.h),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Price per ticket',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(color: Colors.grey),
-                            ),
-                            Text(
-                              '\$$pricePerTicket',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Quantity',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(color: Colors.grey),
-                            ),
-                            const Text(
-                              '1',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            Text(
-                              '\$$pricePerTicket',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(color: const Color(0xFFCC18CA)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 55.h,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark
-                                ? Colors.black
-                                : Colors.white,
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.zero,
+                          SizedBox(height: 20.h),
+                          Divider(color: Color(0xFFCC18CA).withOpacity(0.15)),
+                          SizedBox(height: 20.h),
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Price per ticket',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(color: Colors.grey),
+                                  ),
+                                  Text(
+                                    '\$$ticketPrice',
+                                    style: Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Quantity',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(color: Colors.grey),
+                                  ),
+                                  Text(
+                                    '$quantity',
+                                    style: Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Total',
+                                    style: Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  Text(
+                                    '\$$total',
+                                    style: Theme.of(context).textTheme.titleSmall
+                                        ?.copyWith(color: Color(0xFFCC18CA)),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          onPressed: () async {
-                            final provider = Provider.of<EventTicketProvider>(
+                          SizedBox(height: 20.h),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                            ),
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 55.h,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      isDark ? Colors.black : Colors.white,
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                ),
+                                onPressed: () {
+                            Navigator.pop(context); // dialog close
+
+                            // Go to Order Summary for payment first
+                            Navigator.pushNamed(
                               context,
-                              listen: false,
+                              OrderSummeryScreen.name,
+                              arguments: {
+                                "eventId": eventId,
+                                "eventTitle":
+                                    singleEvent?.data?.title ??
+                                    "Unknown Event",
+                                "eventDate":
+                                    singleEvent?.data?.startDate ?? "",
+                                "eventTime":
+                                    singleEvent?.data?.startTime ?? "",
+                                "eventLocation":
+                                    singleEvent?.data?.address ?? "",
+                                "quantity": quantity,
+                                "price": ticketPrice, // Unit price
+                                "totalPrice": total, // Total price
+                                "imageUrl":
+                                    (singleEvent?.data?.images != null &&
+                                        singleEvent!.data!.images!.isNotEmpty)
+                                    ? singleEvent!.data!.images![0]
+                                    : '',
+                                // no ticketId yet
+                              },
                             );
-
-                            final int quantity = 1;
-                            final int price = int.tryParse(pricePerTicket) ?? 0;
-                            final int totalPrice = price;
-
-                            final bool success = await provider.createTicket(
-                              eventId: eventId,
-                              promotionCode: couponController.text.trim(),
-                              quantity: quantity,
-                              price: price,
-                            );
-
-                            if (success) {
-                              if (!context.mounted) return;
-                              Navigator.pop(context); // dialog close
-                              
-                              final ticketId = provider.ticketData != null
-                                  ? (provider.ticketData!['id'] ??
-                                        provider.ticketData!['_id'] ??
-                                        provider.ticketData!['ticketId'] ??
-                                        provider.ticketData!['ticket']?['id'])
-                                  : null;
-
-                              try {
-                                await context
-                                    .read<EventDetailsController>()
-                                    .checkIfUserHasTicket(eventId);
-                              } catch (_) {}
-
-                              if (!context.mounted) return;
-                              
-                              Navigator.pushNamed(
-                                context,
-                                OrderSummeryScreen.name,
-                                arguments: {
-                                  "eventId": eventId,
-                                  "eventTitle":
-                                      singleEvent?.data?.title ??
-                                      "Unknown Event",
-                                  "eventDate":
-                                      singleEvent?.data?.startDate ?? "",
-                                  "eventTime":
-                                      singleEvent?.data?.startTime ?? "",
-                                  "eventLocation":
-                                      singleEvent?.data?.address ?? "",
-                                  "quantity": quantity,
-                                  "price": price,
-                                  "totalPrice": totalPrice,
-                                  "imageUrl":
-                                      (singleEvent.data?.images != null &&
-                                          singleEvent.data!.images!.isNotEmpty)
-                                      ? singleEvent.data!.images![0]
-                                      : '',
-                                  if (ticketId != null) "ticketId": ticketId,
-                                },
-                              );
-                            } else {
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Ticket booking failed"),
-                                ),
-                              );
-                            }
                           },
-                          child: Text(
-                            'Confirm Booking',
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              color: isDark ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.w600,
+                            
+                                child: Text(
+                                  'Confirm Booking',
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: isDark ? Colors.white : Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ),
+              );
+            },
+          );
+        },
       );
     }
 
@@ -728,7 +704,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
                 SizedBox(height: 20.h),
                 CircularPercentIndicator(
-                  radius: 100.r,
+                  radius: 80.r,
                   lineWidth: 16,
                   percent: 82 / 100,
                   center: Column(
@@ -844,12 +820,14 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             category: singleEvent!.data!.category,
                             images: singleEvent!.data!.images,
                             ticketPrice: singleEvent!.data!.ticketPrice,
-                            startDate: DateTime.tryParse(singleEvent!.data!.startDate ?? ""),
+                            startDate: DateTime.tryParse(
+                                singleEvent!.data!.startDate ?? ""),
                             address: singleEvent!.data!.address,
                             favorites: singleEvent!.data!.favorites,
+                            // Map other necessary fields if needed by EventData
                           ),
                         )
-                      : const SizedBox(),
+                      : SizedBox(),
                 ),
 
                 SizedBox(height: 20.h),
@@ -1423,38 +1401,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                 backgroundColor: const Color(
                                                   0xFFCC18CA,
                                                 ).withOpacity(0.3),
-                                              child: review.reviewerImage.isNotEmpty
-                                                  ? ClipOval(
-                                                      child: Image.network(
-                                                        review.reviewerImage.startsWith('http')
-                                                            ? review.reviewerImage
-                                                            : '${app_urls.Urls.baseUrl}${review.reviewerImage.startsWith('/') ? '' : '/'}${review.reviewerImage}',
-                                                        width: 44.r,
-                                                        height: 44.r,
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder: (context, error, stackTrace) => 
-                                                          Text(
-                                                            review.reviewerName.isNotEmpty
-                                                                ? review.reviewerName[0].toUpperCase()
-                                                                : '?',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 18.sp,
-                                                            ),
-                                                          ),
-                                                      ),
-                                                    )
-                                                  : Text(
-                                                      review.reviewerName.isNotEmpty
-                                                          ? review.reviewerName[0].toUpperCase()
-                                                          : '?',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 18.sp,
-                                                      ),
-                                                    ),
+                                                child: Text(
+                                                  review.reviewerName.isNotEmpty
+                                                      ? review.reviewerName[0]
+                                                            .toUpperCase()
+                                                      : '?',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18.sp,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                             SizedBox(width: 12.w),
