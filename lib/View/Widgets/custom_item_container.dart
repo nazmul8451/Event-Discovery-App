@@ -71,40 +71,94 @@ class Custom_item_container extends StatelessWidget {
                         ),
                       ),
 
-                      // Bookmark Button
+                      // Category Chip (Top Left)
+                      Positioned(
+                        left: 8.w,
+                        top: 8.h,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFB026FF), // Purple
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Text(
+                            event.category ?? "Event",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Price Badge (Bottom Right)
+                      Positioned(
+                        right: 8.w,
+                        bottom: 8.h,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00C2CB), // Teal/Cyan
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Text(
+                            "\$${event.ticketPrice ?? 0}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Bookmark Button (Top Right)
                       Positioned(
                         right: 4,
                         top: 4,
                         child: Selector<SavedEventController, bool>(
                           selector: (_, c) => c.isSaved(event),
                           builder: (context, isSaved, _) {
-                            return IconButton(
-                              icon: Icon(
-                                isSaved
-                                    ? Icons.bookmark
-                                    : Icons.bookmark_border_outlined,
-                                color: const Color(0xFFFF006E),
+                            return Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withOpacity(0.3), // Background for better visibility
                               ),
-                              onPressed: () async {
-                                final result = await context
-                                    .read<SavedEventController>()
-                                    .toggleSave(event);
+                              child: IconButton(
+                                icon: Icon(
+                                  isSaved
+                                      ? Icons.bookmark
+                                      : Icons.bookmark_border_outlined,
+                                  color: const Color(0xFFFF006E),
+                                ),
+                                onPressed: () async {
+                                  final result = await context
+                                      .read<SavedEventController>()
+                                      .toggleSave(event);
 
-                                if (result != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      duration: const Duration(
-                                        milliseconds: 800,
+                                  if (result != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        duration: const Duration(
+                                          milliseconds: 800,
+                                        ),
+                                        content: Text(
+                                          result
+                                              ? "Event saved"
+                                              : "Removed from saved",
+                                        ),
                                       ),
-                                      content: Text(
-                                        result
-                                            ? "Event saved"
-                                            : "Removed from saved",
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
+                                    );
+                                  }
+                                },
+                              ),
                             );
                           },
                         ),

@@ -374,6 +374,27 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Stack(
           children: [
+            // Category Chip (Top Left)
+            Positioned(
+              left: 16.w,
+              top: 16.h,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB026FF), // Purple
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  event.category ?? "Event",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            
             Positioned(
               top: 16.h,
               right: 16.w,
@@ -382,16 +403,22 @@ class _HomePageState extends State<HomePage> {
                   final isSaved = provider.isSaved(
                     event,
                   ); // check from controller
-                  return IconButton(
-                    onPressed: () async {
-                      await provider.toggleSave(event);
-                    },
-                    icon: Icon(
-                      isSaved ? Icons.bookmark : Icons.bookmark_border,
-                      color: isSaved
-                          ? const Color(0xFFFF006E)
-                          : (controller.isDarkMode ? Colors.white : Color(0xFFFF006E)),
-                      size: 25.sp.clamp(25, 26),
+                  return Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withOpacity(0.3),
+                    ),
+                    child: IconButton(
+                      onPressed: () async {
+                        await provider.toggleSave(event);
+                      },
+                      icon: Icon(
+                        isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        color: isSaved
+                            ? const Color(0xFFFF006E)
+                            : (controller.isDarkMode ? Colors.white : Color(0xFFFF006E)),
+                        size: 25.sp.clamp(25, 26),
+                      ),
                     ),
                   );
                 },
@@ -404,80 +431,55 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: controller.isDarkMode
-                          ? Colors.white
-                          : Colors.white,
-                      fontSize: 22.sp.clamp(22, 22),
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22.sp.clamp(22, 22),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      // Price Badge
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 5.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00C2CB), // Teal
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Text(
+                          "\$${event.ticketPrice ?? 0}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 6.h),
                   Row(
                     children: [
                       Expanded(
-                        flex: 3,
                         child: Text(
                           subtitle,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: controller.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
+                            color: Colors.white70,
                             fontSize: 12.sp.clamp(12, 16),
                           ),
                         ),
-                      ),
-                      const Spacer(),
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(30.r),
-                            ),
-                            child: Text(
-                              'Hip-Hop',
-                              style: TextStyle(
-                                color: controller.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize: 13.sp.clamp(13, 13),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10.w),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(30.r),
-                            ),
-                            child: Text(
-                              'Social',
-                              style: TextStyle(
-                                color: controller.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize: 13.sp.clamp(13, 13),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),

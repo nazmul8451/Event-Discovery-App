@@ -29,31 +29,62 @@ class _SavedPageState extends State<SavedPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               SizedBox(height: 10.h),
-              Text(
-                '2 events saved',
-                style: Theme.of(context).textTheme.titleMedium,
+              Consumer<SavedEventController>(
+                builder: (context, controller, child) {
+                  return Text(
+                    '${controller.savedEvents.length} events saved',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  );
+                },
               ),
               SizedBox(height: 10.h),
               // Expanded(
-              //   child: Consumer<SavedEventController>(
-              //     builder:(context,controller,child) {
-              //     // return  GridView.builder(
-              //     //     itemCount:controller.savedEvents.length,
-              //     //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              //     //       crossAxisCount: 2,
-              //     //       mainAxisSpacing: 10,
-              //     //       crossAxisSpacing: 10,
-              //     //       childAspectRatio: 7 / 9,
-              //     //     ),
-              //     //     itemBuilder: (context, index) {
-              //     //       return Consumer<SavedEventController>(
-              //     //         builder: (context, controller, child) {
-              //     //           final saveEventList = controller.savedEvents;
-              //     //           // return Custom_item_container(
-              //     //           //   // event: ,
-              //     //           //   // event: saveEventList[index],
-              //     //           // );
-              //     //         },
+              Expanded(
+                child: Consumer<SavedEventController>(
+                  builder: (context, controller, child) {
+                    if (controller.inProgress) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.savedEvents.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.bookmark_border, size: 60.sp, color: Colors.grey),
+                            SizedBox(height: 10.h),
+                            Text(
+                              "No saved events yet",
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return GridView.builder(
+                        itemCount: controller.savedEvents.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.80,
+                          mainAxisSpacing: 16.w,
+                          crossAxisSpacing: 16.w,
+                        ),
+                        itemBuilder: (context, index) {
+                          final savedEventData = controller.savedEvents[index];
+                          return Custom_item_container(
+                             event: savedEventData.event,
+                             onTap: () => Navigator.pushNamed(
+                                      context,
+                                      '/details-screen', 
+                                      arguments: savedEventData.event.id,
+                                    ),
+                          );
+                        },
+                      );
+                  }
+                ),
+              ),
               //     //       );
               //     //     },
               //     //   );
