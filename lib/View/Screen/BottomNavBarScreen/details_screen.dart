@@ -358,6 +358,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               // quantity logic
               int quantity = int.tryParse(qtyController.text) ?? 1;
               int total = quantity * ticketPrice;
+              bool isLoading = false;
 
               return AlertDialog(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -523,45 +524,89 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                   ),
                                   padding: EdgeInsets.zero,
                                 ),
-                                onPressed: () {
-                            Navigator.pop(context); // dialog close
+                                onPressed: isLoading
+                                    ? null
+                                    : () async {
+                                        setDialogState(() {
+                                          isLoading = true;
+                                        });
 
-                            // Go to Order Summary for payment first
-                            Navigator.pushNamed(
-                              context,
-                              OrderSummeryScreen.name,
-                              arguments: {
-                                "eventId": eventId,
-                                "eventTitle":
-                                    singleEvent?.data?.title ??
-                                    "Unknown Event",
-                                "eventDate":
-                                    singleEvent?.data?.startDate ?? "",
-                                "eventTime":
-                                    singleEvent?.data?.startTime ?? "",
-                                "eventLocation":
-                                    singleEvent?.data?.address ?? "",
-                                "quantity": quantity,
-                                "price": ticketPrice, // Unit price
-                                "totalPrice": total, // Total price
-                                "imageUrl":
-                                    (singleEvent?.data?.images != null &&
-                                        singleEvent!.data!.images!.isNotEmpty)
-                                    ? singleEvent!.data!.images![0]
-                                    : '',
-                                // no ticketId yet
-                              },
-                            );
-                          },
-                            
-                                child: Text(
-                                  'Confirm Booking',
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    color: isDark ? Colors.white : Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                        final String? ticketId = await context
+                                            .read<EventTicketProvider>()
+                                            .createTicket(
+                                              quantity: quantity,
+                                              price: ticketPrice,
+                                              eventId: eventId,
+                                              promotionCode: couponController.text.trim(),
+                                            );
+                                        
+                                        setDialogState(() {
+                                          isLoading = false;
+                                        });
+
+                                        if (ticketId != null) {
+                                          Navigator.pop(context); // dialog close
+
+                                          // Go to Order Summary for payment first
+                                          Navigator.pushNamed(
+                                            context,
+                                            OrderSummeryScreen.name,
+                                            arguments: {
+                                              "eventId": eventId,
+                                              "eventTitle":
+                                                  singleEvent?.data?.title ??
+                                                      "Unknown Event",
+                                              "eventDate":
+                                                  singleEvent?.data?.startDate ??
+                                                      "",
+                                              "eventTime":
+                                                  singleEvent?.data?.startTime ??
+                                                      "",
+                                              "eventLocation":
+                                                  singleEvent?.data?.address ??
+                                                      "",
+                                              "quantity": quantity,
+                                              "price": ticketPrice, // Unit price
+                                              "totalPrice": total, // Total price
+                                              "imageUrl": (singleEvent
+                                                          ?.data?.images !=
+                                                      null &&
+                                                  singleEvent!
+                                                      .data!.images!.isNotEmpty)
+                                                  ? singleEvent!.data!.images![0]
+                                                  : '',
+                                              "ticketId": ticketId,
+                                            },
+                                          );
+                                        } else {
+                                          showCustomSnackBar(
+                                            context: context,
+                                            message: "Failed to create ticket",
+                                            isError: true,
+                                          );
+                                        }
+                                      },
+                                child: isLoading
+                                    ? SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Confirm Booking',
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               ),
                             ),
                           ),

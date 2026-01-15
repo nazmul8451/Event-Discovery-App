@@ -21,7 +21,7 @@ class EventTicketProvider extends ChangeNotifier {
   //   checkTicketStatus();
   // }
 
-  Future<bool> createTicket({
+  Future<String?> createTicket({
     required int quantity,
     required int price,
     required String eventId,
@@ -35,7 +35,7 @@ class EventTicketProvider extends ChangeNotifier {
           "eventId": eventId,
           "price": price,
           "quantity": quantity,
-          "promotionCode": promotionCode,
+          "promotionCode": promotionCode ?? "",
         },
         requireAuth: true,
       );
@@ -43,14 +43,22 @@ class EventTicketProvider extends ChangeNotifier {
       if (response.isSuccess && response.body!['statusCode'] == 201) {
         _ticketData = response.body!['data'];
         _setStatus(TicketStatus.purchased);
-        return true;
+        print("Ticket Created");
+        // Assuming the ID field is named 'id' or '_id' in the response 'data'
+        // Adjust this if your backend returns it differently. 
+        // Based on typical patterns, it's often '_id' or 'id'.
+        // Let's return the string ID if possible.
+        return _ticketData?['_id'] ?? _ticketData?['id']; 
+
       } else {
         _setStatus(TicketStatus.notPurchased);
-        return false;
+
+        print("Ticekt Create False");
+        return null;
       }
     } catch (e) {
       _setStatus(TicketStatus.error);
-      return false;
+      return null;
     }
   }
 
