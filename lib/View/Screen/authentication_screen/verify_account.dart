@@ -85,7 +85,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17.sp,
-                      color: isDark ? Colors.white : Colors.black,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                 ],

@@ -28,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emialController = TextEditingController();
   TextEditingController passController = TextEditingController();
+  bool _isEmailValid = false;
 
   //-----------------------
   bool _signUpIn_Progress = false;
@@ -50,28 +51,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Expanded(
                     child: SizedBox(), // উপরের স্পেস
                   ),
-                  Consumer<ThemeProvider>(
-                    builder: (context, controller, child) {
-                      return Center(
-                        child: Image.asset(
-                          controller.isDarkMode
-                              ? 'assets/images/splash2.png'
-                              : 'assets/images/splash_img.png',
-                          height: 80.h,
-                          width: 80.h,
-                        ),
-                      );
-                    },
+                  Center(
+                    child: Image.asset(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assets/images/splash2.png'
+                          : 'assets/images/splash_img.png',
+                      height: 80.h,
+                      width: 80.h,
+                    ),
                   ),
                   SizedBox(height: 10.h),
-                  Text(
-                    'Sign up to discover amazing events',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Form(
@@ -105,9 +95,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           AuthTextField(
                             controller: emialController,
-                            icon: Icons.check,
+                            icon: _isEmailValid ? Icons.check : null,
                             hintText: 'your@email.com',
                             labelText: 'Email',
+                            onChanged: (value) {
+                              setState(() {
+                                _isEmailValid = EmailValidator.validate(value);
+                              });
+                            },
                             validator: (String? value) {
                               String email = value ?? '';
                               if (EmailValidator.validate(email) == false) {
@@ -197,37 +192,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             style: TextStyle(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF6A7282),
+                              color: Theme.of(context).hintColor,
                             ),
                           ),
                           SizedBox(height: 20.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/gmail_icon.png',
-                              ),
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/facebook_icon.png',
-                              ),
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/phone_icon.png',
-                              ),
+                          ContinueWithContainer(
+                            iconImg: 'assets/images/gmail_icon.png',
+                          ),
+                          ContinueWithContainer(
+                            iconImg: 'assets/images/facebook_icon.png',
+                          ),
+                          ContinueWithContainer(
+                            iconImg: 'assets/images/phone_icon.png',
+                          ),
                             ],
                           ),
                           SizedBox(height: 30.h),
-                          RichText(
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              text: "Have an account? ",
-                              children: [
-                                TextSpan(
-                                  text: 'Log in',
-                                  style: TextStyle(color: Color(0xFF9810FA)),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = onTapLogIn_button,
-                                ),
-                              ],
+                          Center(
+                            child: RichText(
+                              text: TextSpan(
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                text: "Already have an account? ",
+                                children: [
+                                  TextSpan(
+                                    text: 'Log in',
+                                    style: TextStyle(color: Color(0xFF9810FA)),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = onTapLogIn_button,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -361,9 +358,8 @@ class ContinueWithContainer extends StatelessWidget {
       child: Center(
         child: Image.asset(
           iconImg,
-          height: 15.h,
-          width: 15.h,
-          color: isDark ? Colors.white : Colors.black,
+          height: 18.h,
+          width: 18.h,
         ),
       ),
     );

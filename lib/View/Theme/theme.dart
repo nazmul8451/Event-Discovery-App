@@ -30,6 +30,8 @@ class ThemeColor {
         color: Colors.white,
       ),
       titleLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+      titleMedium: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+      titleSmall: TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
       labelLarge: TextStyle(color: Colors.white), // Button text
       labelMedium: TextStyle(color: Color(0xFFCC18CA)), // TextButton
     ),
@@ -115,6 +117,8 @@ class ThemeColor {
       bodyMedium: TextStyle(color: Colors.white70),
       bodySmall: TextStyle(fontSize: 13, color: Colors.white60), // Added
       titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+      titleMedium: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+      titleSmall: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
       labelLarge: TextStyle(color: Colors.white),
       labelMedium: TextStyle(color: Color(0xFFCC18CA)),
     ),

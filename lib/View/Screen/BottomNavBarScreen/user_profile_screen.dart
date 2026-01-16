@@ -36,16 +36,14 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         Text(
           count,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         SizedBox(height: 5.h),
         Text(
           label,
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Provider.of<ThemeProvider>(context).isDarkMode
-                    ? Colors.grey
-                    : Colors.black,
-              ),
+          style: Theme.of(context).textTheme.titleSmall,
         ),
       ],
     );
@@ -109,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     : Colors.grey[200],
                                 border: Border.all(
                                   width: 2,
-                                  color: Colors.black,
+                                  color: Theme.of(context).colorScheme.outline,
                                 ),
                               ),
                               child: Center(
@@ -194,7 +192,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: SizedBox(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
+                                    backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                                        ? Colors.white10 
+                                        : Colors.grey[200],
+                                    foregroundColor: Theme.of(context).colorScheme.onSurface,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16.r),
                                     ),

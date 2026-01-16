@@ -49,18 +49,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, controller, child) {
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          body: Center(
-            child: Image.asset(
-             controller.isDarkMode?'assets/images/splash2.png' :'assets/images/splash_img.png',
-              height: 300.h,
-            ),
-          ),
-        );
-      },
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Center(
+        child: Image.asset(
+          isDark ? 'assets/images/splash2.png' : 'assets/images/splash_img.png',
+          height: 300.h,
+        ),
+      ),
     );
   }
 }

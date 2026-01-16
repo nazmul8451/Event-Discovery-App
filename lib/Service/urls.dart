@@ -5,11 +5,17 @@ class Urls {
 
    //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
+
   static const String loginUrl = "$baseUrl/api/v1/auth/login";
+
   static const String forgotpassUrl = "$baseUrl/api/v1/auth/forget-password";
+
   static const String verifyOtpUrl = "$baseUrl/api/v1/auth/verify-account";
+
   static const String resetPassUrl = "$baseUrl/api/v1/auth/reset-password";
+
   static const String getAllEvent = "$baseUrl/api/v1/event";
+  
 
   static String getSingleEvent(String eventID) =>
       "$baseUrl/api/v1/event/$eventID";

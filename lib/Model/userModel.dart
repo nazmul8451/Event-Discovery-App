@@ -65,9 +65,9 @@ class UserProfileModel {
       stats: json['stats'] != null
           ? Stats.fromJson(json['stats'])
           : Stats(
-              events: int.tryParse((json['eventCount'] ?? json['events'] ?? '0').toString()) ?? 0,
-              followers: int.tryParse((json['followerCount'] ?? json['followers'] ?? '0').toString()) ?? 0,
-              following: int.tryParse((json['followingCount'] ?? json['following'] ?? '0').toString()) ?? 0,
+              events: int.tryParse((json['events'] ?? json['eventCount'] ?? json['totalEvents'] ?? '0').toString()) ?? 0,
+              followers: int.tryParse((json['followers'] ?? json['followerCount'] ?? json['totalFollowers'] ?? '0').toString()) ?? 0,
+              following: int.tryParse((json['following'] ?? json['followingCount'] ?? json['totalFollowing'] ?? '0').toString()) ?? 0,
             ),
       isFollowing: json['isFollowing'] ?? json['isFollowed'] ?? false,
     );
@@ -173,9 +173,9 @@ class Stats {
 
   factory Stats.fromJson(Map<String, dynamic> json) {
     return Stats(
-      events: int.tryParse(json['events']?.toString() ?? '0') ?? 0,
-      followers: int.tryParse(json['followers']?.toString() ?? '0') ?? 0,
-      following: int.tryParse(json['following']?.toString() ?? '0') ?? 0,
+      events: int.tryParse((json['events'] ?? json['eventCount'] ?? json['totalEvents'] ?? '0').toString()) ?? 0,
+      followers: int.tryParse((json['followers'] ?? json['followerCount'] ?? json['totalFollowers'] ?? '0').toString()) ?? 0,
+      following: int.tryParse((json['following'] ?? json['followingCount'] ?? json['totalFollowing'] ?? '0').toString()) ?? 0,
     );
   }
 

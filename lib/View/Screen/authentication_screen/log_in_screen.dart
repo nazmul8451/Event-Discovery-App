@@ -29,6 +29,7 @@ class _LogInScreenState extends State<LogInScreen> {
   //textfromField controller
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
+  bool _isEmailValid = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,28 +44,17 @@ class _LogInScreenState extends State<LogInScreen> {
               children: [
                 const Spacer(),
                 // Logo
-                Consumer<ThemeProvider>(
-                  builder: (context, controller, child) {
-                    return Center(
-                      child: Image.asset(
-                        controller.isDarkMode
-                            ? 'assets/images/splash2.png'
-                            : 'assets/images/splash_img.png',
-                        height: 80.h,
-                        width: 80.h,
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: 10.h),
-                // Welcome Text
-                Text(
-                  'Welcome Back',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w400,
+                Center(
+                  child: Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/images/splash2.png'
+                        : 'assets/images/splash_img.png',
+                    height: 100.h.clamp(100,100),
+                    width: 100.h.clamp(100,100),
                   ),
                 ),
+                SizedBox(height: 10.h),
+      
 
                 Padding(
                   padding: EdgeInsets.all(20.w),
@@ -87,9 +77,14 @@ class _LogInScreenState extends State<LogInScreen> {
                           children: [
                             AuthTextField(
                               controller: emailController,
-                              icon: Icons.check,
+                              icon: _isEmailValid ? Icons.check : null,
                               hintText: 'your@email.com',
                               labelText: 'Email',
+                              onChanged: (value) {
+                                setState(() {
+                                  _isEmailValid = EmailValidator.validate(value);
+                                });
+                              },
                               validator: (String? value) {
                                 String email = value ?? '';
                                 if (EmailValidator.validate(email) == false) {
@@ -262,7 +257,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ContinueWithContainer(
-                            iconImg: 'assets/images/facebook_icon.png',
+                            iconImg: 'assets/images/gmail_icon.png',
                           ),
                           ContinueWithContainer(
                             iconImg: 'assets/images/facebook_icon.png',
@@ -342,16 +337,17 @@ class _LogInScreenState extends State<LogInScreen> {
         isError: false,
       );
 
-      // সাকসেস হলে হোমে যাও
       Navigator.pushNamedAndRemoveUntil(
         context,
         BottomNavBarScreen.name,
         (route) => false,
       );
     } else {
+      String error = logInController.errorMessage ?? "Invalid email or password";
+      debugPrint("❌ Login failed: $error");
       showCustomSnackBar(
         context: context,
-        message: logInController.errorMessage ?? "Invalid email or password",
+        message: error,
       );
     }
   }
@@ -399,9 +395,8 @@ class ContinueWithContainer extends StatelessWidget {
       child: Center(
         child: Image.asset(
           iconImg,
-          height: 15.h,
-          width: 15.h,
-          color: isDark ? Colors.white : Colors.black,
+          height: 18.h,
+          width: 18.h,
         ),
       ),
     );

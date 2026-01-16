@@ -32,6 +32,8 @@ import 'View/Theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  final themeProvider = ThemeProvider();
+  await themeProvider.init(); // Initialize ThemeProvider
   Stripe.publishableKey =
       'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa';
   await Stripe.instance.applySettings();
