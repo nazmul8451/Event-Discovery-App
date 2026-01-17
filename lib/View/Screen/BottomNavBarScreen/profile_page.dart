@@ -14,6 +14,7 @@ import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.da
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -428,8 +429,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ? user.profile!
                                                 : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
                                             fit: BoxFit.cover,
-                                            placeholder: (context, url) => const Center(
-                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            placeholder: (context, url) => Shimmer.fromColors(
+                                              baseColor: Colors.grey[300]!,
+                                              highlightColor: Colors.grey[100]!,
+                                              child: Container(
+                                                color: Colors.white,
+                                              ),
                                             ),
                                             errorWidget: (context, url, error) => Icon(
                                               Icons.person,

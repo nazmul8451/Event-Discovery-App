@@ -7,6 +7,8 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.da
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/Service/urls.dart';
 
@@ -86,20 +88,27 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                               color: Provider.of<ThemeProvider>(context).isDarkMode
                                   ? Colors.grey[800]
                                   : Colors.white,
-                              image: user.profile != null &&
-                                      user.profile!.isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
-                                          ? user.profile!
-                                          : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
                             ),
-                            child: user.profile == null ||
-                                    user.profile!.isEmpty
-                                ? Icon(Icons.person, size: 50.sp, color: Colors.grey[400])
-                                : null,
+                            child: ClipOval(
+                              child: user.profile != null && user.profile!.isNotEmpty
+                                  ? CachedNetworkImage(
+                                      imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
+                                          ? user.profile!
+                                          : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Shimmer.fromColors(
+                                        baseColor: Colors.grey[300]!,
+                                        highlightColor: Colors.grey[100]!,
+                                        child: Container(color: Colors.white),
+                                      ),
+                                      errorWidget: (context, url, error) => Icon(
+                                        Icons.person,
+                                        size: 50.sp,
+                                        color: Colors.grey[400],
+                                      ),
+                                    )
+                                  : Icon(Icons.person, size: 50.sp, color: Colors.grey[400]),
+                            ),
                           ),
                         ),
                         SizedBox(width: 10.w),
@@ -366,18 +375,27 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
-                      image: user?.profile != null && user!.profile!.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
-                                  ? user.profile!
-                                  : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
                     ),
-                    child: user?.profile == null || user!.profile!.isEmpty
-                        ? Icon(Icons.person, size: 45.sp, color: Colors.grey[400])
-                        : null,
+                    child: ClipOval(
+                      child: user?.profile != null && user!.profile!.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
+                                  ? user.profile!
+                                  : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Container(color: Colors.white),
+                              ),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.person,
+                                size: 45.sp,
+                                color: Colors.grey[400],
+                              ),
+                            )
+                          : Icon(Icons.person, size: 45.sp, color: Colors.grey[400]),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20.h),
