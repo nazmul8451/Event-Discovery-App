@@ -132,30 +132,6 @@ class _LogInScreenState extends State<LogInScreen> {
                       ),
                       SizedBox(height: 10.h),
 
-                      // SizedBox(
-                      //   height: 56.h,
-                      //   width: double.infinity,
-                      //   child: Container(
-                      //     decoration: BoxDecoration(
-                      //       gradient: const LinearGradient(
-                      //         colors: [
-                      //           Color(0xFFB290FF),
-                      //           Color(0xFF8063F4),
-                      //         ], // Define your gradient colors
-                      //         begin: Alignment.topLeft,
-                      //         end: Alignment.bottomRight,
-                      //       ),
-                      //     ),
-                      //     child: ElevatedButton(
-                      //       style: ElevatedButton.styleFrom(
-                      //         backgroundColor:Colors.transparent
-                      //       ),
-                      //       onPressed: () {},
-                      //       child: Text('Log in'),
-                      //     ),
-                      //   ),
-                      // ),
-
                       // Login Button
                       GestureDetector(
                         onTap: _signinIn_Progress ? null : onTapLoginButton,

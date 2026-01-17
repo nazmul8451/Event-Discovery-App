@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gathering_app/Model/userModel.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -48,15 +49,32 @@ Future<bool> fetchProfile({required bool forceRefresh}) async {
   }
 
   try {
+    final String? userId = AuthController().userId;
+    debugPrint("🆔 Current User ID for fetch: $userId");
+
     final response = await NetworkCaller.getRequest(
-      url: Urls.userProfileUrl,
+      url: (userId != null && userId.isNotEmpty) 
+          ? Urls.getUserByIdUrl(userId) 
+          : Urls.userProfileUrl,
       requireAuth: true,
     );
 
     if (response.isSuccess && response.body != null) {
       final userData = response.body!['data'] as Map<String, dynamic>;
 
+      // Debug: Print API response
+      debugPrint("👤 ProfileController API Response: $userData");
+      debugPrint("📊 Stats field: ${userData['stats']}");
+      debugPrint("📊 Events field: ${userData['events']}");
+      debugPrint("📊 Followers field: ${userData['followers']}");
+      debugPrint("📊 Following field: ${userData['following']}");
+
       _currentUser = UserProfileModel.fromJson(userData);
+
+      // Debug: Print parsed stats
+      debugPrint("✅ Parsed Stats - Events: ${_currentUser?.stats?.events}");
+      debugPrint("✅ Parsed Stats - Followers: ${_currentUser?.stats?.followers}");
+      debugPrint("✅ Parsed Stats - Following: ${_currentUser?.stats?.following}");
 
       await _storage.write('cached_user_profile', userData);
 

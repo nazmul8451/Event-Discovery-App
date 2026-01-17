@@ -50,6 +50,11 @@ class OtherUserProfileController extends ChangeNotifier {
     }
   }
 
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<bool> toggleFollow(String userId) async {
     if (_userProfile == null || _followInProgress) return false;
 
@@ -94,6 +99,15 @@ class OtherUserProfileController extends ChangeNotifier {
         return true;
       } else {
         debugPrint("❌ Toggle follow failed: ${response.errorMessage}");
+        
+        // Handle "Already following" or similar desync
+        if (response.errorMessage?.contains("Already following") ?? false) {
+           _userProfile!.isFollowing = true;
+           _errorMessage = null; // Don't show as error, just sync
+           notifyListeners();
+           return true; 
+        }
+
         // Rollback on failure
         _userProfile!.isFollowing = isCurrentlyFollowing;
         if (_userProfile!.stats != null) {

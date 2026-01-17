@@ -342,15 +342,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.add)),
         actions: [
-          TextButton(
-            onPressed: () {},
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Image(image: AssetImage('assets/images/instagram.png')),
-            ),
-          ),
           Consumer<NotificationController>(
             builder: (context, notificationController, child) => Stack(
               clipBehavior: Clip.none,
@@ -388,6 +380,15 @@ class _ProfilePageState extends State<ProfilePage> {
           return Consumer<ProfileController>(
             builder: (context, profileController, child) {
               final user = profileController.currentUser;
+              
+              // Debug: Print user stats
+              if (kDebugMode) {
+                print('🔍 Profile Page - User: ${user?.name}');
+                print('🔍 Profile Page - Events: ${user?.stats?.events}');
+                print('🔍 Profile Page - Followers: ${user?.stats?.followers}');
+                print('🔍 Profile Page - Following: ${user?.stats?.following}');
+              }
+              
               return SafeArea(
                 child: RefreshIndicator(
                   onRefresh: () => profileController.fetchProfile(forceRefresh: true),
@@ -402,41 +403,48 @@ class _ProfilePageState extends State<ProfilePage> {
                             Stack(
                               children: [
                                 Container(
-                                  height: 100.h,
-                                  width: 100.h,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
+                                  padding: EdgeInsets.all(3.w),
+                                  decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Provider.of<ThemeProvider>(context).isDarkMode
-                                        ? Colors.grey[500]
-                                        : Colors.grey[200],
-                                    border: Border.all(
-                                      width: 2,
-                                      color: Colors.black,
+                                    gradient: LinearGradient(
+                                      colors: [Colors.deepPurpleAccent, Colors.purpleAccent],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
                                   ),
-                                  child: user?.profile != null && user!.profile!.isNotEmpty
-                                      ? CachedNetworkImage(
-                                          imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
-                                              ? user.profile!
-                                              : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) => const Center(
-                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: Container(
+                                    height: 100.h,
+                                    width: 100.h,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Provider.of<ThemeProvider>(context).isDarkMode
+                                          ? Colors.grey[800]
+                                          : Colors.white,
+                                    ),
+                                    child: user?.profile != null && user!.profile!.isNotEmpty
+                                        ? CachedNetworkImage(
+                                            imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
+                                                ? user.profile!
+                                                : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) => const Center(
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                            errorWidget: (context, url, error) => Icon(
+                                              Icons.person,
+                                              size: 50.sp,
+                                              color: Colors.grey,
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Icon(
+                                              Icons.person,
+                                              size: 50.sp,
+                                              color: Colors.grey,
+                                            ),
                                           ),
-                                          errorWidget: (context, url, error) => Icon(
-                                            Icons.person,
-                                            size: 50.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        )
-                                      : Center(
-                                          child: Icon(
-                                            Icons.person,
-                                            size: 50.sp,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
+                                  ),
                                 ),
                                 Positioned(
                                   bottom: 0,
@@ -541,7 +549,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     _showEditProfileDialog(context),
                                 child: Text(
                                   'Edit Profile',
-                                  style: TextStyle(fontSize: 15.sp, color: Colors.white),
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -556,16 +568,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                     backgroundColor:
                                         Provider.of<ThemeProvider>(context)
                                                 .isDarkMode
-                                            ? Colors.grey[800]
+                                            ? Colors.grey[850]
                                             : Colors.black,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16.r),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    // TODO: Navigate to settings screen
+                                    // Navigator.pushNamed(context, SettingsScreen.name);
+                                  },
                                   child: Text(
                                     'Settings',
-                                    style: TextStyle(fontSize: 15.sp, color: Colors.white),
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),

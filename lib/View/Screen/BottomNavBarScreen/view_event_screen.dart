@@ -25,7 +25,6 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
   @override
@@ -323,7 +322,9 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                     border: Border.all(width: 1, color: Colors.grey),
                   ),
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // TODO: Implement like/rating functionality
+                    },
                     icon: Icon(Icons.thumb_up_alt_outlined),
                   ),
                 ),
@@ -337,7 +338,9 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
                     border: Border.all(width: 1, color: Colors.grey),
                   ),
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // TODO: Implement dislike/rating functionality
+                    },
                     icon: Icon(Icons.thumb_down_alt_outlined),
                   ),
                 ),

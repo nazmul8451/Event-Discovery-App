@@ -199,12 +199,24 @@ class _UserChatScreenState extends State<UserChatScreen> {
           ),
 
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.call_outlined)),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Implement voice call functionality
+              },
+              icon: const Icon(Icons.call_outlined),
+            ),
+            IconButton(
+              onPressed: () {
+                // TODO: Implement video call functionality
+              },
               icon: const Icon(Icons.videocam_outlined),
             ),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            IconButton(
+              onPressed: () {
+                // TODO: Show more options menu
+              },
+              icon: const Icon(Icons.more_vert),
+            ),
             SizedBox(width: 8.w),
           ],
         ),

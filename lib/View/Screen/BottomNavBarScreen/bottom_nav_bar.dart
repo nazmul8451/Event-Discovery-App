@@ -6,7 +6,6 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
 import 'chat_page.dart';
 
-
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
@@ -23,24 +22,26 @@ class BottomNavBarScreen extends StatefulWidget {
 }
 
 class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
-
   @override
   void initState() {
     super.initState();
-    // Initialize if needed, but controller handles it. 
+    // Initialize if needed, but controller handles it.
     // Usually standard provider pattern doesn't need init here unless syncing widget param.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(widget.initialIndex != 0) {
+      if (widget.initialIndex != 0) {
         context.read<BottomNavController>().onItemTapped(widget.initialIndex);
       }
-      
+
       // Global Chat Initialization
       final auth = AuthController();
       if (auth.userId == null) {
-         context.read<ProfileController>().fetchProfile(forceRefresh: false).then((_) {
-           context.read<ChatController>().getChats();
-           context.read<ChatController>().initChatListSocket();
-         });
+        context
+            .read<ProfileController>()
+            .fetchProfile(forceRefresh: false)
+            .then((_) {
+              context.read<ChatController>().getChats();
+              context.read<ChatController>().initChatListSocket();
+            });
       } else {
         context.read<ChatController>().getChats();
         context.read<ChatController>().initChatListSocket();
@@ -49,17 +50,16 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   }
 
   final List<Widget> _pages = [
-    const HomePage(),
-    const MapPage(),
-    const SavedPage(),
+    HomePage(),
+    MapPage(),
+    SavedPage(),
     ChatPage(),
-    const ProfilePage(),
+    ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Consumer<BottomNavController>(
       builder: (context, controller, child) {
         return Scaffold(
@@ -100,52 +100,58 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Image.asset(
-                                  icons[index],
-                                  width: 24.w.clamp(24, 26),
-                                  height: 24.h.clamp(24, 26),
-                                  color: isSelected
-                                      ? (isDark ? Colors.white : Colors.black)
-                                      : (isDark ? Colors.grey.shade500 : Colors.grey.shade600),
-                                ),
-                                  if (index == 3 && !isSelected) // Chat Icon and NOT selected
-                                  Consumer<ChatController>(
-                                    builder: (context, chatController, _) {
-                                      debugPrint("🎨 BottomNavBar - Chat Badge Build: unreadCount=${chatController.unreadCount}");
-                                      if (chatController.unreadCount > 0) {
-                                        return Positioned(
-                                          right: -6.w,
-                                          top: -4.h,
-                                          child: Container(
-                                            padding: EdgeInsets.all(4.w),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.red,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            constraints: BoxConstraints(
-                                              minWidth: 16.w,
-                                              minHeight: 16.h,
-                                            ),
-                                            child: Text(
-                                              chatController.unreadCount.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 8.sp,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Image.asset(
+                                icons[index],
+                                width: 24.w.clamp(24, 26),
+                                height: 24.h.clamp(24, 26),
+                                color: isSelected
+                                    ? (isDark ? Colors.white : Colors.black)
+                                    : (isDark
+                                          ? Colors.grey.shade500
+                                          : Colors.grey.shade600),
+                              ),
+                              if (index == 3 &&
+                                  !isSelected) // Chat Icon and NOT selected
+                                Consumer<ChatController>(
+                                  builder: (context, chatController, _) {
+                                    debugPrint(
+                                      "🎨 BottomNavBar - Chat Badge Build: unreadCount=${chatController.unreadCount}",
+                                    );
+                                    if (chatController.unreadCount > 0) {
+                                      return Positioned(
+                                        right: -6.w,
+                                        top: -4.h,
+                                        child: Container(
+                                          padding: EdgeInsets.all(4.w),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
                                           ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
-                                  ),
-                              ],
-                            ),
+                                          constraints: BoxConstraints(
+                                            minWidth: 16.w,
+                                            minHeight: 16.h,
+                                          ),
+                                          child: Text(
+                                            chatController.unreadCount
+                                                .toString(),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 8.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                            ],
+                          ),
 
                           SizedBox(height: 4.h),
 
@@ -164,7 +170,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                                         : Colors.black) // Selected
                                   : (isDark
                                         ? Colors.grey.shade500
-                                        : Colors.grey.shade600), 
+                                        : Colors.grey.shade600),
                             ),
                           ),
                         ],

@@ -7,6 +7,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.da
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 class OtherUserProfileScreen extends StatefulWidget {
@@ -40,26 +41,18 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
             Navigator.pop(context);
           },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Image(image: AssetImage('assets/images/instagram.png')),
-            ),
-          ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none)),
-        ],
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<OtherUserProfileController>(
         builder: (context, controller, child) {
-          if (controller.inProgress) {
+          if (controller.inProgress && controller.userProfile == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (controller.errorMessage != null) {
-            return Center(child: Text(controller.errorMessage!));
+          if (controller.errorMessage != null && controller.userProfile == null) {
+            return Center(
+              child: Text(controller.errorMessage!),
+            );
           }
 
           final user = controller.userProfile;
@@ -76,31 +69,38 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                     Row(
                       children: [
                         Container(
-                          height: 100.h,
-                          width: 100.h,
-                          decoration: BoxDecoration(
+                          padding: EdgeInsets.all(3.w),
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Provider.of<ThemeProvider>(context).isDarkMode
-                                ? Colors.grey[500]
-                                : Colors.grey[200],
-                            border: Border.all(
-                              width: 2,
-                              color: Theme.of(context).colorScheme.outline,
+                            gradient: LinearGradient(
+                              colors: [Colors.deepPurpleAccent, Colors.purpleAccent],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            image: user.profile != null &&
-                                    user.profile!.isNotEmpty
-                                ? DecorationImage(
-                                    image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
-                                        ? user.profile!
-                                        : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
-                                    fit: BoxFit.cover,
-                                  )
+                          ),
+                          child: Container(
+                            height: 100.h,
+                            width: 100.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Provider.of<ThemeProvider>(context).isDarkMode
+                                  ? Colors.grey[800]
+                                  : Colors.white,
+                              image: user.profile != null &&
+                                      user.profile!.isNotEmpty
+                                  ? DecorationImage(
+                                      image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
+                                          ? user.profile!
+                                          : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: user.profile == null ||
+                                    user.profile!.isEmpty
+                                ? Icon(Icons.person, size: 50.sp, color: Colors.grey[400])
                                 : null,
                           ),
-                          child: user.profile == null ||
-                                  user.profile!.isEmpty
-                              ? Icon(Icons.person, size: 50.sp, color: Colors.grey[800])
-                              : null,
                         ),
                         SizedBox(width: 10.w),
                         Expanded(
@@ -158,11 +158,24 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                                 borderRadius: BorderRadius.circular(16.r),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               if (user.isFollowing ?? false) {
                                 _showUnfollowDialog(context, controller, user.name ?? 'User');
                               } else {
-                                controller.toggleFollow(widget.userId);
+                                final success = await controller.toggleFollow(widget.userId);
+                                if (success && context.mounted) {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "You are now following ${user.name}",
+                                  );
+                                } else if (!success && context.mounted) {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: controller.errorMessage ?? "Failed to follow",
+                                    isError: true,
+                                  );
+                                  controller.clearError();
+                                }
                               }
                             },
                             child: controller.followInProgress 
@@ -319,26 +332,125 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
   }
 
   void _showUnfollowDialog(BuildContext context, OtherUserProfileController controller, String name) {
+    final user = controller.userProfile;
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          title: Text("Unfollow $name?"),
-          content: Text("Are you sure you want to unfollow this user?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Theme.of(context).cardColor,
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24.r),
+              color: Theme.of(context).cardColor,
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                controller.toggleFollow(widget.userId);
-              },
-              child: const Text("Unfollow", style: TextStyle(color: Colors.redAccent)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Modern Avatar Container
+                Container(
+                  width: 90.w,
+                  height: 90.w,
+                  padding: EdgeInsets.all(3.w),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Colors.deepPurpleAccent, Colors.purpleAccent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      image: user?.profile != null && user!.profile!.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(Uri.encodeFull(user.profile!.startsWith('http')
+                                  ? user.profile!
+                                  : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}')),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: user?.profile == null || user!.profile!.isEmpty
+                        ? Icon(Icons.person, size: 45.sp, color: Colors.grey[400])
+                        : null,
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Text(
+                  "Stop following $name?",
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  "If you change your mind, you'll have to request to follow $name again.",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 30.h),
+                // Divider
+                Divider(height: 1, color: Colors.grey.withOpacity(0.15)),
+                SizedBox(height: 12.h),
+                // Action Buttons
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(dialogContext);
+                      final success = await controller.toggleFollow(widget.userId);
+                      if (success && context.mounted) {
+                        showCustomSnackBar(
+                          context: context,
+                          message: "Unfollowed ${user?.name ?? 'user'}",
+                        );
+                      } else if (!success && context.mounted) {
+                         showCustomSnackBar(
+                          context: context,
+                          message: controller.errorMessage ?? "Failed to unfollow",
+                          isError: true,
+                        );
+                        controller.clearError();
+                      }
+                    },
+                    child: const Text(
+                      "Unfollow",
+                      style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+                ),
+                Divider(height: 1, color: Colors.grey.withOpacity(0.15)),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

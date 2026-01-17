@@ -56,8 +56,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Theme.of(context).brightness == Brightness.dark
                           ? 'assets/images/splash2.png'
                           : 'assets/images/splash_img.png',
-                      height: 80.h,
-                      width: 80.h,
+               height: 100.h.clamp(100,100),
+                    width: 100.h.clamp(100,100),
                     ),
                   ),
                   SizedBox(height: 10.h),

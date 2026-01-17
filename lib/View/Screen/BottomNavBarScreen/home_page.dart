@@ -613,7 +613,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 16.h),
             Text(
-              "No events available ekhon available nei",
+              "No events available right now",
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,

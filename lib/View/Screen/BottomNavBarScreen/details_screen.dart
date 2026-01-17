@@ -11,6 +11,7 @@ import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
+import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
@@ -42,7 +43,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   late String eventId;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       eventId = ModalRoute.of(context)!.settings.arguments as String;
@@ -66,7 +66,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _reviewController.dispose();
   }
@@ -641,7 +640,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   // Share button (kept)
                   Consumer<ThemeProvider>(
                     builder: (context, controller, child) => GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        // TODO: Implement share functionality
+                        // Share event details to social media or other apps
+                      },
                       child: Container(
                         height: 36,
                         width: 36,
@@ -1446,17 +1448,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                                 backgroundColor: const Color(
                                                   0xFFCC18CA,
                                                 ).withOpacity(0.3),
-                                                child: Text(
-                                                  review.reviewerName.isNotEmpty
-                                                      ? review.reviewerName[0]
-                                                            .toUpperCase()
-                                                      : '?',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18.sp,
-                                                  ),
-                                                ),
+                                                backgroundImage: review.reviewerImage.isNotEmpty
+                                                    ? NetworkImage(
+                                                        review.reviewerImage.startsWith('http')
+                                                            ? review.reviewerImage
+                                                            : '${Urls.baseUrl}${review.reviewerImage.startsWith('/') ? '' : '/'}${review.reviewerImage}',
+                                                      )
+                                                    : null,
+                                                child: review.reviewerImage.isEmpty
+                                                    ? Text(
+                                                        review.reviewerName.isNotEmpty
+                                                            ? review.reviewerName[0]
+                                                                  .toUpperCase()
+                                                            : '?',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 18.sp,
+                                                        ),
+                                                      )
+                                                    : null,
                                               ),
                                             ),
                                             SizedBox(width: 12.w),
