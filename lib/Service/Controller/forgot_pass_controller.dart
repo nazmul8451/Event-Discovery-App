@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
 
 class ForgotPasswordController extends ChangeNotifier {
   bool _inProgress = false;
@@ -27,7 +28,7 @@ class ForgotPasswordController extends ChangeNotifier {
     try {
       final response = await NetworkCaller.postRequest(
         url: Urls.forgotpassUrl,
-        body: requestBody as Map<String,String>?,
+        body: requestBody,
         requireAuth: false,
       );
 
@@ -68,19 +69,31 @@ class ForgotPasswordController extends ChangeNotifier {
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.verifyOtpUrl,
-        body: requestBody as Map<String, String>?,
+        body: requestBody,
         requireAuth: false,
       );
 
+      print('OTP Verify Response Body: ${response.body}');
+
       if (response.isSuccess && response.body != null) {
-        final token = response.body?['data']?['token'] as String?;
+        final data = response.body?['data'];
+        
+        // Robust token extraction (matching AuthController/OtpVerifyController)
+        final String? token = data?['token']?.toString() ?? 
+                             data?['accessToken']?.toString() ?? 
+                             response.body?['token']?.toString() ?? 
+                             response.body?['accessToken']?.toString();
+        
+        final String? refreshToken = data?['refreshToken']?.toString() ?? response.body?['refreshToken']?.toString();
 
         if (token != null && token.isNotEmpty) {
           _passwordResetToken = token;
-          print("Password Reset Token saved: $_passwordResetToken");
+          print("SUCCESS: Session Token caught: $_passwordResetToken");
+          
           return true;
         } else {
-          _errorMessage = "Token not received from server";
+          print("ERROR: Token not found in response body.");
+          _errorMessage = "Verification succeeded but token missing";
           return false;
         }
       } else {
@@ -120,18 +133,25 @@ class ForgotPasswordController extends ChangeNotifier {
       "confirmPassword": confirmPass,
     };
 
+    print('URL: ${Urls.resetPassUrl}');
+    print('Body: $requestBody');
+    print('Using Token: $_passwordResetToken');
+
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
         url: Urls.resetPassUrl,
-        body: requestBody as Map<String, String>?,
-        requireAuth: false,
+        body: requestBody,
+        token: _passwordResetToken,
       );
 
       if (response.isSuccess) {
         _passwordResetToken = null; // Clear token after successful reset
+        await AuthController().logout(); // Ensure session is cleared so user MUST login
         print("Password reset successful!");
         return true;
       } else {
+        print("RESET PASSWORD FAILED - STATUS: ${response.statusCode}");
+        print("RESET PASSWORD FAILED - BODY: ${response.body}");
         _errorMessage = response.errorMessage ?? "Failed to reset password";
         return false;
       }

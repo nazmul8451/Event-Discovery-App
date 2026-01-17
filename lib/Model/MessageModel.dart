@@ -28,7 +28,14 @@ class MessageModel {
       sender = json['sender']?.toString();
     }
     text = json['text'];
-    image = json['image'];
+    // Handle image/images field
+    if (json['images'] is List && (json['images'] as List).isNotEmpty) {
+      image = json['images'][0]?.toString();
+    } else if (json['images'] != null) {
+      image = json['images'].toString();
+    } else {
+      image = json['image'];
+    }
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];

@@ -545,9 +545,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: Size(double.infinity, 48),
-                                  backgroundColor: Colors.deepPurpleAccent,
+                                  backgroundColor: const Color(0xFF0D0D15),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16.r),
+                                    borderRadius: BorderRadius.circular(12.r),
                                   ),
                                 ),
                                 onPressed: () =>
@@ -570,13 +570,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     minimumSize: Size(double.infinity, 48),
-                                    backgroundColor:
-                                        Provider.of<ThemeProvider>(context)
-                                                .isDarkMode
-                                            ? Colors.grey[850]
-                                            : Colors.black,
+                                    backgroundColor: const Color(0xFF0D0D15),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16.r),
+                                      borderRadius: BorderRadius.circular(12.r),
                                     ),
                                   ),
                                   onPressed: () {
@@ -584,7 +580,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     // Navigator.pushNamed(context, SettingsScreen.name);
                                   },
                                   child: Text(
-                                    'Settings',
+                                    'Setting',
                                     style: TextStyle(
                                       fontSize: 15.sp,
                                       color: Colors.white,
@@ -1350,7 +1346,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ListTile(
                                           leading: Icon(Icons.person),
                                           title: Text(
-                                            'Edit Profile',
+                                            'Change Password',
                                             style: Theme.of(
                                               context,
                                             ).textTheme.titleMedium,

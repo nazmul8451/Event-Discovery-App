@@ -9,6 +9,7 @@ import 'package:gathering_app/Service/Controller/log_in_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
+import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
@@ -47,16 +48,21 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
             child: SafeArea(
               child: Column(
                 children: [
-
                   Align(
                     alignment: Alignment.topLeft,
-                    child: IconButton(onPressed: (){
-                      Navigator.pushNamedAndRemoveUntil(context, ForgotPassScreen.name,(predicate)=> false);
-                    }, icon: Icon(Icons.arrow_back)),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          ForgotPassScreen.name,
+                          (predicate) => false,
+                        );
+                      },
+                      icon: Icon(Icons.arrow_back),
+                    ),
                   ),
                   const Spacer(),
-                        
-              
+
                   Padding(
                     padding: EdgeInsets.all(20.w),
                     child: Column(
@@ -64,14 +70,15 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                       children: [
                         Text(
                           'Create New Password',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
 
                         SizedBox(height: 30.h),
-              
+
                         // TextFields
                         Form(
                           key: _formKey,
@@ -80,8 +87,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                               AuthTextField(
                                 controller: newpassController,
                                 hintText: '••••••••',
-                                labelText: 'New Passwrod',
-                                              obscureText: true,
+                                labelText: 'New Password',
+                                obscureText: true,
                                 isPassword: true,
                               ),
                               SizedBox(height: 16.h),
@@ -93,8 +100,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                                 obscureText: true,
                                 isPassword: true,
                                 validator: (String? value) {
-                                  if ((value?.length ?? 0) <= 6) {
-                                    return 'Enter a valid pasword';
+                                  if (value != newpassController.text) {
+                                    return 'Passwords do not match';
+                                  }
+                                  if ((value?.length ?? 0) < 6) {
+                                    return 'Password must be at least 6 characters';
                                   }
                                   return null;
                                 },
@@ -102,34 +112,23 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                             ],
                           ),
                         ),
-              
-                  
+
                         SizedBox(height: 10.h),
-              
+
                         // Login Button
-                        Consumer2<LogInController, ThemeProvider>(
-                          builder: (context, signUpCtrl, themeCtrl, child) {
-                            final progressColor = themeCtrl.isDarkMode
-                                ? Color(0xFFCC18CA)
-                                : const Color(0xFF6A7282);
-                            return signUpCtrl.inProgress
-                                ? Center(
-                                    child: CircularProgressIndicator(
-                                      color: progressColor,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : GestureDetector(
-                                    onTap: onTapConfirmButton,
-                                    child: CustomButton(buttonName: 'Confirm'),
-                                  );
+                        Consumer<ForgotPasswordController>(
+                          builder: (context, forgotController, child) {
+                            return CustomButton(
+                              buttonName: 'Confirm',
+                              isLoading: forgotController.inProgress,
+                              onPressed: onTapConfirmButton,
+                            );
                           },
                         ),
-              
                       ],
                     ),
                   ),
-              
+
                   const Spacer(),
                 ],
               ),
@@ -148,18 +147,22 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 
   Future<void> createNewPassword() async {
-final newPassControll = Provider.of<ForgotPasswordController>(
-  context,
-  listen: false,
-);
+    final newPassControll = Provider.of<ForgotPasswordController>(
+      context,
+      listen: false,
+    );
 
     bool isSuccess = await newPassControll.forgotNewPassword(
       newpassController.text.trim(),
-      confirmpassController.text.trim()
-      );
+      confirmpassController.text.trim(),
+    );
     if (isSuccess) {
-      showCustomSnackBar(context: context, message: "Congress! Update your password. please Log in your account");
-      Navigator.pushReplacementNamed(context, BottomNavBarScreen.name);
+      showCustomSnackBar(
+        context: context,
+        message: "Congratulations! Your password has been updated. Please log in to your account.",
+        isError: false,
+      );
+      Navigator.pushNamedAndRemoveUntil(context, LogInScreen.name, (route) => false);
     } else {
       showCustomSnackBar(
         context: context,
@@ -167,5 +170,4 @@ final newPassControll = Provider.of<ForgotPasswordController>(
       );
     }
   }
-
 }

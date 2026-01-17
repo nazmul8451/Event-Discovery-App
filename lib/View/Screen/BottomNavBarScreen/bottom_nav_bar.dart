@@ -28,9 +28,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     // Initialize if needed, but controller handles it.
     // Usually standard provider pattern doesn't need init here unless syncing widget param.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.initialIndex != 0) {
-        context.read<BottomNavController>().onItemTapped(widget.initialIndex);
-      }
+      context.read<BottomNavController>().onItemTapped(widget.initialIndex);
 
       // Global Chat Initialization
       final auth = AuthController();
@@ -95,8 +93,10 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                       'Profile',
                     ];
 
-                    return GestureDetector(
-                      onTap: () => controller.onItemTapped(index),
+                    return Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => controller.onItemTapped(index),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -175,8 +175,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                           ),
                         ],
                       ),
-                    );
-                  }),
+                    ),
+                  );
+                }),
                 ),
               ),
             ),

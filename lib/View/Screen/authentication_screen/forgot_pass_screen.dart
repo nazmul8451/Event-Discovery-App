@@ -22,7 +22,6 @@ class ForgotPassScreen extends StatefulWidget {
 class _ForgotPassScreenState extends State<ForgotPassScreen> {
   TextEditingController emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool inProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,23 +68,13 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                 ),
               ),
               SizedBox(height: 20.h),
-              Consumer2<ForgotPasswordController, ThemeProvider>(
-                builder: (context, forgotController, themeCtrl, child) {
-                  final progressColor = themeCtrl.isDarkMode
-                      ? Color(0xFFCC18CA)
-                      : const Color(0xFF6A7282);
-
-                  return forgotController.inProgress
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: progressColor,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: onTapSendCodeButton,
-                          child: CustomButton(buttonName: 'Send code'),
-                        );
+              Consumer<ForgotPasswordController>(
+                builder: (context, forgotController, child) {
+                  return CustomButton(
+                    buttonName: 'Send code',
+                    isLoading: forgotController.inProgress,
+                    onPressed: onTapSendCodeButton,
+                  );
                 },
               ),
             ],
@@ -114,7 +103,11 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
     print('Your Current Saved Email-${forgotPassController.savedEmail}');
 
     if (isSuccess) {
-      showCustomSnackBar(context: context, message: 'OTP code send your email');
+      showCustomSnackBar(
+        context: context, 
+        message: 'OTP code sent to your email',
+        isError: false,
+      );
       Navigator.pushNamed(context, CodeSubmit.name);
 
     } else {

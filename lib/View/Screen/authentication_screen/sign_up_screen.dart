@@ -145,45 +145,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           SizedBox(height: 20.h),
-                          GestureDetector(
-                            onTap: _signUpIn_Progress
-                                ? null
-                                : onTapSignUp_button,
-                            child: Consumer<ThemeProvider>(
-                              builder: (context, controller, child) =>
-                                  Container(
-                                    height: 56.h,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0xFFB290FF),
-                                          Color(0xFF8063F4),
-                                        ],
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: _signUpIn_Progress
-                                          ? SizedBox(
-                                              height: 24.h,
-                                              width: 24.h,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 3,
-                                              ),
-                                            )
-                                          : Text(
-                                              'Sign up',
-                                              style: TextStyle(
-                                                fontSize: 14.sp.clamp(14, 16),
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                    ),
-                                  ),
-                            ),
+                          CustomButton(
+                            buttonName: 'Sign up',
+                            isLoading: _signUpIn_Progress,
+                            onPressed: onTapSignUp_button,
                           ),
 
                           SizedBox(height: 20.h),

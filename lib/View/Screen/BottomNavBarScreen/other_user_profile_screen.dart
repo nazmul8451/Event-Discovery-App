@@ -159,13 +159,19 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size(double.infinity, 48),
+                              minimumSize: Size(double.infinity, 45.h),
                               backgroundColor: (user.isFollowing ?? false) 
                                   ? Colors.grey[800] 
-                                  : Colors.deepPurpleAccent,
+                                  : const Color(0xFF0D011D), // Dark purple/black
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.r),
+                                borderRadius: BorderRadius.circular(12.r),
+                                side: BorderSide(
+                                  color: (user.isFollowing ?? false) 
+                                      ? Colors.transparent 
+                                      : Colors.white10,
+                                ),
                               ),
+                              elevation: 0,
                             ),
                             onPressed: () async {
                               if (user.isFollowing ?? false) {
@@ -188,17 +194,21 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                               }
                             },
                             child: controller.followInProgress 
-                                ? const SizedBox(
-                                    height: 12,
-                                    width: 12,
-                                    child: CircularProgressIndicator(
+                                ? SizedBox(
+                                    height: 18.h,
+                                    width: 18.h,
+                                    child: const CircularProgressIndicator(
                                       color: Colors.white,
-                                      strokeWidth: 2,
+                                      strokeWidth: 2.5,
                                     ),
                                   )
                                 : Text(
                                     (user.isFollowing ?? false) ? 'Following' : 'Follow',
-                                    style: TextStyle(fontSize: 15.sp, color: Colors.white),
+                                    style: TextStyle(
+                                      fontSize: 15.sp, 
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                           ),
                         ),
@@ -206,76 +216,71 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
                         Expanded(
                           child: Consumer<ChatController>(
                             builder: (context, chatController, child) {
-                              return SizedBox(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(double.infinity, 48),
-                                    backgroundColor:
-                                        Theme.of(context).brightness == Brightness.dark 
-                                            ? Colors.white10 
-                                            : Colors.grey[200],
-                                    foregroundColor: Theme.of(context).colorScheme.onSurface,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16.r),
+                              return ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(double.infinity, 45.h),
+                                  backgroundColor: const Color(0xFF0D011D), // Same dark color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    side: const BorderSide(
+                                      color: Colors.white10,
                                     ),
                                   ),
-                                  onPressed: () async {
-                                    final chatId = await chatController
-                                        .createChat(widget.userId);
-
-                                    if (chatId != null) {
-                                      final user = controller.userProfile;
-                                      final chat = ChatModel(
-                                        id: chatId,
-                                        otherUserId: widget.userId,
-                                        name: user?.name,
-                                        imageIcon: user?.profile,
-                                        status: 'offline',
-                                      );
-
-                                      // Switch to Chat Tab (index 3) first
-                                      context.read<BottomNavController>().onItemTapped(3);
-
-                                      // Pop everything until the BottomNavBarScreen is reached (assuming it's the root or nearly root)
-                                      // Using popUntil to go back to the BottomNavBarScreen.
-                                      Navigator.of(context).popUntil((route) => route.isFirst); 
-
-                                      // Then Push UserChatScreen
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              UserChatScreen(chat: chat),
-                                        ),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            chatController.errorMessage ??
-                                                "Failed to create chat",
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: chatController.inProgress
-                                      ? const SizedBox(
-                                          height: 12,
-                                          width: 12,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : Text(
-                                          'Message',
-                                          style: TextStyle(
-                                              fontSize: 15.sp,
-                                              color: Colors.white),
-                                        ),
+                                  elevation: 0,
                                 ),
+                                onPressed: () async {
+                                  final chatId = await chatController
+                                      .createChat(widget.userId);
+
+                                  if (chatId != null) {
+                                    final user = controller.userProfile;
+                                    final chat = ChatModel(
+                                      id: chatId,
+                                      otherUserId: widget.userId,
+                                      name: user?.name,
+                                      imageIcon: user?.profile,
+                                      status: 'offline',
+                                    );
+
+                                    context.read<BottomNavController>().onItemTapped(3);
+                                    Navigator.of(context).popUntil((route) => route.isFirst); 
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            UserChatScreen(chat: chat),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          chatController.errorMessage ??
+                                              "Failed to create chat",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: chatController.inProgress
+                                    ? SizedBox(
+                                        height: 18.h,
+                                        width: 18.h,
+                                        child: const CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.5,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Message',
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               );
                             },
                           ),

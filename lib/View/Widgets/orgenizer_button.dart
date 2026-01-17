@@ -52,13 +52,13 @@ class ContactOrgenizerButton extends StatelessWidget {
           child: Center(
             child: isLoading
                 ? SizedBox(
-              height: 24.h,
-              width: 24.h,
-              child: const CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2.5,
-              ),
-            )
+                    height: 24.h,
+                    width: 24.h,
+                    child: CircularProgressIndicator(
+                      color: isDark ? Colors.white : const Color(0xFF8063F4),
+                      strokeWidth: 3,
+                    ),
+                  )
                 : Text(
               buttonName,
               style: TextStyle(

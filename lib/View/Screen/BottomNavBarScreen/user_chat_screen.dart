@@ -41,6 +41,19 @@ class _UserChatScreenState extends State<UserChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Robust argument extraction fallback
+      if (widget.chat == null) {
+        final args = ModalRoute.of(context)?.settings.arguments;
+        debugPrint("📱 UserChatScreen - Extracting args: $args");
+        if (args is ChatModel) {
+          setState(() {
+            widget.chat = args;
+          });
+        }
+      }
+
+      debugPrint("📱 UserChatScreen Init - Chat Object: ${widget.chat?.toJson()}");
+      
       final authController = AuthController();
       if (widget.chat?.id != null) {
         context.read<ChatController>().getMessages(widget.chat!.id!);
@@ -129,21 +142,28 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         children: [
                           CircleAvatar(
                             radius: 20.r,
-                            backgroundColor: Colors.grey[300],
+                            backgroundColor: Colors.primaries[(widget.chat?.name ?? "").hashCode % Colors.primaries.length].withOpacity(0.2),
                             child: ClipOval(
                                 child: (widget.chat?.imageIcon != null && widget.chat!.imageIcon!.isNotEmpty)
                                   ? Image.network(
                                       widget.chat!.imageIcon!.startsWith('http')
                                           ? widget.chat!.imageIcon!
                                           : '${Urls.baseUrl}${widget.chat!.imageIcon!.startsWith('/') ? '' : '/'}${widget.chat!.imageIcon!}',
-                                      fit: BoxFit.cover,
                                       width: 40.r,
                                       height: 40.r,
+                                      fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) =>
                                           const Icon(Icons.person),
                                     )
-                                  : const Icon(Icons.person, size: 24),
-                            ),
+                                  : Text(
+                                      (widget.chat?.name != null && widget.chat!.name!.isNotEmpty)
+                                          ? widget.chat!.name![0].toUpperCase()
+                                          : "?",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.primaries[(widget.chat?.name ?? "").hashCode % Colors.primaries.length],
+                                      ),
+                                    )),
                           ),
                           // Online Dot
                           Positioned(
@@ -171,7 +191,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "${widget.chat?.name}",
+                              "${widget.chat?.name ?? 'Chat'}",
                               style: TextStyle(
                                 fontSize: 14.sp.clamp(14, 16),
                                 fontWeight: FontWeight.w600,
@@ -266,10 +286,22 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                           if(message.image != null)
+                           if(message.image != null && message.image!.isNotEmpty)
                              Padding(
                                padding: const EdgeInsets.only(bottom: 5.0),
-                               child: Image.network(message.image!, height: 150, fit: BoxFit.cover,),
+                               child: ClipRRect(
+                                 borderRadius: BorderRadius.circular(8.r),
+                                 child: Image.network(
+                                   message.image!.startsWith('http') 
+                                     ? message.image! 
+                                     : '${Urls.baseUrl}${message.image!.startsWith('/') ? '' : '/'}${message.image!}', 
+                                   height: 150.h, 
+                                   width: 200.w,
+                                   fit: BoxFit.cover,
+                                   errorBuilder: (context, error, stackTrace) => 
+                                     const Icon(Icons.broken_image, color: Colors.grey),
+                                 ),
+                               ),
                              ),
                             Text(
                               message.text ?? '',
@@ -372,25 +404,42 @@ class _UserChatScreenState extends State<UserChatScreen> {
                           
                           if (text.isEmpty && imagePath == null) return;
                           
+                          if (widget.chat?.id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Cannot send message: Chat ID missing"))
+                            );
+                            return;
+                          }
+
+                          // Store original text in case of failure
+                          final originalText = _textController.text;
+                          
                           _textController.clear();
                           setState(() {
                             _selectedImage = null;
                           });
                           
-                          if (widget.chat?.id != null) {
-                            bool success = await context.read<ChatController>().sendMessage(
-                              widget.chat!.id!, 
-                              text.isEmpty ? null : text,
-                              imagePath: imagePath,
-                            );
-                            if(success) {
-                              if (_scrollController.hasClients) {
-                                  _scrollController.animateTo(
-                                    0.0, 
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOut,
-                                  );
-                              }
+                          bool success = await context.read<ChatController>().sendMessage(
+                            widget.chat!.id!, 
+                            text.isEmpty ? null : text,
+                            imagePath: imagePath,
+                          );
+
+                          if(success) {
+                            if (_scrollController.hasClients) {
+                                _scrollController.animateTo(
+                                  0.0, 
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                            }
+                          } else {
+                            // Restore text on failure
+                            _textController.text = originalText;
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Failed to send message"))
+                              );
                             }
                           }
                         },

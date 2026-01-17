@@ -103,14 +103,22 @@ class _ChatPageState extends State<ChatPage> {
                       return ListTile(
                         leading: CircleAvatar(
                           radius: 26.r,
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: Colors.primaries[userChat.name.hashCode % Colors.primaries.length].withOpacity(0.2),
                           backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.isNotEmpty)
                               ? NetworkImage(userChat.imageIcon!.startsWith('http') 
                                   ? userChat.imageIcon! 
                                   : '${Urls.baseUrl}${userChat.imageIcon!.startsWith('/') ? '' : '/'}${userChat.imageIcon!}')
                               : null,
                           child: (userChat.imageIcon == null || userChat.imageIcon!.isEmpty)
-                              ? const Icon(Icons.person, color: Colors.grey)
+                              ? Text(
+                                  (userChat.name != null && userChat.name!.isNotEmpty)
+                                      ? userChat.name![0].toUpperCase()
+                                      : "?",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.primaries[userChat.name.hashCode % Colors.primaries.length],
+                                  ),
+                                )
                               : null,
                         ),
                         title: Row(

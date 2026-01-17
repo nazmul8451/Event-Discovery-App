@@ -23,6 +23,9 @@ import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
+import 'package:gathering_app/Service/Controller/chat_controller.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:gathering_app/Model/ChatModel.dart';
 import '../../Widgets/auth_textFormField.dart';
 import '../../Widgets/custom carosel_slider.dart';
 
@@ -41,6 +44,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   double _currentRating = 5.0;
   final TextEditingController _reviewController = TextEditingController();
   late String eventId;
+  bool _isChatLoading = false;
   @override
   void initState() {
     super.initState();
@@ -934,7 +938,71 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ),
 
                 SizedBox(height: 10.h),
-                ContactOrgenizerButton(buttonName: "Contact Orgenizer"),
+                ContactOrgenizerButton(
+                  buttonName: "Contact Orgenizer",
+                  isLoading: _isChatLoading,
+                  onPressed: () async {
+                    if (singleEvent?.data?.organizerId?.sId == null) {
+                      showCustomSnackBar(
+                        context: context,
+                        message: "Organizer information not available",
+                        isError: true,
+                      );
+                      return;
+                    }
+
+                    setState(() {
+                      _isChatLoading = true;
+                    });
+
+                    try {
+                      final chatController = context.read<ChatController>();
+                      final String? chatId = await chatController.createChat(
+                        singleEvent!.data!.organizerId!.sId!,
+                      );
+
+                      if (chatId != null) {
+                        // Navigate to UserChatScreen directly to ensure object passing
+                        if (mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserChatScreen(
+                                chat: ChatModel(
+                                  id: chatId,
+                                  name: singleEvent!.data!.organizerId!.name ?? "Organizer",
+                                  otherUserId: singleEvent!.data!.organizerId!.sId!,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        if (mounted) {
+                          showCustomSnackBar(
+                            context: context,
+                            message: "Failed to initiate chat",
+                            isError: true,
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        showCustomSnackBar(
+                          context: context,
+                          message: "An error occurred: $e",
+                          isError: true,
+                        );
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          _isChatLoading = false;
+                        });
+                      }
+                    }
+                  },
+                ),
 
                 // Align(
                 //   alignment: Alignment.center,

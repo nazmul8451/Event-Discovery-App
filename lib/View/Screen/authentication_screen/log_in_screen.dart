@@ -132,61 +132,10 @@ class _LogInScreenState extends State<LogInScreen> {
                       ),
                       SizedBox(height: 10.h),
 
-                      // Login Button
-                      GestureDetector(
-                        onTap: _signinIn_Progress ? null : onTapLoginButton,
-                        child: Consumer<ThemeProvider>(
-                          builder: (context, controller, child) {
-                            bool isDark = controller.isDarkMode;
-
-                            return AnimatedContainer(
-                              duration: Duration(milliseconds: 120),
-                              height: 56.h,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                border: Border.all(
-                                  color: isDark ? Colors.grey : Colors.grey,
-                                  width: 1.5,
-                                ),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFB290FF),
-                                    Color(0xFF8063F4),
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: isDark
-                                        ? Colors.white.withOpacity(0.2)
-                                        : Colors.black.withOpacity(0.15),
-                                    offset: Offset(4, 4),
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: Center(
-                                child: _signinIn_Progress
-                                    ? SizedBox(
-                                        height: 24.h,
-                                        width: 24.h,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 3,
-                                        ),
-                                      )
-                                    : Text(
-                                        'Log in',
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                              ),
-                            );
-                          },
-                        ),
+                      CustomButton(
+                        buttonName: 'Log in',
+                        isLoading: _signinIn_Progress,
+                        onPressed: onTapLoginButton,
                       ),
 
                       // Consumer2<LogInController, ThemeProvider>(

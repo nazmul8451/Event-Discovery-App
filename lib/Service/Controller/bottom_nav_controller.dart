@@ -10,4 +10,9 @@ class BottomNavController extends ChangeNotifier {
     _selectedIndex = index;
     notifyListeners();
   }
+
+  void reset() {
+    _selectedIndex = 0;
+    notifyListeners();
+  }
 }

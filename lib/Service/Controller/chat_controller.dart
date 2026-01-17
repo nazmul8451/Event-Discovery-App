@@ -114,9 +114,11 @@ class ChatController extends ChangeNotifier {
 
     if (response.isSuccess && response.body != null) {
       final data = response.body!['data'];
-      if (data != null && data['_id'] != null) {
+      final dynamic chatId = (data is Map) ? (data['_id'] ?? data['id']) : null;
+      if (chatId != null) {
+        await getChats(); // Refresh the chat list so the new chat appears
         notifyListeners();
-        return data['_id'];
+        return chatId.toString();
       }
     } else {
       _errorMessage = response.errorMessage;
@@ -196,7 +198,10 @@ Future<void> getChats() async {
               if (pId != null && currentUserId != null && pId != currentUserId) {
                 otherUserMap = p;
                 otherUserId = pId;
-                otherUserName = p['name']?.toString();
+                otherUserName = p['name']?.toString() ?? 
+                                p['username']?.toString() ?? 
+                                p['firstName']?.toString() ?? 
+                                p['fullName']?.toString();
                 break;
               }
             }
@@ -321,7 +326,7 @@ void markChatAsSeenLocally(String chatId) {
       response = await NetworkCaller.multipartRequest(
         url: Urls.sendMessage,
         method: 'POST',
-        fileKey: 'image',
+        fileKey: 'images',
         filePath: imagePath,
         fields: {
           "chatId": chatId,

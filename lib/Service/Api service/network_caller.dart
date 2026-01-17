@@ -46,7 +46,12 @@ class NetworkCaller {
       if (requireAuth) {
         final String? resolvedToken = await _getToken();
         if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $resolvedToken';
+           if (resolvedToken.contains('.')) {
+              headers['Authorization'] = 'Bearer $resolvedToken';
+           } else {
+              headers['Authorization'] = resolvedToken;
+              headers['token'] = resolvedToken;
+           }
         }
       }
 
@@ -72,6 +77,7 @@ class NetworkCaller {
     required String url,
     Map<String, dynamic>? body,
     bool requireAuth = true,
+    String? token,
   }) async {
     try {
       final Uri uri = Uri.parse(url);
@@ -81,14 +87,28 @@ class NetworkCaller {
         'Accept': 'application/json',
       };
 
-      // এখানে অটো টোকেন যোগ করো
-      if (requireAuth) {
+      // Handle Authentication
+      if (token != null && token.isNotEmpty) {
+        if (token.contains('.')) {
+          headers['Authorization'] = 'Bearer $token';
+          debugPrint("JWT TOKEN ADDED: Bearer $token");
+        } else {
+          headers['Authorization'] = token;
+          headers['token'] = token;
+          debugPrint("RAW TOKEN ADDED: $token");
+        }
+      } else if (requireAuth) {
         final String? resolvedToken = await _getToken();
         if (resolvedToken != null && resolvedToken.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $resolvedToken';
-          debugPrint("TOKEN ADDED TO HEADER: Bearer $resolvedToken");
+          if (resolvedToken.contains('.')) {
+            headers['Authorization'] = 'Bearer $resolvedToken';
+          } else {
+            headers['Authorization'] = resolvedToken;
+            headers['token'] = resolvedToken;
+          }
+          debugPrint("TOKEN ADDED TO HEADER");
         } else {
-          debugPrint("NO TOKEN FOUND (AuthController or storage)");
+          debugPrint("NO TOKEN FOUND");
         }
       }
 
@@ -215,20 +235,21 @@ class NetworkCaller {
           'HEADERS: $headers\n'
           'FIELDS: $fields\n'
           'FILE: $filePath\n'
+          'FILE_KEY: $fileKey\n'
           '========================');
 
-      final http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 5));
+      final http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 60));
       final http.Response httpResponse = await http.Response.fromStream(response);
 
       _logResponse(method, url, httpResponse);
 
       return _parseResponse(httpResponse);
     } on TimeoutException {
-      debugPrint('Network Error (MULTIPART): Request Timed out');
+      debugPrint('Network Error (MULTIPART): Request Timed out (60s)');
       return NetworkResponse(
         isSuccess: false,
         statusCode: 408,
-        errorMessage: 'Request timed out (5s limit)',
+        errorMessage: 'Request timed out (60s limit)',
       );
     } catch (e) {
       debugPrint('Network Error (MULTIPART): $e');
@@ -298,12 +319,11 @@ class NetworkCaller {
           body: decoded is Map<String, dynamic> ? decoded : null,
         );
       } else if (response.statusCode == 401) {
-        // টোকেন এক্সপায়ার হলে লগআউট করতে পারো (অপশনাল)
-        // AuthController().logout();
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
           errorMessage: _unAuthorizeMessage,
+          body: decoded is Map<String, dynamic> ? decoded : null,
         );
       } else {
         final String message = decoded is Map
@@ -315,6 +335,7 @@ class NetworkCaller {
           isSuccess: false,
           statusCode: response.statusCode,
           errorMessage: message,
+          body: decoded is Map<String, dynamic> ? decoded : null,
         );
       }
     } catch (e) {

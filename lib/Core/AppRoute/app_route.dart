@@ -9,6 +9,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_scree
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
+import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_submit.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/new_password_screen.dart';
@@ -51,7 +52,10 @@ class AppRoutes {
     codeSubmit: (context) => CodeSubmit(),
     bottomNavBar: (context) => const BottomNavBarScreen(),
     notificationScreen: (context) => const NotificationScreen(),
-    userchatScreen: (context) => UserChatScreen(),
+    userchatScreen: (context) {
+      final chat = ModalRoute.of(context)!.settings.arguments as ChatModel?;
+      return UserChatScreen(chat: chat);
+    },
     detaisScreen: (context) => const DetailsScreen(),
     bookingConfirmScreen: (context) => const BookingConfirmedScreen(),
     viewEventScreen: (context) => const ViewEventScreen(),

@@ -138,21 +138,11 @@ class _VerifyAccountState extends State<VerifyAccount> {
             SizedBox(height: 40.h),
     
             // Submit Button with Loading
-            _inProgress
-                ? Center(
-                    child: CircularProgressIndicator(
-                      color: const Color(0xFFCC18CA),
-                      strokeWidth: 3,
-                    ),
-                  )
-                : SizedBox(
-                    width: double.infinity,
-                    child: CustomButton(
-                      onPressed: ()=>_submitOtp(),
-                      buttonName: 'Submit',
-                      // onTap: _submitOtp,
-                    ),
-                  ),
+            CustomButton(
+              onPressed: _submitOtp,
+              buttonName: 'Submit',
+              isLoading: _inProgress,
+            ),
     
             SizedBox(height: 30.h),
     

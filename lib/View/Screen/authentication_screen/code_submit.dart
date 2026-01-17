@@ -49,7 +49,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
             ),
             SizedBox(height: 20.h),
             Text(
-              'Enter the 4-Digit code sent to you at\n${forgotPassController.savedEmail}',
+              'Enter the 6-Digit code sent to you at\n${forgotPassController.savedEmail}',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w400,
@@ -99,23 +99,13 @@ class _CodeSubmitState extends State<CodeSubmit> {
               },
             ),
             SizedBox(height: 20.h),
-            Consumer2<ForgotPasswordController, ThemeProvider>(
-              builder: (context, forgotController, themeCtrl, child) {
-                final progressColor = themeCtrl.isDarkMode
-                    ? Color(0xFFCC18CA)
-                    : const Color(0xFF6A7282);
-
-                return forgotController.inProgress
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: progressColor,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: onTapSubmit,
-                        child: CustomButton(buttonName: 'Submit'),
-                      );
+            Consumer<ForgotPasswordController>(
+              builder: (context, forgotController, child) {
+                return CustomButton(
+                  buttonName: 'Submit',
+                  isLoading: forgotController.inProgress,
+                  onPressed: onTapSubmit,
+                );
               },
             ),
             SizedBox(height: 10.h),
@@ -142,20 +132,17 @@ class _CodeSubmitState extends State<CodeSubmit> {
     );
   }
 
-  void ontapResendCode() {
-    //! wait kro abr api call hobe
+  Future<void> ontapResendCode() async {
+    final forgotPassController = Provider.of<ForgotPasswordController>(context, listen: false);
+    bool isSuccess = await forgotPassController.forgotPassword(forgotPassController.savedEmail);
+    if (isSuccess && mounted) {
+      showCustomSnackBar(context: context, message: 'Code resent to ${forgotPassController.savedEmail}', isError: false);
+    } else if (mounted) {
+      showCustomSnackBar(context: context, message: forgotPassController.errorMessage ?? 'Resend failed');
+    }
   }
 
   void onTapSubmit() async {
-    await forgotPassword_otp();
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      NewPasswordScreen.name,
-      (predicate) => false,
-    );
-  }
-
-  Future<void> forgotPassword_otp() async {
     final forgotPassController = Provider.of<ForgotPasswordController>(
       context,
       listen: false,
@@ -165,15 +152,24 @@ class _CodeSubmitState extends State<CodeSubmit> {
       otpController.text.trim(),
     );
 
-    print('Your Current Saved Email-${otpController}');
-
     if (isSuccess) {
       showCustomSnackBar(
         context: context,
-        message: 'Wow nice! Create your new password',
+        message: 'Verification successful! Now create your new password.',
+        isError: false,
+      );
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        NewPasswordScreen.name,
+        (predicate) => false,
       );
     } else {
-      showCustomSnackBar(context: context, message: 'Something went wrong!');
+      showCustomSnackBar(
+        context: context,
+        message: forgotPassController.errorMessage ?? 'Something went wrong!',
+      );
     }
   }
+
+  // Removed redundant function
 }
