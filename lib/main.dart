@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
@@ -31,14 +30,24 @@ import 'View/Theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Run heavy initializations and await them
   await GetStorage.init();
-  final themeProvider = ThemeProvider();
-  await themeProvider.init(); // Initialize ThemeProvider
-  Stripe.publishableKey =
-      'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa';
-  await Stripe.instance.applySettings();
-  runApp(DevicePreview(enabled: false, builder: (context) => const MyApp()));
+  
+  try {
+    final themeProvider = ThemeProvider();
+    await themeProvider.init();
+
+    Stripe.publishableKey =
+        'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa';
+    await Stripe.instance.applySettings();
+  } catch (e) {
+    debugPrint('Initialization error: $e');
+  }
+
+  runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -64,7 +73,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReivewController()),
         ChangeNotifierProvider(create: (_) => OtherUserProfileController()),
         ChangeNotifierProvider(create: (_) => OtpVerifyController()),
-
         ChangeNotifierProvider(
           create: (_) {
             final c = AuthController();
@@ -87,10 +95,6 @@ class MyApp extends StatelessWidget {
           return Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp(
-                useInheritedMediaQuery: true,
-                locale: DevicePreview.locale(context),
-                builder: DevicePreview.appBuilder,
-
                 debugShowCheckedModeBanner: false,
                 title: 'Gathering App',
                 theme: ThemeColor.lightMode,

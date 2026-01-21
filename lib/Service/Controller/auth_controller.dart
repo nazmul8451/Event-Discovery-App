@@ -11,7 +11,11 @@ class AuthController extends ChangeNotifier {
   factory AuthController() => _instance;
   AuthController._internal();
 
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
 
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
@@ -58,15 +62,27 @@ class AuthController extends ChangeNotifier {
 
   // অ্যাপ স্টার্টে সব লোড করা
   Future<void> initialize() async {
-    _accessToken = await _storage.read(key: _accessTokenKey);
-    _refreshToken = await _storage.read(key: _refreshTokenKey);
-    _userId = await _storage.read(key: _userIdKey);
-    _userName = await _storage.read(key: _userNameKey);
+    try {
+      // Add a timeout to prevent hanging on older Android devices (KeyStore issues)
+      await Future.any([
+        Future.wait([
+          _storage.read(key: _accessTokenKey).then((v) => _accessToken = v),
+          _storage.read(key: _refreshTokenKey).then((v) => _refreshToken = v),
+          _storage.read(key: _userIdKey).then((v) => _userId = v),
+          _storage.read(key: _userNameKey).then((v) => _userName = v),
+        ]),
+        Future.delayed(const Duration(seconds: 3)).then((_) => throw Exception("Storage timeout")),
+      ]);
 
-    _isLoggedIn = _accessToken != null && _accessToken!.trim().isNotEmpty;
-
-    debugPrint("🔄 Auth initialized - Logged in: $_isLoggedIn, User: $_userName");
-    notifyListeners();
+      _isLoggedIn = _accessToken != null && _accessToken!.trim().isNotEmpty;
+      debugPrint("🔄 Auth initialized - Logged in: $_isLoggedIn, User: $_userName");
+    } catch (e) {
+      debugPrint("⚠️ Auth initialization failure/timeout: $e");
+      // Fallback: assume not logged in instead of hanging
+      _isLoggedIn = false;
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<bool> login({

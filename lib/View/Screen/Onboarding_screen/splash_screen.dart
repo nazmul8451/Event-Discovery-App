@@ -23,25 +23,42 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 2));
-      if (!mounted) return;
+      try {
+        // Minimum splash time
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
 
-      final auth = Provider.of<AuthController>(context, listen: false);
-      await auth.initialize(); // Ensure tokens are loaded from secure storage
-      
-      if (auth.isLoggedIn) {
-        // User is already logged in, go to Home
-        Navigator.of(context).pushReplacementNamed(BottomNavBarScreen.name);
-      } else {
-        // User not logged in, check if they've seen onboarding
-        final hasSeenOnboarding = GetStorage().read<bool>('hasSeenOnboarding') ?? false;
+        final auth = Provider.of<AuthController>(context, listen: false);
         
-        if (hasSeenOnboarding) {
-          // Already seen onboarding, go to Login
-          Navigator.of(context).pushReplacementNamed(LogInScreen.name);
+        // Use a timeout for safety
+        await auth.initialize().timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => debugPrint("Splash: Auth initialization timed out"),
+        );
+        
+        if (!mounted) return;
+
+        if (auth.isLoggedIn) {
+          Navigator.of(context).pushReplacementNamed(BottomNavBarScreen.name);
         } else {
-          // New user, show onboarding
-          Navigator.of(context).pushReplacementNamed(GetStartScreen.name);
+          bool hasSeenOnboarding = false;
+          try {
+             hasSeenOnboarding = GetStorage().read<bool>('hasSeenOnboarding') ?? false;
+          } catch (e) {
+            debugPrint("GetStorage error: $e");
+          }
+          
+          if (hasSeenOnboarding) {
+            Navigator.of(context).pushReplacementNamed(LogInScreen.name);
+          } else {
+            Navigator.of(context).pushReplacementNamed(GetStartScreen.name);
+          }
+        }
+      } catch (e) {
+        debugPrint("Splash error: $e");
+        // Emergency fallback to Login Screen to avoid sticking on splash
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed(LogInScreen.name);
         }
       }
     });

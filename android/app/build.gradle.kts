@@ -1,12 +1,13 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.gathering_app"
+
+    // Plugins need higher SDK, safe to use
     compileSdk = 36
     ndkVersion = "26.1.10909125"
 
@@ -21,17 +22,20 @@ android {
 
     defaultConfig {
         applicationId = "com.example.gathering_app"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 36
+
+        // 🔥 VERY IMPORTANT: minSdk must be fixed for low phones
+        minSdk = flutter.minSdkVersion   
+
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("debug") 
-            isMinifyEnabled = false                            
-            isShrinkResources = false                          
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
 
         getByName("debug") {
