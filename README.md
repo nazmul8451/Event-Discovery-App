@@ -2,9 +2,6 @@
 
 <img width="4647" height="2811" alt="gathering_cover" src="https://github.com/user-attachments/assets/64036ccf-c07b-4563-83cd-e8f439c4dce8" />
 
-
-<img src="https://github.com/your-username/Gathering/blob/main/screenshots/banner.jpg?raw=true" alt="Gathering App Banner" />
-
 **Find, Join, and Host unforgettable events** – Nightlife, Concerts, House Parties, Food Festivals & more – all in one place!
 
 Live on Android & iOS (soon on Play Store & App Store)
