@@ -1,4 +1,7 @@
-## Gathering – The Ultimate Event Discovery & Social App
+<img width="4647" height="2811" alt="gathering_cover" src="https://github.com/user-attachments/assets/07e9fdf2-8977-4bb4-9c5a-00a7e759bfd9" />## Gathering – The Ultimate Event Discovery & Social App
+
+<img width="4647" height="2811" alt="gathering_cover" src="https://github.com/user-attachments/assets/64036ccf-c07b-4563-83cd-e8f439c4dce8" />
+
 
 <img src="https://github.com/your-username/Gathering/blob/main/screenshots/banner.jpg?raw=true" alt="Gathering App Banner" />
 
