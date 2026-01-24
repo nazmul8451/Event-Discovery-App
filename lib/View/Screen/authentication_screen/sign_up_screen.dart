@@ -8,6 +8,7 @@ import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
+import 'package:gathering_app/Utils/app_utils.dart';
 import '../../Theme/theme_provider.dart';
 import 'forgot_pass_screen.dart';
 import 'package:email_validator/email_validator.dart';
@@ -207,7 +208,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void onTapSignUp_button() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_signUpIn_Progress || !_formKey.currentState!.validate()) {
       return;
     }
 
@@ -215,28 +216,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _signUpIn_Progress = true;
     });
 
-    await _signUp();
-
-    if (mounted) {
-      setState(() {
-        _signUpIn_Progress = false;
-      });
+    try {
+      await _signUp();
+    } catch (e) {
+      debugPrint("❌ Sign up error: $e");
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: "An unexpected error occurred. Please try again.",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _signUpIn_Progress = false;
+        });
+      }
     }
   }
 
   //  sign up api calling
   Future<void> _signUp() async {
     final email = emialController.text.trim();
-    final signUpController = Provider.of<SignUpController>(
-      context,
-      listen: false,
-    );
+    final signUpController =
+        Provider.of<SignUpController>(context, listen: false);
 
     bool isSuccess = await signUpController.signUp(
       email: emialController.text.trim(),
       name: nameController.text.trim(),
       password: passController.text,
-      context: context,
     );
 
     if (!mounted) return;
@@ -245,20 +253,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _clearTextField();
       showCustomSnackBar(
         context: context,
-        message: "Registration successful! Please verify your email",
+        message: "Registration successful! Please check your email for OTP",
         isError: false,
       );
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VerifyAccount(
-              email: email.trim(),
-            ), // trim() যোগ করো + নিশ্চিত করো email empty না
+      AppUtils.navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (context) => VerifyAccount(
+            email: email.trim(),
           ),
-        );
-        print("Email : $email");
-      }
+        ),
+      );
+      print("Email : $email");
     } else {
       showCustomSnackBar(
         context: context,

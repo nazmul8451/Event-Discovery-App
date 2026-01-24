@@ -50,15 +50,34 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          ForgotPassScreen.name,
-                          (predicate) => false,
-                        );
-                      },
-                      icon: Icon(Icons.arrow_back),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20.w, top: 10.h),
+                      child: Consumer<ThemeProvider>(
+                        builder: (context, controller, child) => GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              ForgotPassScreen.name,
+                              (predicate) => false,
+                            );
+                          },
+                          child: Container(
+                            height: 36.r,
+                            width: 36.r,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              color: controller.isDarkMode
+                                  ? const Color(0xFF3E043F)
+                                  : const Color(0xFF686868),
+                            ),
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   const Spacer(),

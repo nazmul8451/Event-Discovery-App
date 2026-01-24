@@ -49,10 +49,19 @@ class AuthController extends ChangeNotifier {
 
     _isLoggedIn = _accessToken!.isNotEmpty;
 
-    await _storage.write(key: _accessTokenKey, value: _accessToken);
-    await _storage.write(key: _refreshTokenKey, value: _refreshToken);
-    await _storage.write(key: _userIdKey, value: _userId);
-    await _storage.write(key: _userNameKey, value: _userName);
+    // Use a timeout to prevent hanging on some Android devices during KeyStore operations
+    await Future.wait([
+      _storage.write(key: _accessTokenKey, value: _accessToken),
+      _storage.write(key: _refreshTokenKey, value: _refreshToken),
+      _storage.write(key: _userIdKey, value: _userId),
+      _storage.write(key: _userNameKey, value: _userName),
+    ]).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        debugPrint("⚠️ Auth: Storage write timed out");
+        return [];
+      },
+    );
 
     debugPrint("✅ Tokens & User data saved successfully");
     notifyListeners();

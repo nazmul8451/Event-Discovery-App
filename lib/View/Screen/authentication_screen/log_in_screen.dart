@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
+import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/forgot_pass_screen.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/sign_up_screen.dart';
@@ -11,6 +12,7 @@ import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:provider/provider.dart';
+import 'package:gathering_app/Utils/app_utils.dart';
 
 class LogInScreen extends StatefulWidget {
   LogInScreen({super.key});
@@ -223,7 +225,7 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void onTapLoginButton() async {
-    if (!_f_key.currentState!.validate()) {
+    if (_signinIn_Progress || !_f_key.currentState!.validate()) {
       return;
     }
 
@@ -231,12 +233,22 @@ class _LogInScreenState extends State<LogInScreen> {
       _signinIn_Progress = true;
     });
 
-    await _Login();
-
-    if (mounted) {
-      setState(() {
-        _signinIn_Progress = false;
-      });
+    try {
+      await _Login();
+    } catch (e) {
+      debugPrint("❌ Login error: $e");
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: "An unexpected error occurred. Please try again.",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _signinIn_Progress = false;
+        });
+      }
     }
   }
 
@@ -246,32 +258,49 @@ class _LogInScreenState extends State<LogInScreen> {
     final bool isSuccess = await logInController.login(
       emailController.text.trim(),
       passController.text.trim(),
-      context,
     );
 
     if (!mounted) return;
 
-    if (!mounted) return;
-
     if (isSuccess) {
-      showCustomSnackBar(
-        context: context,
-        message: "Login successful! 🎉",
-        isError: false,
-      );
+      debugPrint("✅ Login success, fetching profile...");
+      // Fetch profile immediately to ensure app state is updated
+      final profileController =
+          Provider.of<ProfileController>(context, listen: false);
+      try {
+        await profileController.fetchProfile(forceRefresh: true);
+      } catch (e) {
+        debugPrint("⚠️ Profile fetch error (ignoring): $e");
+      }
 
-      Navigator.pushNamedAndRemoveUntil(
-        context,
+      if (!mounted) return;
+
+      debugPrint("🚀 Navigating to BottomNavBarScreen...");
+      
+      try {
+        showCustomSnackBar(
+          context: context,
+          message: "Login successful! 🎉",
+          isError: false,
+        );
+      } catch (e) {
+        debugPrint("⚠️ Snackbar error: $e");
+      }
+
+      AppUtils.navigatorKey.currentState?.pushNamedAndRemoveUntil(
         BottomNavBarScreen.name,
         (route) => false,
       );
     } else {
-      String error = logInController.errorMessage ?? "Invalid email or password";
+      String error =
+          logInController.errorMessage ?? "Invalid email or password";
       debugPrint("❌ Login failed: $error");
-      showCustomSnackBar(
-        context: context,
-        message: error,
-      );
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: error,
+        );
+      }
     }
   }
 

@@ -170,49 +170,58 @@ class _VerifyAccountState extends State<VerifyAccount> {
       ),
     );
   }
- Future<void> _submitOtp() async {
-  if (otpController.text.trim().length != 6) {
-    showCustomSnackBar(
-      context: context,
-      message: "Please enter a valid 6-digit OTP",
-    );
-    return;
-  }
-
-  setState(() {
-    _inProgress = true;
-  });
-
-  final otpVerifyCtrl = Provider.of<OtpVerifyController>(context, listen: false);
-
-  final bool success = await otpVerifyCtrl.verifyOtp(
-    email: widget.email,            
-    otp: otpController.text.trim(),   
-  );
-
-  setState(() {
-    _inProgress = false;
-  });
-
-  if (!mounted) return;
-
-  if (success) {
-    if (mounted) {
+  Future<void> _submitOtp() async {
+    if (_inProgress || otpController.text.trim().length != 6) {
       showCustomSnackBar(
         context: context,
-        message: "Account verified successfully! please log in..",
-        isError: false,
+        message: "Please enter a valid 6-digit OTP",
       );
+      return;
     }
-    Navigator.pushNamedAndRemoveUntil(context, LogInScreen.name, (predicate)=>false);
 
-  } else {
-    if (mounted) {
-      showCustomSnackBar(
-        context: context,
-        message: otpVerifyCtrl.errorMessage ?? "Invalid OTP. Try again.",
+    setState(() {
+      _inProgress = true;
+    });
+
+    try {
+      final otpVerifyCtrl =
+          Provider.of<OtpVerifyController>(context, listen: false);
+
+      final bool success = await otpVerifyCtrl.verifyOtp(
+        email: widget.email,
+        otp: otpController.text.trim(),
       );
+
+      if (!mounted) return;
+
+      if (success) {
+        showCustomSnackBar(
+          context: context,
+          message: "Account verified successfully! please log in..",
+          isError: false,
+        );
+        Navigator.pushNamedAndRemoveUntil(
+            context, LogInScreen.name, (predicate) => false);
+      } else {
+        showCustomSnackBar(
+          context: context,
+          message: otpVerifyCtrl.errorMessage ?? "Invalid OTP. Try again.",
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ OTP verification error: $e");
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: "An unexpected error occurred. Please try again.",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _inProgress = false;
+        });
+      }
     }
   }
-}
 }

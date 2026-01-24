@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart' show BottomNavBarScreen;
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:get_storage/get_storage.dart';
@@ -37,10 +38,25 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            // Back Button
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back),
+            Consumer<ThemeProvider>(
+              builder: (context, controller, child) => GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  height: 36.r,
+                  width: 36.r,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    color: controller.isDarkMode
+                        ? const Color(0xFF3E043F)
+                        : const Color(0xFF686868),
+                  ),
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                    size: 24.sp,
+                  ),
+                ),
+              ),
             ),
             SizedBox(width: 10.w),
             Column(

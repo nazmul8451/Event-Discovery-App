@@ -38,10 +38,29 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         surfaceTintColor: Colors.transparent,
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leading: Consumer<ThemeProvider>(
+          builder: (context, controller, child) => Center(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                height: 36.r,
+                width: 36.r,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  color: controller.isDarkMode
+                      ? const Color(0xFF3E043F)
+                      : const Color(0xFF686868),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                    size: 24.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,

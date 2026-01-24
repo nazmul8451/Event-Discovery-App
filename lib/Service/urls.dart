@@ -2,7 +2,7 @@ class Urls {
   //base url 
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
   //  static const String baseUrl = "http://10.10.7.50:4005";
-   static const String baseUrl = "http://72.167.224.54:4005";
+   static const String baseUrl = "http://195.35.6.13:4005";
 
    //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";

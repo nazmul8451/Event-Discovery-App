@@ -147,18 +147,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 GestureDetector(
                                   onTap: () => Navigator.pop(context),
                                   child: Container(
-                                    margin: EdgeInsets.only(right: 10),
-                                    height: 40,
-                                    width: 40,
+                                    height: 36.r,
+                                    width: 36.r,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       color: controller.isDarkMode
-                                          ? Color(0xFF3E043F)
-                                          : Color(0xFF686868),
-                                      // image: DecorationImage(image: AssetImage('assets/images/cross_icon.png',))
+                                          ? const Color(0xFF3E043F)
+                                          : const Color(0xFF686868),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(10.0),
+                                      padding: EdgeInsets.all(10.r),
                                       child: Image.asset(
                                         'assets/images/cross_icon.png',
                                       ),
@@ -413,17 +411,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               GestureDetector(
                                 onTap: () => Navigator.pop(context),
                                 child: Container(
-                                  margin: EdgeInsets.only(right: 10),
-                                  height: 40,
-                                  width: 40,
+                                  height: 36.r,
+                                  width: 36.r,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12.r),
                                     color: isDark
                                         ? const Color(0xFF3E043F)
                                         : const Color(0xFF686868),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
+                                    padding: EdgeInsets.all(10.r),
                                     child: Image.asset(
                                       'assets/images/cross_icon.png',
                                     ),
@@ -642,53 +639,51 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Share button (kept)
-                  Consumer<ThemeProvider>(
-                    builder: (context, controller, child) => GestureDetector(
-                      onTap: () {
-                        // TODO: Implement share functionality
-                        // Share event details to social media or other apps
-                      },
-                      child: Container(
-                        height: 36,
-                        width: 36,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: controller.isDarkMode
-                              ? const Color(0xFF3E043F)
-                              : const Color(0xFF686868),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.share,
-                              size: 20.sp,
-                              color: controller.isDarkMode
-                                  ? Colors.white
-                                  : Colors.white70,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Consumer<ThemeProvider>(
+                  //   builder: (context, controller, child) => GestureDetector(
+                  //     onTap: () {
+                  //       // TODO: Implement share functionality
+                  //       // Share event details to social media or other apps
+                  //     },
+                  //     child: Container(
+                  //       height: 36.r,
+                  //       width: 36.r,
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(12.r),
+                  //         color: controller.isDarkMode
+                  //             ? const Color(0xFF3E043F)
+                  //             : const Color(0xFF686868),
+                  //       ),
+                  //       child: Center(
+                  //         child: Padding(
+                  //           padding: EdgeInsets.all(10.r),
+                  //           child: Icon(
+                  //             Icons.share,
+                  //             size: 20.sp,
+                  //             color: Colors.white,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
 
                   // Close button
                   Consumer<ThemeProvider>(
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        height: 36,
-                        width: 36,
+                        height: 36.r,
+                        width: 36.r,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: controller.isDarkMode
                               ? const Color(0xFF3E043F)
                               : const Color(0xFF686868),
                         ),
                         child: Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(10.r),
                             child: Image.asset('assets/images/cross_icon.png'),
                           ),
                         ),

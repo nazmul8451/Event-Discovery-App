@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gathering_app/Service/Api%20Service/network_caller.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:provider/provider.dart';
+import 'profile_page_controller.dart';
 
 class LogInController extends ChangeNotifier {
   bool _inProgress = false;
@@ -12,7 +14,7 @@ class LogInController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
 
-  Future<bool> login(String email, String password, BuildContext context) async {
+  Future<bool> login(String email, String password) async {
     _inProgress = true;
     _errorMessage = null;
     notifyListeners();
@@ -58,6 +60,8 @@ class LogInController extends ChangeNotifier {
             userId: userId,
             userName: userName,
           );
+
+          debugPrint("✅ Tokens & User data saved successfully");
           isSuccess = true;
         } else {
           _errorMessage = "Invalid response from server";

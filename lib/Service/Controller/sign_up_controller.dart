@@ -15,7 +15,6 @@ class SignUpController extends ChangeNotifier {
     required String email,
     required String name,
     required String password,
-    required BuildContext context,
   }) async {
     _inProgress = true;
     _errorMessage = null;
@@ -38,14 +37,6 @@ class SignUpController extends ChangeNotifier {
       notifyListeners();
 
       if (response.isSuccess) {
-        // সাকসেস — OTP অটো সেন্ড হয়েছে ব্যাকএন্ড থেকে
-        if (context.mounted) {
-          showCustomSnackBar(
-            context: context,
-            message: "Registration successful! Please check your email for OTP",
-            isError: false,
-          );        
-        }
         return true;
       } else {
         // এরর হ্যান্ডেল
@@ -60,10 +51,6 @@ class SignUpController extends ChangeNotifier {
         }
 
         _errorMessage = errorMsg;
-
-        if (context.mounted) {
-          showCustomSnackBar(context: context, message: errorMsg);
-        }
         return false;
       }
     } catch (e) {

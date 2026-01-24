@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Service/Controller/event _detailsController.dart';
+import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
@@ -203,7 +204,32 @@ class _OrderSummeryScreenState extends State<OrderSummeryScreen> {
     final String eventId = (args['eventId'] ?? args['event_id'] ?? '')?.toString() ?? '';
 
     return Scaffold(
-      appBar: AppBar(leading: const BackButton(), title: const Text('Order summary')),
+      appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          leading: Consumer<ThemeProvider>(
+            builder: (context, controller, child) => Center(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  height: 36.r,
+                  width: 36.r,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    color: controller.isDarkMode
+                        ? const Color(0xFF3E043F)
+                        : const Color(0xFF686868),
+                  ),
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                    size: 24.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          title: const Text('Order summary')),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(

@@ -23,6 +23,7 @@ import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Service/Controller/notification_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:gathering_app/Utils/app_utils.dart';
 
 import 'Core/AppRoute/app_route.dart';
 import 'View/Screen/Onboarding_screen/splash_screen.dart';
@@ -95,6 +96,8 @@ class MyApp extends StatelessWidget {
           return Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp(
+                navigatorKey: AppUtils.navigatorKey,
+                scaffoldMessengerKey: AppUtils.scaffoldMessengerKey,
                 debugShowCheckedModeBanner: false,
                 title: 'Gathering App',
                 theme: ThemeColor.lightMode,

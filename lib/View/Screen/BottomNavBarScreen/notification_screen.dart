@@ -61,16 +61,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
               onTap: () => Navigator.pop(context),
               child: Container(
                 margin: EdgeInsets.only(right: 18.w),
-                height: 36.h,
-                width: 36.w,
+                height: 36.r,
+                width: 36.r,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   color: controller.isDarkMode
-                      ? Color(0xFF3E043F)
-                      : Color(0xFF686868),
+                      ? const Color(0xFF3E043F)
+                      : const Color(0xFF686868),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: EdgeInsets.all(10.r),
                   child: Image.asset('assets/images/cross_icon.png'),
                 ),
               ),

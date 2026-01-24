@@ -153,17 +153,17 @@ class _LiveStreamState extends State<LiveStream> {
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        height: 36,
-                        width: 36,
+                        height: 36.r,
+                        width: 36.r,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: controller.isDarkMode
-                              ? Color(0xFF3E043F)
-                              : Color(0xFF686868),
+                              ? const Color(0xFF3E043F)
+                              : const Color(0xFF686868),
                         ),
                         child: Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(10.r),
                             child: Image.asset('assets/images/cross_icon.png'),
                           ),
                         ),
@@ -174,19 +174,19 @@ class _LiveStreamState extends State<LiveStream> {
                     builder: (context, controller, child) => GestureDetector(
                       onTap: () => _loadStreamData(),
                       child: Container(
-                        height: 36,
-                        width: 36,
+                        height: 36.r,
+                        width: 36.r,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: controller.isDarkMode
-                              ? Color(0xFF3E043F)
-                              : Color(0xFF686868),
+                              ? const Color(0xFF3E043F)
+                              : const Color(0xFF686868),
                         ),
                         child: Center(
                           child: Icon(
                             Icons.refresh,
                             color: Colors.white,
-                            size: 20,
+                            size: 20.sp,
                           ),
                         ),
                       ),
@@ -484,8 +484,8 @@ class _LiveStreamState extends State<LiveStream> {
               }
             },
             child: Container(
-              height: 44.h,
-              width: 44.h,
+              height: 44.r,
+              width: 44.r,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
                 gradient: const LinearGradient(

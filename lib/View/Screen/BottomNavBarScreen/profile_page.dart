@@ -12,6 +12,7 @@ import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
@@ -133,15 +134,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ? null
                                 : () => Navigator.pop(context),
                             child: Container(
-                              height: 40.r,
-                              width: 40.r,
+                              height: 36.r,
+                              width: 36.r,
                               decoration: BoxDecoration(
                                 color: ctrl.isDarkMode
                                     ? const Color(0xFF3E043F)
                                     : const Color(0xFF686868),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10.r),
                               child: Image.asset(
                                 'assets/images/cross_icon.png',
                               ),
@@ -341,40 +342,41 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        actions: [
-          Consumer<NotificationController>(
-            builder: (context, notificationController, child) => Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, NotificationScreen.name);
-                  },
-                  icon: const Icon(Icons.notifications_none),
-                ),
-                if (notificationController.unreadCount > 0)
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: CircleAvatar(
-                      radius: 9,
-                      backgroundColor: const Color(0xFFFF006E),
-                      child: Text(
-                        '${notificationController.unreadCount}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   surfaceTintColor: Colors.transparent,
+      //   ///ekhon comment thak pore dekha jabe 
+      //   // actions: [
+      //   //   Consumer<NotificationController>(
+      //   //     builder: (context, notificationController, child) => Stack(
+      //   //       clipBehavior: Clip.none,
+      //   //       children: [
+      //   //         IconButton(
+      //   //           onPressed: () {
+      //   //             Navigator.pushNamed(context, NotificationScreen.name);
+      //   //           },
+      //   //           icon: const Icon(Icons.notifications_none),
+      //   //         ),
+      //   //         if (notificationController.unreadCount > 0)
+      //   //           Positioned(
+      //   //             right: 4,
+      //   //             top: 4,
+      //   //             child: CircleAvatar(
+      //   //               radius: 9,
+      //   //               backgroundColor: const Color(0xFFFF006E),
+      //   //               child: Text(
+      //   //                 '${notificationController.unreadCount}',
+      //   //                 style: const TextStyle(
+      //   //                   color: Colors.white,
+      //   //                   fontSize: 10,
+      //   //                 ),
+      //   //               ),
+      //   //             ),
+      //   //           ),
+      //   //       ],
+      //   //     ),
+      //   //   ),
+      //   // ],
+      // ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -860,50 +862,57 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                   Expanded(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: 60.h,
-                                          width: 60.h,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          child: Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                8.0,
-                                              ),
-                                              child: Image.asset(
-                                                height: 20,
-                                                width: 20,
-                                                'assets/images/fav_icon.png',
-                                                color: Color(0xFFB026FF),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        context
+                                            .read<BottomNavController>()
+                                            .onItemTapped(2);
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 60.h,
+                                            width: 60.h,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Color(
+                                                0xFFCC18CA,
+                                              ).withOpacity(0.15),
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Image.asset(
+                                                  height: 20,
+                                                  width: 20,
+                                                  'assets/images/fav_icon.png',
+                                                  color: Color(0xFFB026FF),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          '${user?.stats?.following ?? 0}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(fontSize: 25.sp),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          'Favorites',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                                fontSize: 12.sp.clamp(12, 12),
-                                              ),
-                                        ),
-                                      ],
+                                          SizedBox(height: 2.h),
+                                          Text(
+                                            '${user?.stats?.following ?? 0}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(fontSize: 25.sp),
+                                          ),
+                                          SizedBox(height: 2.h),
+                                          Text(
+                                            'Favorites',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall!
+                                                .copyWith(
+                                                  fontSize: 12.sp.clamp(12, 12),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1374,7 +1383,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             size: 16.sp,
                                           ),
                                           onTap: () {
-                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
+                                            context
+                                                .read<BottomNavController>()
+                                                .onItemTapped(2);
                                           },
                                         ),
 

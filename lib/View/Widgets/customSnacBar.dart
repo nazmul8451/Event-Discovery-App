@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// customSnacBar.dart ফাইলে রাখো
-import 'package:flutter/material.dart';
+import 'package:gathering_app/Utils/app_utils.dart';
 
 void showCustomSnackBar({
   required BuildContext context,
@@ -9,9 +7,9 @@ void showCustomSnackBar({
   bool isError = false,
   Duration duration = const Duration(seconds: 4),
 }) {
-  ScaffoldMessenger.of(context).clearSnackBars();
+  AppUtils.scaffoldMessengerKey.currentState?.clearSnackBars();
 
-  ScaffoldMessenger.of(context).showSnackBar(
+  AppUtils.scaffoldMessengerKey.currentState?.showSnackBar(
     SnackBar(
       content: Row(
         children: [
@@ -42,7 +40,7 @@ void showCustomSnackBar({
             ),
           ),
           GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+            onTap: () => AppUtils.scaffoldMessengerKey.currentState?.hideCurrentSnackBar(),
             child: const Icon(
               Icons.close_rounded,
               color: Colors.white70,
@@ -56,7 +54,28 @@ void showCustomSnackBar({
           : const Color(0xFFCC18CA),
       behavior: SnackBarBehavior.floating,
       margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).size.height * 0.1,
+        bottom: () {
+          // Use provided context only if it's active
+          if (context.mounted) {
+            try {
+              return MediaQuery.of(context).size.height * 0.1;
+            } catch (e) {
+              debugPrint("CustomSnackBar: MediaQuery failed with context: $e");
+            }
+          }
+          
+          // Fallback to global navigator context
+          final globalCtx = AppUtils.navigatorKey.currentContext;
+          if (globalCtx != null && globalCtx.mounted) {
+            try {
+              return MediaQuery.of(globalCtx).size.height * 0.1;
+            } catch (e) {
+              debugPrint("CustomSnackBar: MediaQuery failed with globalCtx: $e");
+            }
+          }
+          
+          return 80.0; // Hard fallback
+        }(),
         left: 20,
         right: 20,
       ),
