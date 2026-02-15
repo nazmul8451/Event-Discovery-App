@@ -7,6 +7,7 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:gathering_app/Service/urls.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -16,64 +17,48 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late MapController mapCtrl;
-  Offset? _overlayPosition;
+  GoogleMapController? _localMapController;
   String? _lastSelectedEventId;
   String _selectedCategory = "Vibe"; // Default as per design
 
   @override
   void initState() {
     super.initState();
-    mapCtrl = MapController();
-    mapCtrl.addListener(_updateUI);
-    mapCtrl.init();
+    context.read<MapController>().addListener(_updateUI);
   }
 
   void _updateUI() {
     if (!mounted) return;
-    
+    final mapCtrl = context.read<MapController>();
+
     if (mapCtrl.selectedEvent != null) {
       if (mapCtrl.selectedEvent!.id != _lastSelectedEventId) {
         _lastSelectedEventId = mapCtrl.selectedEvent!.id;
-        // Keep the old position if available for a smoother transition, 
-        // or clear it if you want it to pop in.
-        _updateOverlayPosition();
-      } else {
-        _updateOverlayPosition();
       }
     } else {
       _lastSelectedEventId = null;
-      _overlayPosition = null;
     }
     setState(() {});
   }
 
-
-
-
-
-
-
-
-
   @override
   void dispose() {
-    mapCtrl.removeListener(_updateUI);
+    context.read<MapController>().removeListener(_updateUI);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final mapCtrl = context.watch<MapController>();
     final isDark = context.watch<ThemeProvider>().isDarkMode;
 
     return Scaffold(
       backgroundColor: const Color(0xFF030303),
       body: Stack(
-
         children: [
           // --- Full Screen Map Area ---
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
+          Consumer2<ThemeProvider, MapController>(
+            builder: (context, themeProvider, mapCtrl, child) {
               // Trigger style update if map is already created
               mapCtrl.applyMapStyle(themeProvider.isDarkMode);
 
@@ -85,29 +70,21 @@ class _MapPageState extends State<MapPage> {
                 markers: mapCtrl.markers,
                 polylines: mapCtrl.polylines,
                 onMapCreated: (controller) {
+                  _localMapController = controller;
                   mapCtrl.setMapController(controller);
                   mapCtrl.applyMapStyle(themeProvider.isDarkMode);
                   if (mapCtrl.currentPosition != null) {
                     mapCtrl.moveToCurrentLocation();
                   }
                 },
-                onCameraMove: (position) {
-                  _updateOverlayPosition();
-                },
-                onCameraIdle: () {
-                  _updateOverlayPosition();
-                },
                 onTap: (_) {
                   mapCtrl.clearSelectedEvent();
                   setState(() {
                     _lastSelectedEventId = null;
-                    _overlayPosition = null;
                   });
                 },
-
-
                 zoomControlsEnabled: false,
-                myLocationEnabled: false,
+                myLocationEnabled: true, // Show user location dot properly
                 myLocationButtonEnabled: false,
               );
             },
@@ -120,10 +97,17 @@ class _MapPageState extends State<MapPage> {
               children: [
                 // --- Custom Header ---
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
+                  ),
                   child: Row(
                     children: [
-                      Icon(Icons.location_on, color: const Color(0xFFB026FF), size: 30.sp),
+                      Icon(
+                        Icons.location_on,
+                        color: const Color(0xFFB026FF),
+                        size: 30.sp,
+                      ),
                       SizedBox(width: 15.w),
                       Text(
                         'G A T H E R I N G',
@@ -137,15 +121,15 @@ class _MapPageState extends State<MapPage> {
                     ],
                   ),
                 ),
-                
+
                 // --- Tabs Section ---
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Row(
                     children: [
-                  _buildTab("Music", _selectedCategory == "Music", isDark),
-                  SizedBox(width: 30.w),
-                  _buildTab("Vibe", _selectedCategory == "Vibe", isDark),
+                      _buildTab("Music", _selectedCategory == "Music", isDark),
+                      SizedBox(width: 30.w),
+                      _buildTab("Vibe", _selectedCategory == "Vibe", isDark),
                     ],
                   ),
                 ),
@@ -168,11 +152,9 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
 
-          // --- Custom Info Card Above Marker ---
-          if (mapCtrl.selectedEvent != null && _overlayPosition != null)
-            _buildEventInfoOverlay(context, mapCtrl.selectedEvent!, context.read<ThemeProvider>()),
-
-
+          // --- Custom Bottom Info Card ---
+          if (mapCtrl.selectedEvent != null)
+            _buildBottomEventCard(mapCtrl.selectedEvent!, mapCtrl),
 
           // --- Map Tool Buttons (Zoom / Location) ---
           Positioned(
@@ -184,42 +166,54 @@ class _MapPageState extends State<MapPage> {
                 SizedBox(height: 10.h),
                 _buildMapToolButton(Icons.remove, mapCtrl.zoomOut),
                 SizedBox(height: 10.h),
-                _buildMapToolButton(Icons.my_location, mapCtrl.moveToCurrentLocation),
+                _buildMapToolButton(
+                  Icons.my_location,
+                  mapCtrl.moveToCurrentLocation,
+                ),
               ],
             ),
           ),
 
           // --- Bottom "Vide" Panel ---
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
-              decoration: BoxDecoration(
-                color: const Color(0xFF030303),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(Icons.list, color: Colors.grey, size: 24.sp),
-                  Text(
-                    "Vide",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+          if (mapCtrl.selectedEvent == null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF030303),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20.r),
                   ),
-                  Icon(Icons.keyboard_arrow_up, color: Colors.grey, size: 24.sp),
-                ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(Icons.list, color: Colors.grey, size: 24.sp),
+                    Text(
+                      "Vide",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_up,
+                      color: Colors.grey,
+                      size: 24.sp,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
           if (mapCtrl.isLoading || mapCtrl.eventsLoading)
-            const Center(child: CircularProgressIndicator(color: Color(0xFFB026FF))),
+            const Center(
+              child: CircularProgressIndicator(color: Color(0xFFB026FF)),
+            ),
         ],
       ),
     );
@@ -238,8 +232,8 @@ class _MapPageState extends State<MapPage> {
           Text(
             label,
             style: TextStyle(
-              color: isSelected 
-                  ? (isDark ? Colors.white : Colors.black) 
+              color: isSelected
+                  ? (isDark ? Colors.white : Colors.black)
                   : Colors.grey,
               fontSize: 18.sp,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
@@ -265,9 +259,13 @@ class _MapPageState extends State<MapPage> {
       margin: EdgeInsets.only(right: 12.w),
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5), // Off-white in light mode
+        color: isDark
+            ? const Color(0xFF121212)
+            : const Color(0xFFF5F5F5), // Off-white in light mode
         borderRadius: BorderRadius.circular(25.r),
-        border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade300),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.grey.shade300,
+        ),
       ),
       child: Text(
         label,
@@ -295,120 +293,252 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> _updateOverlayPosition() async {
-    if (mapCtrl.selectedEvent == null || mapCtrl.mapController == null) return;
-
-    final lat = (mapCtrl.selectedEvent!.location?.coordinates?[1] as num?)?.toDouble() ?? 0;
-    final lng = (mapCtrl.selectedEvent!.location?.coordinates?[0] as num?)?.toDouble() ?? 0;
-
-    final ScreenCoordinate screenCoordinate = await mapCtrl.mapController!.getScreenCoordinate(
-      LatLng(lat, lng),
-    );
-
-    if (mounted) {
-      setState(() {
-        _overlayPosition = Offset(screenCoordinate.x.toDouble(), screenCoordinate.y.toDouble());
-      });
-    }
-  }
-
-  Widget _buildEventInfoOverlay(BuildContext context, EventData event, ThemeProvider themeProvider) {
-    if (_overlayPosition == null) return const SizedBox.shrink();
-
-    final cardWidth = 240.w;
-
+  Widget _buildBottomEventCard(EventData event, MapController mapCtrl) {
     return Positioned(
-      left: (_overlayPosition!.dx - (cardWidth / 2)).clamp(10.w, 1.sw - cardWidth - 10.w),
-      top: _overlayPosition!.dy - 170.h, 
+      bottom: 90.h, // Adjusted to sit above BottomNavigationBar
+      left: 16.w,
+      right: 16.w,
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            DetailsScreen.name,
-            arguments: event.id,
-          );
+          Navigator.pushNamed(context, DetailsScreen.name, arguments: event.id);
         },
         child: Container(
-          width: cardWidth,
-          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+          height: 220.h,
           decoration: BoxDecoration(
-            color: const Color(0xFF0A0A0A), // Near black
-            borderRadius: BorderRadius.circular(15.r),
-            border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.0),
+            borderRadius: BorderRadius.circular(24.r),
+            image: DecorationImage(
+              image: event.images != null && event.images!.isNotEmpty
+                  ? NetworkImage("${Urls.baseUrl}${event.images!.first}")
+                  : AssetImage('assets/images/container_img.png')
+                        as ImageProvider,
+              fit: BoxFit.cover,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.7),
-                blurRadius: 15,
-                spreadRadius: 2,
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 20,
+                offset: Offset(0, 10),
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                event.title ?? 'Noir Lounge',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.2,
-                ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24.r),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
               ),
-              SizedBox(height: 14.h),
-              Row(
-                children: [
-                  Icon(Icons.star, color: const Color(0xFFFF5400), size: 18.sp),
-                  SizedBox(width: 4.w),
-                  Text(
-                    "4.0",
-                    style: TextStyle(
-                      color: const Color(0xFFFF5400),
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Text(
-                    "Open",
-                    style: TextStyle(
-                      color: const Color(0xFFFF5400),
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      "Not Cover",
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w500,
+            ),
+            padding: EdgeInsets.all(20.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFF5400),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Text(
+                        "LIVE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        event.title ?? "Event Title",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4.h),
+                Row(
+                  children: [
+                    Icon(Icons.stars, color: Color(0xFFB026FF), size: 16.sp),
+                    SizedBox(width: 6.w),
+                    Text(
+                      "Official Gathering Location",
+                      style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+                    ),
+                    if (mapCtrl.distance != null) ...[
+                      const Spacer(),
+                      Icon(
+                        Icons.access_time,
+                        color: Colors.white60,
+                        size: 14.sp,
+                      ),
+                      SizedBox(width: 4.w),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: mapCtrl.duration != null
+                                  ? "${mapCtrl.duration} "
+                                  : "",
+                              style: TextStyle(
+                                color: const Color(
+                                  0xFF1DB954,
+                                ), // Friendly Green
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "(${mapCtrl.distance})",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.white60, size: 14.sp),
+                    SizedBox(width: 6.w),
+                    Expanded(
+                      child: Text(
+                        event.address ?? "Address not available",
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 13.sp,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            DetailsScreen.name,
+                            arguments: event.id,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFB026FF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.near_me,
+                              color: Colors.white,
+                              size: 16.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              "Check In",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: mapCtrl.isRouting
+                            ? null
+                            : () {
+                                if (_localMapController != null) {
+                                  mapCtrl.setMapController(
+                                    _localMapController!,
+                                  );
+                                }
+                                final lat =
+                                    (event.location?.coordinates?[1] as num?)
+                                        ?.toDouble() ??
+                                    0;
+                                final lng =
+                                    (event.location?.coordinates?[0] as num?)
+                                        ?.toDouble() ??
+                                    0;
+                                mapCtrl.showRouteToEvent(LatLng(lat, lng));
+                              },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.white24),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (mapCtrl.isRouting)
+                              SizedBox(
+                                height: 16.sp,
+                                width: 16.sp,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            else ...[
+                              Icon(
+                                Icons.near_me_outlined,
+                                color: Colors.white,
+                                size: 16.sp,
+                              ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                "Get Direction${mapCtrl.duration != null ? ' (${mapCtrl.duration})' : ''}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-
-
-
-
-
-
 }

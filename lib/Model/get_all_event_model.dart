@@ -38,8 +38,8 @@ class EventListData {
       meta: json['meta'] != null ? Meta.fromJson(json['meta']) : null,
       data: json['data'] != null
           ? (json['data'] as List<dynamic>)
-              .map((v) => EventData.fromJson(v as Map<String, dynamic>))
-              .toList()
+                .map((v) => EventData.fromJson(v as Map<String, dynamic>))
+                .toList()
           : null,
     );
   }
@@ -88,27 +88,23 @@ class EventData {
   String? description;
   String? category;
   List<String>? tags;
-  List<String>? features; // নতুন যোগ করা (API-তে আছে)
+  List<String>? features;
   OrganizerId? organizerId;
   String? status;
   String? visibility;
-  DateTime? startDate;   // String → DateTime
+  DateTime? startDate;
   String? startTime;
   String? locationType;
   String? address;
   int? capacity;
-  int? ticketsSold;
-  int? ticketPrice;
   List<String>? images;
   List<String>? gallery;
   int? views;
   int? favorites;
-  bool? hasLiveStream;
-  String? liveStreamId;
-  bool? isStreamingActive;
   DateTime? createdAt;
   DateTime? updatedAt;
   int? iV;
+  String? price;
 
   EventData({
     this.location,
@@ -126,30 +122,32 @@ class EventData {
     this.locationType,
     this.address,
     this.capacity,
-    this.ticketsSold,
-    this.ticketPrice,
     this.images,
     this.gallery,
     this.views,
     this.favorites,
-    this.hasLiveStream,
-    this.liveStreamId,
-    this.isStreamingActive,
     this.createdAt,
     this.updatedAt,
     this.iV,
+    this.price,
   });
 
   factory EventData.fromJson(Map<String, dynamic> json) {
     return EventData(
-      location: json['location'] != null ? Location.fromJson(json['location']) : null,
+      location: json['location'] != null
+          ? Location.fromJson(json['location'])
+          : null,
       id: json['_id'] ?? json['id'],
       title: json['title']?.toString(),
       description: json['description']?.toString(),
       category: json['category']?.toString(),
       tags: json['tags'] is List ? List<String>.from(json['tags']) : null,
-      features: json['features'] is List ? List<String>.from(json['features']) : null,
-      organizerId: json['organizerId'] != null ? OrganizerId.fromJson(json['organizerId']) : null,
+      features: json['features'] is List
+          ? List<String>.from(json['features'])
+          : null,
+      organizerId: json['organizerId'] != null
+          ? OrganizerId.fromJson(json['organizerId'])
+          : null,
       status: json['status']?.toString(),
       visibility: json['visibility']?.toString(),
       startDate: _parseDate(json['startDate']),
@@ -157,18 +155,14 @@ class EventData {
       locationType: json['locationType']?.toString(),
       address: json['address']?.toString(),
       capacity: json['capacity'],
-      ticketsSold: json['ticketsSold'],
-      ticketPrice: json['ticketPrice'],
       images: _parseStringList(json['images']),
       gallery: _parseStringList(json['gallery']),
       views: json['views'],
       favorites: json['favorites'],
-      hasLiveStream: json['hasLiveStream'],
-      liveStreamId: json['liveStreamId']?.toString(),
-      isStreamingActive: json['isStreamingActive'],
       createdAt: _parseDate(json['createdAt']),
       updatedAt: _parseDate(json['updatedAt']),
       iV: json['__v'],
+      price: json['price']?.toString(),
     );
   }
 
@@ -189,18 +183,14 @@ class EventData {
     map['locationType'] = locationType;
     map['address'] = address;
     map['capacity'] = capacity;
-    map['ticketsSold'] = ticketsSold;
-    map['ticketPrice'] = ticketPrice;
     map['images'] = images;
     map['gallery'] = gallery;
     map['views'] = views;
     map['favorites'] = favorites;
-    map['hasLiveStream'] = hasLiveStream;
-    map['liveStreamId'] = liveStreamId;
-    map['isStreamingActive'] = isStreamingActive;
     map['createdAt'] = createdAt?.toIso8601String();
     map['updatedAt'] = updatedAt?.toIso8601String();
     map['__v'] = iV;
+    map['price'] = price;
     return map;
   }
 
@@ -215,7 +205,10 @@ class EventData {
 // Helper functions
 List<String> _parseStringList(dynamic value) {
   if (value is List) {
-    return value.map((e) => e?.toString() ?? '').where((e) => e.isNotEmpty).toList();
+    return value
+        .map((e) => e?.toString() ?? '')
+        .where((e) => e.isNotEmpty)
+        .toList();
   }
   return [];
 }
@@ -239,19 +232,20 @@ class Location {
     return Location(
       type: json['type']?.toString(),
       coordinates: json['coordinates'] is List
-          ? (json['coordinates'] as List).map((e) => (e as num?)?.toDouble() ?? 0.0).toList()
+          ? (json['coordinates'] as List)
+                .map((e) => (e as num?)?.toDouble() ?? 0.0)
+                .toList()
           : null,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'coordinates': coordinates,
-      };
+  Map<String, dynamic> toJson() => {'type': type, 'coordinates': coordinates};
 
   // Google Maps friendly getters (coordinates [lng, lat] → lat, lng)
-  double get latitude => (coordinates != null && coordinates!.length >= 2) ? coordinates![1] : 0.0;
-  double get longitude => (coordinates != null && coordinates!.length >= 2) ? coordinates![0] : 0.0;
+  double get latitude =>
+      (coordinates != null && coordinates!.length >= 2) ? coordinates![1] : 0.0;
+  double get longitude =>
+      (coordinates != null && coordinates!.length >= 2) ? coordinates![0] : 0.0;
 }
 
 class OrganizerId {
@@ -274,10 +268,10 @@ class OrganizerId {
   }
 
   Map<String, dynamic> toJson() => {
-        '_id': id,
-        'name': name,
-        'email': email,
-        'role': role,
-        'timezone': timezone,
-      };
+    '_id': id,
+    'name': name,
+    'email': email,
+    'role': role,
+    'timezone': timezone,
+  };
 }

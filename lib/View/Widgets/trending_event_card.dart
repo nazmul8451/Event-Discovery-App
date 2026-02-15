@@ -20,18 +20,17 @@ class TrendingEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // -- Data Parsing --
     final String imageUrl = (event.images != null && event.images!.isNotEmpty)
         ? "${Urls.baseUrl}${event.images!.first}"
         : "assets/images/personLocation.jpg";
 
     final String category = event.category ?? 'Event';
-    final String price = event.ticketPrice == 0 ? "Free" : "\$${event.ticketPrice}";
     final String title = event.title ?? "Untitled Event";
     // Date formatting (basic) - You might want intl package for "Nov 15 • 8:00 PM"
-    final String dateStr = event.startDate != null 
-        ? "${event.startDate!.day}/${event.startDate!.month} • ${event.startTime ?? ''}" 
+    final String dateStr = event.startDate != null
+        ? "${event.startDate!.day}/${event.startDate!.month} • ${event.startTime ?? ''}"
         : "Date TBA";
     final String location = event.address ?? "Location TBA";
     final double rating = 4.8; // Static for now as requested/design
@@ -43,7 +42,9 @@ class TrendingEventCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           color: isDark ? const Color(0xFFCC18CA) : Colors.white,
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade200,
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.grey.shade200,
           ),
           boxShadow: [
             BoxShadow(
@@ -64,7 +65,9 @@ class TrendingEventCard extends StatelessWidget {
                 children: [
                   // 1. Background Image
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16.r),
+                    ),
                     child: CachedNetworkImage(
                       imageUrl: imageUrl,
                       fit: BoxFit.cover,
@@ -75,7 +78,10 @@ class TrendingEventCard extends StatelessWidget {
                       ),
                       errorWidget: (context, url, error) => Container(
                         color: Colors.grey.shade200,
-                        child: Icon(Icons.image_not_supported, color: Colors.grey),
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ),
@@ -85,9 +91,14 @@ class TrendingEventCard extends StatelessWidget {
                     top: 10.h,
                     left: 10.w,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
-                        color:const Color(0xFFB026FF).withOpacity(0.9), // Purple accent
+                        color: const Color(
+                          0xFFB026FF,
+                        ).withOpacity(0.9), // Purple accent
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
@@ -128,27 +139,6 @@ class TrendingEventCard extends StatelessWidget {
                       },
                     ),
                   ),
-
-                   // 4. Price Chip (Bottom Right of Image)
-                  Positioned(
-                    bottom: 10.h,
-                    right: 10.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00F0FF), // Cyan accent
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Text(
-                        price,
-                        style: TextStyle(
-                          color: Colors.black, // Dark text on Cyan
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -173,11 +163,15 @@ class TrendingEventCard extends StatelessWidget {
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
-                    
+
                     // Date
                     Row(
                       children: [
-                        Icon(Icons.calendar_today_outlined, size: 12.sp, color: Colors.grey),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 12.sp,
+                          color: Colors.grey,
+                        ),
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
@@ -195,7 +189,11 @@ class TrendingEventCard extends StatelessWidget {
                     // Location + Rating
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 12.sp, color: Colors.grey),
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 12.sp,
+                          color: Colors.grey,
+                        ),
                         SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
@@ -208,13 +206,17 @@ class TrendingEventCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        
+
                         // Rating (Next to location as requested)
                         Container(
                           margin: EdgeInsets.only(left: 4.w),
                           child: Row(
                             children: [
-                              Icon(Icons.star, size: 12.sp, color: Colors.amber),
+                              Icon(
+                                Icons.star,
+                                size: 12.sp,
+                                color: Colors.amber,
+                              ),
                               SizedBox(width: 2.w),
                               Text(
                                 "$rating",

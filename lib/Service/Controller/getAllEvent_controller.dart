@@ -71,17 +71,24 @@ class GetAllEventController extends ChangeNotifier {
     _filteredEvents = temp;
   }
 
-  /// First 2 events → ListView
-  List<EventData> get topTwoEvents {
+  /// First 1 event → Featured Section
+  List<EventData> get topEvent {
+    return _filteredEvents.take(_filteredEvents.isNotEmpty ? 1 : 0).toList();
+  }
+
+  /// Events for the horizontal scroll section (skip top 1, take next 5)
+  List<EventData> get horizontalEvents {
+    if (_filteredEvents.length <= 1) return [];
     return _filteredEvents
-        .take(_filteredEvents.length >= 2 ? 2 : _filteredEvents.length)
+        .skip(1)
+        .take(_filteredEvents.length >= 6 ? 5 : _filteredEvents.length - 1)
         .toList();
   }
 
-  /// Remaining events after removing top 2 → GridView
+  /// Remaining events after featured and horizontal sections → GridView
   List<EventData> get remainingEvents {
-    if (_filteredEvents.length <= 2) return [];
-    return _filteredEvents.skip(2).toList();
+    if (_filteredEvents.length <= 6) return [];
+    return _filteredEvents.skip(6).toList();
   }
 
   List<String> get categories => _categories;
@@ -99,11 +106,8 @@ class GetAllEventController extends ChangeNotifier {
     //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoSWQiOiI2OTNiM2VlMjAxNDcwOTJlZWUyMTY5OWUiLCJyb2xlIjoidXNlciIsIm5hbWUiOiJraGFsdCIsImVtYWlsIjoib2p6N3pia3dpNEBtcm90emlzLmNvbSIsImlhdCI6MTc2NTU2NjE3MSwiZXhwIjoxNzY2NDMwMTcxfQ.QEJQZfSlcgKLcQT_BZ46pBmRqwz0mHTceV7bDCCXHko';
 
     try {
-      final response = await NetworkCaller.getRequest(
-        url: Urls.getAllEvent,
-      );
-      
-      
+      final response = await NetworkCaller.getRequest(url: Urls.getAllEvent);
+
       if (response.statusCode == 200) {
         // Safe body handling
         Map<String, dynamic> body;

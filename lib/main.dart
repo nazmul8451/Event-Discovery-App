@@ -2,11 +2,9 @@ import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:gathering_app/Service/Controller/email_verify_controller.dart';
-import 'package:gathering_app/Service/Controller/event%20_detailsController.dart';
+import 'package:gathering_app/Service/Controller/event_details_controller.dart';
 import 'package:gathering_app/Service/Controller/forgot_pass_controller.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 import 'package:gathering_app/Service/Controller/log_in_controller.dart';
@@ -14,13 +12,13 @@ import 'package:gathering_app/Service/Controller/other_user_profile_controller.d
 import 'package:gathering_app/Service/Controller/otp_verify_controller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
-import 'package:gathering_app/Service/Controller/liveStreamController.dart';
 import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
 import 'package:gathering_app/Service/Controller/sign_up_controller.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Service/Controller/notification_controller.dart';
+import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Utils/app_utils.dart';
@@ -34,21 +32,16 @@ void main() async {
 
   // Run heavy initializations and await them
   await GetStorage.init();
-  
+
   try {
     final themeProvider = ThemeProvider();
     await themeProvider.init();
-
-    Stripe.publishableKey =
-        'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa';
-    await Stripe.instance.applySettings();
   } catch (e) {
     debugPrint('Initialization error: $e');
   }
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -57,11 +50,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) {
-          final p = ProfileController();
-          p.initialize();
-          return p;
-        }),
+        ChangeNotifierProvider(
+          create: (_) {
+            final p = ProfileController();
+            p.initialize();
+            return p;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => InterestScreenController()),
         ChangeNotifierProvider(create: (_) => SavedEventController()),
@@ -81,12 +76,17 @@ class MyApp extends StatelessWidget {
             return c;
           },
         ),
-        ChangeNotifierProvider(create: (_) => EventTicketProvider()),
         ChangeNotifierProvider(create: (_) => ChatController()),
         ChangeNotifierProvider(create: (_) => BottomNavController()),
-        ChangeNotifierProvider(create: (_) => LiveStreamController()),
         ChangeNotifierProvider(create: (_) => LiveChatController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final m = MapController();
+            m.init();
+            return m;
+          },
+        ),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

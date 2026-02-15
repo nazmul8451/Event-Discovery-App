@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,8 +10,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:ui' as ui;
 import 'dart:typed_data';
-
-
+import 'package:gathering_app/View/Widgets/customSnacBar.dart';
+import 'package:gathering_app/Utils/app_utils.dart';
 
 class MapController with ChangeNotifier {
   /// ================= MAP + ROUTE =================
@@ -26,6 +28,9 @@ class MapController with ChangeNotifier {
 
   bool _eventsLoading = true;
   bool get eventsLoading => _eventsLoading;
+
+  bool _isRouting = false;
+  bool get isRouting => _isRouting;
 
   /// ================= LOCATION =================
   Position? _currentPosition;
@@ -48,11 +53,16 @@ class MapController with ChangeNotifier {
   EventData? _selectedEvent;
   EventData? get selectedEvent => _selectedEvent;
 
+  String? _distance;
+  String? get distance => _distance;
+
+  String? _duration;
+  String? get duration => _duration;
+
   /// ================= INIT =================
   Future<void> init() async {
     _polylinePoints = PolylinePoints(
-      apiKey:
-          'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa',
+      apiKey: 'AIzaSyDvuwAjadUqjxuBqNbTnZ5WhZ3HrD3ODGk',
     );
     await _loadEventIcon();
     await getCurrentLocation();
@@ -83,11 +93,14 @@ class MapController with ChangeNotifier {
     }
   }
 
-  Future<BitmapDescriptor> _createCustomMarkerBitmap(int size, int height) async {
+  Future<BitmapDescriptor> _createCustomMarkerBitmap(
+    int size,
+    int height,
+  ) async {
     // Increase canvas size to accommodate glow
     final int canvasWidth = (size * 1.5).toInt();
     final int canvasHeight = (height * 1.2).toInt();
-    
+
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..isAntiAlias = true;
@@ -104,19 +117,29 @@ class MapController with ChangeNotifier {
     // Draw the main pin shape
     final Path path = Path();
     path.moveTo(centerX, canvasHeight.toDouble());
-    path.quadraticBezierTo(centerX - size / 2, centerY + size / 2, centerX - size / 2, centerY);
-    path.arcToPoint(Offset(centerX + size / 2, centerY), radius: Radius.circular(size / 2));
-    path.quadraticBezierTo(centerX + size / 2, centerY + size / 2, centerX, canvasHeight.toDouble());
+    path.quadraticBezierTo(
+      centerX - size / 2,
+      centerY + size / 2,
+      centerX - size / 2,
+      centerY,
+    );
+    path.arcToPoint(
+      Offset(centerX + size / 2, centerY),
+      radius: Radius.circular(size / 2),
+    );
+    path.quadraticBezierTo(
+      centerX + size / 2,
+      centerY + size / 2,
+      centerX,
+      canvasHeight.toDouble(),
+    );
     path.close();
 
     // Create gradient
     paint.shader = ui.Gradient.linear(
       Offset(centerX, canvasHeight.toDouble()),
       Offset(centerX, 0),
-      [
-        const Color(0xFFB026FF), 
-        const Color(0xFFFF5400), 
-      ],
+      [const Color(0xFFB026FF), const Color(0xFFFF5400)],
     );
     canvas.drawPath(path, paint);
 
@@ -128,12 +151,15 @@ class MapController with ChangeNotifier {
     paint.color = Colors.black;
     canvas.drawCircle(Offset(centerX, centerY), size / 6, paint);
 
-    final ui.Image image = await pictureRecorder.endRecording().toImage(canvasWidth, canvasHeight);
-    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final ui.Image image = await pictureRecorder.endRecording().toImage(
+      canvasWidth,
+      canvasHeight,
+    );
+    final ByteData? byteData = await image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
   }
-
-
 
   /// ================= LOCATION =================
   Future<void> getCurrentLocation() async {
@@ -219,15 +245,10 @@ class MapController with ChangeNotifier {
             onTap: () {
               _selectedEvent = event;
               notifyListeners();
-              // Center camera on marker
-              if (_mapController != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newLatLng(LatLng(lat, lng)),
-                );
-              }
+              // showRouteToEvent will handle specialized camera movement
               showRouteToEvent(LatLng(lat, lng));
+              _calculateDistance(LatLng(lat, lng));
             },
-
           ),
         );
       }
@@ -245,46 +266,181 @@ class MapController with ChangeNotifier {
     notifyListeners();
   }
 
-Future<void> showRouteToEvent(LatLng eventLatLng) async {
-  if (_currentPosition == null || _mapController == null) return;
+  Future<void> showRouteToEvent(LatLng eventLatLng) async {
+    if (_currentPosition == null) {
+      debugPrint('📍 Current position is null, attempting to get location...');
+      await getCurrentLocation();
+    }
 
-  clearRoute();
+    if (_currentPosition == null) {
+      _showError('Please enable location services to view the route');
+      return;
+    }
 
-  final polylinePoints = PolylinePoints(apiKey: 'pk_test_51RcvK8GdOsJASBMC9aDK1onP8kTVwAxve4385Mr09r2Edd1fxcbSWD1y5DCclahZ7MHa0hf1eBnsnq16bWavPRY400W2WfumAa');
+    if (_mapController == null) {
+      debugPrint('🗺️ Map controller is not initialized yet');
+      return;
+    }
 
-  try {
-    // Use PolylineRequest instead of RoutesApiRequest
-    final request = PolylineRequest(
-      origin: PointLatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-      destination: PointLatLng(eventLatLng.latitude, eventLatLng.longitude), mode: TravelMode.driving,
+    _isRouting = true;
+    notifyListeners();
+    debugPrint(
+      '🌉 Starting showRouteToEvent to ${eventLatLng.latitude}, ${eventLatLng.longitude}',
     );
 
-    final response = await polylinePoints.getRouteBetweenCoordinates(
-      request: request,
+    clearRoute();
+
+    final polylinePoints = PolylinePoints(
+      apiKey: 'AIzaSyDvuwAjadUqjxuBqNbTnZ5WhZ3HrD3ODGk',
     );
 
-    if (response.points.isNotEmpty) {
-      _polylineCoordinates = response.points
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
-
-      _routePolyline = Polyline(
-        polylineId: const PolylineId('route'),
-        color: Colors.blue,
-        width: 5,
-        points: _polylineCoordinates,
+    try {
+      // Use PolylineRequest instead of RoutesApiRequest
+      final request = PolylineRequest(
+        origin: PointLatLng(
+          _currentPosition!.latitude,
+          _currentPosition!.longitude,
+        ),
+        destination: PointLatLng(eventLatLng.latitude, eventLatLng.longitude),
+        mode: TravelMode.driving,
       );
 
+      final response = await polylinePoints.getRouteBetweenCoordinates(
+        request: request,
+      );
+
+      if (response.points.isNotEmpty) {
+        _polylineCoordinates = response.points
+            .map((point) => LatLng(point.latitude, point.longitude))
+            .toList();
+
+        _routePolyline = Polyline(
+          polylineId: const PolylineId('route'),
+          color: const Color(0xFF4285F4), // Google Maps Blue
+          width: 5,
+          points: _polylineCoordinates,
+        );
+
+        // Fetch Distance and Duration from Directions API directly for accuracy
+        await _fetchRouteInfo(
+          _currentPosition!.latitude,
+          _currentPosition!.longitude,
+          eventLatLng.latitude,
+          eventLatLng.longitude,
+        );
+
+        notifyListeners();
+        _fitRouteBounds(eventLatLng);
+        debugPrint('✅ Route polyline and info updated successfully');
+      } else {
+        debugPrint('❌ Directions API Failure:');
+        debugPrint('   Status: ${response.status}');
+        debugPrint('   Error Message: ${response.errorMessage}');
+        _showError(
+          response.errorMessage ?? 'No road path found to this location',
+        );
+      }
+    } catch (e) {
+      debugPrint('Route error in showRouteToEvent: $e');
+      _showError('Error calculating route path');
+    } finally {
+      _isRouting = false;
       notifyListeners();
     }
-  } catch (e) {
-    debugPrint('Route error: $e');
   }
-}
+
+  Future<void> _fetchRouteInfo(
+    double originLat,
+    double originLng,
+    double destLat,
+    double destLng,
+  ) async {
+    const apiKey = 'AIzaSyDvuwAjadUqjxuBqNbTnZ5WhZ3HrD3ODGk';
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$originLat,$originLng&destination=$destLat,$destLng&key=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['routes'] != null && data['routes'].isNotEmpty) {
+          final leg = data['routes'][0]['legs'][0];
+          _distance = leg['distance']['text'];
+          _duration = leg['duration']['text'];
+          debugPrint('🚗 Route Info Fetched: $_duration, $_distance');
+          notifyListeners();
+        } else {
+          debugPrint('⚠️ Directions API returned no routes');
+        }
+      } else {
+        debugPrint(
+          '❌ Directions API Error: ${response.statusCode} - ${response.body}',
+        );
+        _showError(
+          'Failed to fetch travel info (Error: ${response.statusCode})',
+        );
+      }
+    } catch (e) {
+      debugPrint('FetchRouteInfo error: $e');
+      _showError('Network error while fetching route');
+    }
+  }
+
+  void _showError(String message) {
+    debugPrint('📢 Map Error: $message');
+    final context = AppUtils.navigatorKey.currentContext;
+    if (context != null) {
+      String userFriendlyMessage = message;
+
+      // Provide actionable advice for common API issues
+      if (message.contains('not authorized') || message.contains('API key')) {
+        userFriendlyMessage =
+            "API Authorization Error: Please check your Google Cloud Console restrictions for the Directions API.";
+      } else if (message.contains('REQUEST_DENIED')) {
+        userFriendlyMessage =
+            "Directions API denied. Ensure it is enabled in your Google Cloud project.";
+      }
+
+      showCustomSnackBar(
+        context: context,
+        message: userFriendlyMessage,
+        isError: true,
+      );
+    }
+  }
 
   /// ================= MAP CONTROLLER =================
   void setMapController(GoogleMapController controller) {
     _mapController = controller;
+  }
+
+  void _fitRouteBounds(LatLng eventLatLng) {
+    if (_mapController == null || _currentPosition == null) return;
+
+    final LatLng userLatLng = LatLng(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+    );
+
+    LatLngBounds bounds;
+    if (userLatLng.latitude > eventLatLng.latitude &&
+        userLatLng.longitude > eventLatLng.longitude) {
+      bounds = LatLngBounds(southwest: eventLatLng, northeast: userLatLng);
+    } else if (userLatLng.longitude > eventLatLng.longitude) {
+      bounds = LatLngBounds(
+        southwest: LatLng(userLatLng.latitude, eventLatLng.longitude),
+        northeast: LatLng(eventLatLng.latitude, userLatLng.longitude),
+      );
+    } else if (userLatLng.latitude > eventLatLng.latitude) {
+      bounds = LatLngBounds(
+        southwest: LatLng(eventLatLng.latitude, userLatLng.longitude),
+        northeast: LatLng(userLatLng.latitude, eventLatLng.longitude),
+      );
+    } else {
+      bounds = LatLngBounds(southwest: userLatLng, northeast: eventLatLng);
+    }
+
+    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
   }
 
   Future<void> applyMapStyle(bool isDarkMode) async {
@@ -301,8 +457,28 @@ Future<void> showRouteToEvent(LatLng eventLatLng) async {
     }
   }
 
+  void _calculateDistance(LatLng eventLatLng) {
+    if (_currentPosition == null) return;
+
+    double distanceInMeters = Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      eventLatLng.latitude,
+      eventLatLng.longitude,
+    );
+
+    if (distanceInMeters >= 1000) {
+      _distance = "${(distanceInMeters / 1000).toStringAsFixed(1)} km";
+    } else {
+      _distance = "${distanceInMeters.round()} m";
+    }
+    notifyListeners();
+  }
+
   void clearSelectedEvent() {
     _selectedEvent = null;
+    _distance = null;
+    _duration = null;
     clearRoute();
     notifyListeners();
   }

@@ -1,11 +1,8 @@
 // View/app.dart
 import 'package:flutter/material.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/booking_confirmed.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/bottom_nav_bar.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/order_summery_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
@@ -34,12 +31,9 @@ class AppRoutes {
   static const String notificationScreen = NotificationScreen.name;
   static const String userchatScreen = UserChatScreen.name;
   static const String detaisScreen = DetailsScreen.name;
-  static const String bookingConfirmScreen = BookingConfirmedScreen.name;
   static const String viewEventScreen = ViewEventScreen.name;
-  static const String liveStream = LiveStream.name;
   static const String newPassScreen = NewPasswordScreen.name;
   static const String verifyAccount = '/verify-account';
-  static const String orderSummery = OrderSummeryScreen.name;
 
   static final routes = {
     splash: (context) => const SplashScreen(),
@@ -57,12 +51,9 @@ class AppRoutes {
       return UserChatScreen(chat: chat);
     },
     detaisScreen: (context) => const DetailsScreen(),
-    bookingConfirmScreen: (context) => const BookingConfirmedScreen(),
     viewEventScreen: (context) => const ViewEventScreen(),
-    liveStream: (context) => LiveStream(),
     newPassScreen: (context) => NewPasswordScreen(),
     verifyAccount: (context) => VerifyAccount(email: ''),
-    orderSummery: (context) => OrderSummeryScreen(),
     OtherUserProfileScreen.name: (context) {
       final userId = ModalRoute.of(context)!.settings.arguments as String;
       return OtherUserProfileScreen(userId: userId);

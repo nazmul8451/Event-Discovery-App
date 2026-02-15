@@ -26,7 +26,7 @@ class Custom_item_container extends StatelessWidget {
         final bool isCurrentlySaved = controller.isSaved(event);
 
         return GestureDetector(
-          onTap: onTap, 
+          onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
@@ -95,30 +95,6 @@ class Custom_item_container extends StatelessWidget {
                         ),
                       ),
 
-                      // Price Badge (Bottom Right)
-                      Positioned(
-                        right: 8.w,
-                        bottom: 8.h,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF00C2CB), // Teal/Cyan
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Text(
-                            "\$${event.ticketPrice ?? 0}",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-
                       // Bookmark Button (Top Right)
                       Positioned(
                         right: 4,
@@ -129,7 +105,9 @@ class Custom_item_container extends StatelessWidget {
                             return Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.black.withOpacity(0.3), // Background for better visibility
+                                color: Colors.black.withOpacity(
+                                  0.3,
+                                ), // Background for better visibility
                               ),
                               child: IconButton(
                                 icon: Icon(
@@ -194,7 +172,7 @@ class Custom_item_container extends StatelessWidget {
                             SizedBox(width: 3.w),
                             Expanded(
                               child: Text(
-                              "${event.startDate ?? "00"}",
+                                "${event.startDate ?? "00"}",
                                 style: TextStyle(
                                   fontSize: 12.sp,
                                   color: Colors.grey[600],
@@ -216,9 +194,9 @@ class Custom_item_container extends StatelessWidget {
                                 event.address?.isNotEmpty == true
                                     ? event.address!
                                     : "Location TBA",
-                                    softWrap: true,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
+                                softWrap: true,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 10.sp,
                                   color: Colors.grey[600],

@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/live_stream.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart'
     show ThemeProvider;
-import 'package:gathering_app/Service/Controller/Event_Ticket_Provider.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
 import 'package:gathering_app/View/Widgets/CustomButton.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 class ViewEventScreen extends StatefulWidget {
-  final bool hasTicket;
-  final String? ticketId;
-  final String? eventId;
-  const ViewEventScreen({super.key, this.hasTicket = false, this.ticketId, this.eventId});
+  const ViewEventScreen({super.key});
 
   static const String name = '/view-event-screen';
 
@@ -22,11 +17,11 @@ class ViewEventScreen extends StatefulWidget {
 }
 
 class _ViewEventScreenState extends State<ViewEventScreen> {
-
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,94 +221,19 @@ class _ViewEventScreenState extends State<ViewEventScreen> {
 
             Row(
               children: [
-                if (widget.hasTicket)
-                  GestureDetector(
-                    onTap: () async {
-                      print("📱 Check-in button tapped. TicketId: ${widget.ticketId}");
-                      if (widget.ticketId != null) {
-                        final provider = context.read<EventTicketProvider>();
-                        final ticketData = await provider.checkIn(widget.ticketId!);
-                        
-                        print("🎫 Full ticket data received: $ticketData");
-                        
-                        if (ticketData != null) {
-                          print("🚀 Check-in success! Navigating to Live Stream...");
-                          // Extract eventId from ticket data
-                          String? extractedEventId;
-                          final eventObj = ticketData['eventId'] ?? ticketData['event'];
-                          
-                          print("🔍 Event object from ticket: $eventObj");
-                          print("🔍 Event object type: ${eventObj.runtimeType}");
-                          
-                          if (eventObj is Map) {
-                            extractedEventId = eventObj['_id']?.toString() ?? eventObj['id']?.toString();
-                            print("🔍 Extracted from Map - _id: ${eventObj['_id']}, id: ${eventObj['id']}");
-                          } else {
-                            extractedEventId = eventObj?.toString();
-                            print("🔍 Extracted as String: $extractedEventId");
-                          }
-                          
-                          print("🎬 Final extracted eventId: $extractedEventId");
-                          print("🎬 Fallback eventId from widget: ${widget.eventId}");
-                          
-                          final finalEventId = extractedEventId ?? widget.eventId;
-                          print("✅ Using eventId for LiveStream: $finalEventId");
-                          
-                          Navigator.pushNamed(
-                            context,
-                            LiveStream.name,
-                            arguments: {
-                              'ticketId': widget.ticketId,
-                              'eventId': finalEventId,
-                            },
-                          );
-                        } else {
-                          print("🚫 Check-in failed in UI.");
-                          showCustomSnackBar(
-                            context: context,
-                            message: 'Check-in failed. Please try again.',
-                          );
-                        }
-                      } else {
-                        print("⚠️ No Ticket ID available on this screen.");
-                        showCustomSnackBar(
-                          context: context,
-                          message: 'No Ticket ID found for check-in.',
-                        );
-                      }
+                SizedBox(
+                  width: 120.w,
+                  child: CustomButton(
+                    buttonName: 'Interested',
+                    onPressed: () {
+                      showCustomSnackBar(
+                        context: context,
+                        message: "Marked as Interested!",
+                        isError: false,
+                      );
                     },
-                    child: Container(
-                      height: 50.h,
-                      width: 120.w, 
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50.r),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.deepPurpleAccent,
-                            const Color.fromARGB(255, 66, 42, 107),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Check in',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  SizedBox(
-                    width: 120.w,
-                    child: CustomButton(
-                      buttonName: 'Get Ticket',
-                      onPressed: () {
-                        // NOTE: You can add navigation to your order summary screen here
-                      },
-                    ),
                   ),
+                ),
                 SizedBox(width: 20.w),
                 Container(
                   width: 60.w,

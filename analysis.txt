@@ -1,0 +1,30 @@
+﻿Analyzing details_screen.dart...                                
+
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:31:39 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:38:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:39:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:40:7 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:64:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:75:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:82:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:160:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:234:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:290:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:291:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:295:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:296:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:433:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:434:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:463:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:464:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:467:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:483:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:588:39 - deprecated_member_use
+  error - Extension methods can't be used in constant expressions - lib\view\screen\bottomnavbarscreen\details_screen.dart:604:40 - const_eval_extension_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:689:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\view\screen\bottomnavbarscreen\details_screen.dart:746:35 - deprecated_member_use
+   info - The variable name 'WriteReviewAlertDialogue' isn't a lowerCamelCase identifier - lib\view\screen\bottomnavbarscreen\details_screen.dart:799:8 - non_constant_identifier_names
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:866:43 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:869:31 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\view\screen\bottomnavbarscreen\details_screen.dart:875:31 - use_build_context_synchronously
+

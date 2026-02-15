@@ -40,8 +40,10 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GetAllEventController>(context, listen: false).getAllEvents();
       context.read<SavedEventController>().loadMySavedEvents();
-      Provider.of<NotificationController>(context, listen: false)
-          .fetchNotifications();
+      Provider.of<NotificationController>(
+        context,
+        listen: false,
+      ).fetchNotifications();
     });
   }
 
@@ -75,7 +77,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           Stack(
+            Stack(
               children: [
                 Center(
                   child: Consumer<ThemeProvider>(
@@ -103,7 +105,9 @@ class _HomePageState extends State<HomePage> {
                             IconButton(
                               onPressed: () {
                                 Navigator.pushNamed(
-                                    context, NotificationScreen.name);
+                                  context,
+                                  NotificationScreen.name,
+                                );
                               },
                               icon: const Icon(Icons.notifications_none),
                             ),
@@ -117,7 +121,9 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     '${notificationController.unreadCount}',
                                     style: const TextStyle(
-                                        color: Colors.white, fontSize: 10),
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -235,19 +241,19 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Consumer<GetAllEventController>(
                             builder: (context, controller, child) {
-                              if (controller.inProgress && controller.events.isEmpty) {
+                              if (controller.inProgress &&
+                                  controller.events.isEmpty) {
                                 return _buildFeaturedShimmer();
                               }
                               if (controller.events.isEmpty) {
-                                return const SizedBox.shrink(); // Empty state handled below
+                                return const SizedBox.shrink();
                               }
                               return ListView.builder(
-                                itemCount: controller.topTwoEvents.length,
+                                itemCount: controller.topEvent.length,
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  final listEvent =
-                                      controller.topTwoEvents[index];
+                                  final listEvent = controller.topEvent[index];
                                   return Column(
                                     children: [
                                       GestureDetector(
@@ -273,6 +279,38 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
 
+                        // New Horizontal Scroll Section
+                        Consumer<GetAllEventController>(
+                          builder: (context, controller, _) {
+                            if (controller.horizontalEvents.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return Column(
+                              children: [
+                                SizedBox(height: 10.h),
+                                SizedBox(
+                                  height: 180.h,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount:
+                                        controller.horizontalEvents.length,
+                                    padding: EdgeInsets.only(left: 16.w),
+                                    itemBuilder: (context, index) {
+                                      final event =
+                                          controller.horizontalEvents[index];
+                                      return Padding(
+                                        padding: EdgeInsets.only(right: 12.w),
+                                        child: _buildHorizontalEventCard(event),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 20.h),
+                              ],
+                            );
+                          },
+                        ),
+
                         SizedBox(height: 20.h),
 
                         Padding(
@@ -294,7 +332,8 @@ class _HomePageState extends State<HomePage> {
 
                         Consumer<GetAllEventController>(
                           builder: (context, controller, _) {
-                            if (controller.inProgress && controller.events.isEmpty) {
+                            if (controller.inProgress &&
+                                controller.events.isEmpty) {
                               return _buildTrendingShimmer();
                             }
                             if (controller.events.isEmpty) {
@@ -394,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            
+
             Positioned(
               top: 16.h,
               right: 16.w,
@@ -416,7 +455,9 @@ class _HomePageState extends State<HomePage> {
                         isSaved ? Icons.bookmark : Icons.bookmark_border,
                         color: isSaved
                             ? const Color(0xFFFF006E)
-                            : (controller.isDarkMode ? Colors.white : Color(0xFFFF006E)),
+                            : (controller.isDarkMode
+                                  ? Colors.white
+                                  : Color(0xFFFF006E)),
                         size: 25.sp.clamp(25, 26),
                       ),
                     ),
@@ -443,25 +484,6 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                             fontSize: 22.sp.clamp(22, 22),
                             fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      // Price Badge
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 5.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00C2CB), // Teal
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: Text(
-                          "\$${event.ticketPrice ?? 0}",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -555,21 +577,24 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildFeaturedShimmer() {
     return Column(
-      children: List.generate(2, (index) => Padding(
-        padding: EdgeInsets.only(bottom: 15.h),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 197.h,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.r),
+      children: List.generate(
+        2,
+        (index) => Padding(
+          padding: EdgeInsets.only(bottom: 15.h),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 197.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.r),
+              ),
             ),
           ),
         ),
-      )),
+      ),
     );
   }
 
@@ -600,6 +625,168 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildHorizontalEventCard(EventData event) {
+    return GestureDetector(
+      onTap: () =>
+          Navigator.pushNamed(context, DetailsScreen.name, arguments: event.id),
+      child: Container(
+        width: 280.w,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          image: DecorationImage(
+            image: NetworkImage(
+              (event.images != null && event.images!.isNotEmpty)
+                  ? '${Urls.baseUrl}${event.images![0]}'
+                  : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&q=80',
+            ),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.8),
+                  ],
+                ),
+              ),
+            ),
+            // LIVE Badge
+            Positioned(
+              top: 12.h,
+              left: 12.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF9E01), // Premium Orange
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6.r,
+                      height: 6.r,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      "LIVE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Category Badge
+            Positioned(
+              top: 12.h,
+              right: 12.w,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: const Color(
+                    0xFFB026FF,
+                  ).withOpacity(0.8), // Glassmorphism-like
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.music_note, color: Colors.white, size: 12.sp),
+                    SizedBox(width: 4.w),
+                    Text(
+                      event.category ?? "Event",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Bottom Info
+            Positioned(
+              bottom: 12.h,
+              left: 12.w,
+              right: 12.w,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.title ?? "Event Title",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "Tonight - ${event.category} - ${event.address ?? ''}",
+                    style: TextStyle(color: Colors.white70, fontSize: 11.sp),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.h),
+                  // Stats Row
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.visibility,
+                        color: Colors.white60,
+                        size: 14.sp,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        "${event.views ?? 0}",
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 11.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Icon(
+                        Icons.group,
+                        color: const Color(0xFFFF9E01),
+                        size: 14.sp,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        "${event.favorites ?? 0}+",
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 11.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -607,10 +794,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "🎫",
-              style: TextStyle(fontSize: 60.sp),
-            ),
+            Text("🎫", style: TextStyle(fontSize: 60.sp)),
             SizedBox(height: 16.h),
             Text(
               "No events available right now",
@@ -623,10 +807,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 8.h),
             Text(
               "Check back later for more adventures!",
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[400],
-              ),
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
             ),
           ],
         ),

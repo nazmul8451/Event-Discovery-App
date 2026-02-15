@@ -4,8 +4,12 @@ class SingleEventDataModel {
   String? message;
   Data? data;
 
-  SingleEventDataModel(
-      {this.statusCode, this.success, this.message, this.data});
+  SingleEventDataModel({
+    this.statusCode,
+    this.success,
+    this.message,
+    this.data,
+  });
 
   SingleEventDataModel.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
@@ -41,48 +45,41 @@ class Data {
   String? locationType;
   String? address;
   int? capacity;
-  int? ticketsSold;
-  int? ticketPrice;
   List<String>? images;
   List<String>? gallery;
   int? views;
   int? favorites;
-  bool? hasLiveStream;
-  String? liveStreamId;
-  bool? isStreamingActive;
   String? createdAt;
   String? updatedAt;
   int? iV;
   String? id;
+  String? price;
 
-  Data(
-      {this.location,
-      this.sId,
-      this.title,
-      this.description,
-      this.category,
-      this.tags,
-      this.organizerId,
-      this.status,
-      this.visibility,
-      this.startDate,
-      this.startTime,
-      this.locationType,
-      this.address,
-      this.capacity,
-      this.ticketsSold,
-      this.ticketPrice,
-      this.images,
-      this.gallery,
-      this.views,
-      this.favorites,
-      this.hasLiveStream,
-      this.liveStreamId,
-      this.isStreamingActive,
-      this.createdAt,
-      this.updatedAt,
-      this.iV,
-      this.id});
+  Data({
+    this.location,
+    this.sId,
+    this.title,
+    this.description,
+    this.category,
+    this.tags,
+    this.organizerId,
+    this.status,
+    this.visibility,
+    this.startDate,
+    this.startTime,
+    this.locationType,
+    this.address,
+    this.capacity,
+    this.images,
+    this.gallery,
+    this.views,
+    this.favorites,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+    this.id,
+    this.price,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     location = json['location'] != null
@@ -103,19 +100,15 @@ class Data {
     locationType = json['locationType'];
     address = json['address'];
     capacity = json['capacity'];
-    ticketsSold = json['ticketsSold'];
-    ticketPrice = json['ticketPrice'];
     images = json['images'] != null ? List<String>.from(json['images']) : [];
     gallery = json['gallery'] != null ? List<String>.from(json['gallery']) : [];
     views = json['views'];
     favorites = json['favorites'];
-    hasLiveStream = json['hasLiveStream'];
-    liveStreamId = json['liveStreamId'];
-    isStreamingActive = json['isStreamingActive'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
     id = json['id'];
+    price = json['price']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -138,19 +131,15 @@ class Data {
     data['locationType'] = this.locationType;
     data['address'] = this.address;
     data['capacity'] = this.capacity;
-    data['ticketsSold'] = this.ticketsSold;
-    data['ticketPrice'] = this.ticketPrice;
     data['images'] = this.images;
     data['gallery'] = this.gallery ?? [];
     data['views'] = this.views;
     data['favorites'] = this.favorites;
-    data['hasLiveStream'] = this.hasLiveStream;
-    data['liveStreamId'] = this.liveStreamId;
-    data['isStreamingActive'] = this.isStreamingActive;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
     data['id'] = this.id;
+    data['price'] = this.price;
     return data;
   }
 }

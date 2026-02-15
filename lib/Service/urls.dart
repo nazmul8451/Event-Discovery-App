@@ -1,10 +1,10 @@
 class Urls {
-  //base url 
+  //base url
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
   //  static const String baseUrl = "http://10.10.7.50:4005";
-   static const String baseUrl = "http://195.35.6.13:4005";
+  static const String baseUrl = "http://195.35.6.13:4005";
 
-   //auth api
+  //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
 
   static const String loginUrl = "$baseUrl/api/v1/auth/login";
@@ -16,16 +16,9 @@ class Urls {
   static const String resetPassUrl = "$baseUrl/api/v1/auth/reset-password";
 
   static const String getAllEvent = "$baseUrl/api/v1/event";
-  
 
   static String getSingleEvent(String eventID) =>
       "$baseUrl/api/v1/event/$eventID";
-
-  static String getHasTicket(String eventID) =>
-      "$baseUrl/api/v1/event/$eventID/has-ticket";
-
-  static const String myTicketsUrl = "$baseUrl/api/v1/ticket/my-tickets";
-
 
   static const String reviewUrl = "$baseUrl/api/v1/review";
 
@@ -47,48 +40,51 @@ class Urls {
 
   static String deleteSavedEvent(String id) => "$baseUrl/api/v1/saved/$id";
 
-  static const String CreateTicket = "$baseUrl/api/v1/ticket";
-
-
   // chat api
-  static  String chatUrl(String other_user_id) => "$baseUrl/api/v1/chat/${other_user_id}";
+  static String chatUrl(String other_user_id) =>
+      "$baseUrl/api/v1/chat/${other_user_id}";
 
   static const String getAllChatsUrl = "$baseUrl/api/v1/chat";
 
-  static  String getMessage(String chatId) => "$baseUrl/api/v1/message/${chatId}";
+  static String getMessage(String chatId) =>
+      "$baseUrl/api/v1/message/${chatId}";
 
   static String sendMessage = "$baseUrl/api/v1/message";
 
   // follow api
-  static String followUserUrl(String userId) => "$baseUrl/api/v1/follow/$userId";
-  static String unfollowUserUrl(String userId) => "$baseUrl/api/v1/follow/$userId/unfollow";
-  static String getFollowStatsUrl(String userId, String type) => "$baseUrl/api/v1/follow/$userId/followers?type=$type";
+  static String followUserUrl(String userId) =>
+      "$baseUrl/api/v1/follow/$userId";
+  static String unfollowUserUrl(String userId) =>
+      "$baseUrl/api/v1/follow/$userId/unfollow";
+  static String getFollowStatsUrl(String userId, String type) =>
+      "$baseUrl/api/v1/follow/$userId/followers?type=$type";
   // check in streaming
   // static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
 
-  static String getTicketByEventIdUrl(String eventId) => "$baseUrl/api/v1/ticket/$eventId";
+  //live chat message api
+  static String sentMessageUrl(String streamId) =>
+      "$baseUrl/api/v1/chatmessage/$streamId/messages";
 
-   static String getLiveStreamByEventID(String eventId) => "$baseUrl/api/v1/livestream/event/$eventId";
-   static String getAgoraTokenUrl(String streamId) => "$baseUrl/api/v1/livestream/$streamId/token";
+  static String getLiveMessageUrl(String streamId) =>
+      "$baseUrl/api/v1/chatmessage/$streamId/messages?limit=50";
 
-   //live chat message api 
-   static String sentMessageUrl(String streamId) => "$baseUrl/api/v1/chatmessage/$streamId/messages";
+  //like message api
+  static String likeMessageUrl(String messageId) =>
+      "$baseUrl/api/v1/chatmessage/messages/$messageId/like";
 
-   static String getLiveMessageUrl(String streamId)=> "$baseUrl/api/v1/chatmessage/$streamId/messages?limit=50"; 
+  //delete message
+  static String deleteMessageUrl(String messageId) =>
+      "$baseUrl/api/v1/chatmessage/messages/$messageId";
+  static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
 
-   //like message api
-   static String likeMessageUrl(String messageId) => "$baseUrl/api/v1/chatmessage/messages/$messageId/like";
+  //Notification api
+  static const String getAllNotificationUrl = "$baseUrl/api/v1/notifications";
+  static String getNotificationByIdUrl(String id) =>
+      "$baseUrl/api/v1/notifications/$id";
 
-   //delete message 
-   static String deleteMessageUrl(String messageId) => "$baseUrl/api/v1/chatmessage/messages/$messageId";
-   static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
+  static String readAllNotificationUrl =
+      "$baseUrl/api/v1/notifications/mark-all";
 
-   //Notification api 
-   static const String getAllNotificationUrl = "$baseUrl/api/v1/notifications";
-   static String getNotificationByIdUrl(String id) => "$baseUrl/api/v1/notifications/$id";
-
-   static String readAllNotificationUrl = "$baseUrl/api/v1/notifications/mark-all";
-
-   static String readNotificationUrl(String id) => "$baseUrl/api/v1/notifications/$id/read";
-   
+  static String readNotificationUrl(String id) =>
+      "$baseUrl/api/v1/notifications/$id/read";
 }
