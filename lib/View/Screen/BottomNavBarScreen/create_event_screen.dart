@@ -397,7 +397,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           fontWeight: FontWeight.w500,
                         ),
                         decoration: InputDecoration(
-                          hintText: "Enter Event Title",
+                          hintText: "Event Title",
                           hintStyle: TextStyle(
                             color: isDark ? Colors.white70 : Colors.black54,
                             fontSize: 14.sp,
