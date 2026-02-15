@@ -295,7 +295,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _buildBottomEventCard(EventData event, MapController mapCtrl) {
     return Positioned(
-      bottom: 90.h, // Adjusted to sit above BottomNavigationBar
+      bottom: 90.h,
       left: 16.w,
       right: 16.w,
       child: GestureDetector(
@@ -303,136 +303,161 @@ class _MapPageState extends State<MapPage> {
           Navigator.pushNamed(context, DetailsScreen.name, arguments: event.id);
         },
         child: Container(
-          height: 220.h,
           decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E).withOpacity(0.95),
             borderRadius: BorderRadius.circular(24.r),
-            image: DecorationImage(
-              image: event.images != null && event.images!.isNotEmpty
-                  ? NetworkImage("${Urls.baseUrl}${event.images!.first}")
-                  : AssetImage('assets/images/container_img.png')
-                        as ImageProvider,
-              fit: BoxFit.cover,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.4),
                 blurRadius: 20,
-                offset: Offset(0, 10),
+                offset: const Offset(0, 10),
               ),
             ],
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24.r),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-              ),
-            ),
-            padding: EdgeInsets.all(20.r),
+          child: Padding(
+            padding: EdgeInsets.all(12.r),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF5400),
-                        borderRadius: BorderRadius.circular(6.r),
-                      ),
-                      child: Text(
-                        "LIVE",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
+                    // --- Left Side: Event Image ---
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Container(
+                        width: 110.w,
+                        height: 110.h,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image:
+                                event.images != null && event.images!.isNotEmpty
+                                ? NetworkImage(
+                                    "${Urls.baseUrl}${event.images!.first}",
+                                  )
+                                : const AssetImage(
+                                        'assets/images/container_img.png',
+                                      )
+                                      as ImageProvider,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: 12.w),
+
+                    // --- Right Side: Event Info ---
                     Expanded(
-                      child: Text(
-                        event.title ?? "Event Title",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Row(
-                  children: [
-                    Icon(Icons.stars, color: Color(0xFFB026FF), size: 16.sp),
-                    SizedBox(width: 6.w),
-                    Text(
-                      "Official Gathering Location",
-                      style: TextStyle(color: Colors.white70, fontSize: 12.sp),
-                    ),
-                    if (mapCtrl.distance != null) ...[
-                      const Spacer(),
-                      Icon(
-                        Icons.access_time,
-                        color: Colors.white60,
-                        size: 14.sp,
-                      ),
-                      SizedBox(width: 4.w),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: mapCtrl.duration != null
-                                  ? "${mapCtrl.duration} "
-                                  : "",
-                              style: TextStyle(
-                                color: const Color(
-                                  0xFF1DB954,
-                                ), // Friendly Green
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 2.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF5400),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Text(
+                                  "LIVE",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: "(${mapCtrl.distance})",
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Text(
+                                  event.title ?? "Event Title",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
+                            ],
+                          ),
+                          SizedBox(height: 6.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.stars,
+                                color: const Color(0xFFB026FF),
+                                size: 14.sp,
+                              ),
+                              SizedBox(width: 6.w),
+                              Expanded(
+                                child: Text(
+                                  "Official Gathering Location",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 11.sp,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.white60,
+                                size: 14.sp,
+                              ),
+                              SizedBox(width: 6.w),
+                              Expanded(
+                                child: Text(
+                                  event.address ?? "Address not available",
+                                  style: TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 12.sp,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (mapCtrl.distance != null) ...[
+                            SizedBox(height: 6.h),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.near_me_outlined,
+                                  color: const Color(0xFF1DB954),
+                                  size: 14.sp,
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  "${mapCtrl.distance}${mapCtrl.duration != null ? ' (${mapCtrl.duration})' : ''}",
+                                  style: TextStyle(
+                                    color: const Color(0xFF1DB954),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.white60, size: 14.sp),
-                    SizedBox(width: 6.w),
-                    Expanded(
-                      child: Text(
-                        event.address ?? "Address not available",
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 13.sp,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        ],
                       ),
                     ),
                   ],
                 ),
                 SizedBox(height: 16.h),
+
+                // --- Bottom Actions ---
                 Row(
                   children: [
                     Expanded(
@@ -445,11 +470,12 @@ class _MapPageState extends State<MapPage> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFB026FF),
+                          backgroundColor: const Color(0xFFB026FF),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           padding: EdgeInsets.symmetric(vertical: 12.h),
+                          elevation: 0,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -494,7 +520,9 @@ class _MapPageState extends State<MapPage> {
                                 mapCtrl.showRouteToEvent(LatLng(lat, lng));
                               },
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.white24),
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -507,20 +535,20 @@ class _MapPageState extends State<MapPage> {
                               SizedBox(
                                 height: 16.sp,
                                 width: 16.sp,
-                                child: CircularProgressIndicator(
+                                child: const CircularProgressIndicator(
                                   strokeWidth: 2,
                                   color: Colors.white,
                                 ),
                               )
                             else ...[
                               Icon(
-                                Icons.near_me_outlined,
+                                Icons.directions_outlined,
                                 color: Colors.white,
                                 size: 16.sp,
                               ),
                               SizedBox(width: 8.w),
                               Text(
-                                "Get Direction${mapCtrl.duration != null ? ' (${mapCtrl.duration})' : ''}",
+                                "Direction",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

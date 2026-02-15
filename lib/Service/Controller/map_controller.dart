@@ -272,10 +272,10 @@ class MapController with ChangeNotifier {
       await getCurrentLocation();
     }
 
-    if (_currentPosition == null) {
-      _showError('Please enable location services to view the route');
-      return;
-    }
+    // if (_currentPosition == null) {
+    //   _showError('Please enable location services to view the route');
+    //   return;
+    // }
 
     if (_mapController == null) {
       debugPrint('🗺️ Map controller is not initialized yet');
@@ -336,13 +336,13 @@ class MapController with ChangeNotifier {
         debugPrint('❌ Directions API Failure:');
         debugPrint('   Status: ${response.status}');
         debugPrint('   Error Message: ${response.errorMessage}');
-        _showError(
-          response.errorMessage ?? 'No road path found to this location',
-        );
+        // _showError(
+        //   response.errorMessage ?? 'No road path found to this location',
+        // );
       }
     } catch (e) {
       debugPrint('Route error in showRouteToEvent: $e');
-      _showError('Error calculating route path');
+      // _showError('Error calculating route path');
     } finally {
       _isRouting = false;
       notifyListeners();
@@ -376,38 +376,37 @@ class MapController with ChangeNotifier {
         debugPrint(
           '❌ Directions API Error: ${response.statusCode} - ${response.body}',
         );
-        _showError(
-          'Failed to fetch travel info (Error: ${response.statusCode})',
-        );
+        // _showError(
+        //   'Failed to fetch travel info (Error: ${response.statusCode})',
+        // );
       }
     } catch (e) {
       debugPrint('FetchRouteInfo error: $e');
-      _showError('Network error while fetching route');
+      // _showError('Network error while fetching route');
     }
   }
 
-  void _showError(String message) {
-    debugPrint('📢 Map Error: $message');
-    final context = AppUtils.navigatorKey.currentContext;
-    if (context != null) {
-      String userFriendlyMessage = message;
+  // void _showError(String message) {
+  //   debugPrint('📢 Map Error: $message');
+  //   final context = AppUtils.navigatorKey.currentContext;
+  //   if (context != null) {
+  //     // Per user request: suppress persistent API authorization/denial errors
+  //     if (message.contains('not authorized') ||
+  //         message.contains('API key') ||
+  //         message.contains('REQUEST_DENIED')) {
+  //       debugPrint('🚫 Suppressing API error snackbar per user request');
+  //       return;
+  //     }
 
-      // Provide actionable advice for common API issues
-      if (message.contains('not authorized') || message.contains('API key')) {
-        userFriendlyMessage =
-            "API Authorization Error: Please check your Google Cloud Console restrictions for the Directions API.";
-      } else if (message.contains('REQUEST_DENIED')) {
-        userFriendlyMessage =
-            "Directions API denied. Ensure it is enabled in your Google Cloud project.";
-      }
+  //     String userFriendlyMessage = message;
 
-      showCustomSnackBar(
-        context: context,
-        message: userFriendlyMessage,
-        isError: true,
-      );
-    }
-  }
+  //     showCustomSnackBar(
+  //       context: context,
+  //       message: userFriendlyMessage,
+  //       isError: true,
+  //     );
+  //   }
+  // }
 
   /// ================= MAP CONTROLLER =================
   void setMapController(GoogleMapController controller) {
