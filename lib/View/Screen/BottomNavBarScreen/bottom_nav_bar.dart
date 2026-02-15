@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/create_event_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/home_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/map_page.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/profile_page.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_page.dart';
 import 'chat_page.dart';
 
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
@@ -50,7 +50,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   final List<Widget> _pages = [
     HomePage(),
     MapPage(),
-    SavedPage(),
+    CreateEventScreen(),
     ChatPage(),
     ProfilePage(),
   ];
@@ -80,7 +80,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     final List<String> icons = [
                       'assets/images/home.png',
                       'assets/images/location.png',
-                      'assets/images/saved_icon.png',
+                      '', // Placeholder for icon since we will use IconData or a custom widget for "Create"
                       'assets/images/chat.png',
                       'assets/images/profile_icon.png',
                     ];
@@ -88,7 +88,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                     final List<String> labels = [
                       'Home',
                       'Map',
-                      'Saved',
+                      'Create',
                       'Chat',
                       'Profile',
                     ];
@@ -97,87 +97,101 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => controller.onItemTapped(index),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Image.asset(
-                                icons[index],
-                                width: 24.w.clamp(24, 26),
-                                height: 24.h.clamp(24, 26),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                index == 2
+                                    ? Icon(
+                                        Icons.add_box_outlined,
+                                        size: 24.sp.clamp(24, 26),
+                                        color: isSelected
+                                            ? (isDark
+                                                  ? Colors.white
+                                                  : Colors.black)
+                                            : (isDark
+                                                  ? Colors.grey.shade500
+                                                  : Colors.grey.shade600),
+                                      )
+                                    : Image.asset(
+                                        icons[index],
+                                        width: 24.w.clamp(24, 26),
+                                        height: 24.h.clamp(24, 26),
+                                        color: isSelected
+                                            ? (isDark
+                                                  ? Colors.white
+                                                  : Colors.black)
+                                            : (isDark
+                                                  ? Colors.grey.shade500
+                                                  : Colors.grey.shade600),
+                                      ),
+                                if (index == 3 &&
+                                    !isSelected) // Chat Icon and NOT selected
+                                  Consumer<ChatController>(
+                                    builder: (context, chatController, _) {
+                                      debugPrint(
+                                        "🎨 BottomNavBar - Chat Badge Build: unreadCount=${chatController.unreadCount}",
+                                      );
+                                      if (chatController.unreadCount > 0) {
+                                        return Positioned(
+                                          right: -6.w,
+                                          top: -4.h,
+                                          child: Container(
+                                            padding: EdgeInsets.all(4.w),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            constraints: BoxConstraints(
+                                              minWidth: 16.w,
+                                              minHeight: 16.h,
+                                            ),
+                                            child: Text(
+                                              chatController.unreadCount
+                                                  .toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 8.sp,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                  ),
+                              ],
+                            ),
+
+                            SizedBox(height: 4.h),
+
+                            Text(
+                              labels[index],
+                              style: TextStyle(
+                                fontSize: 10.sp.clamp(10, 11),
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+
+                                // ⭐ Text Color Logic
                                 color: isSelected
-                                    ? (isDark ? Colors.white : Colors.black)
+                                    ? (isDark
+                                          ? Colors.white
+                                          : Colors.black) // Selected
                                     : (isDark
                                           ? Colors.grey.shade500
                                           : Colors.grey.shade600),
                               ),
-                              if (index == 3 &&
-                                  !isSelected) // Chat Icon and NOT selected
-                                Consumer<ChatController>(
-                                  builder: (context, chatController, _) {
-                                    debugPrint(
-                                      "🎨 BottomNavBar - Chat Badge Build: unreadCount=${chatController.unreadCount}",
-                                    );
-                                    if (chatController.unreadCount > 0) {
-                                      return Positioned(
-                                        right: -6.w,
-                                        top: -4.h,
-                                        child: Container(
-                                          padding: EdgeInsets.all(4.w),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.red,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          constraints: BoxConstraints(
-                                            minWidth: 16.w,
-                                            minHeight: 16.h,
-                                          ),
-                                          child: Text(
-                                            chatController.unreadCount
-                                                .toString(),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 8.sp,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                            ],
-                          ),
-
-                          SizedBox(height: 4.h),
-
-                          Text(
-                            labels[index],
-                            style: TextStyle(
-                              fontSize: 10.sp.clamp(10, 11),
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-
-                              // ⭐ Text Color Logic
-                              color: isSelected
-                                  ? (isDark
-                                        ? Colors.white
-                                        : Colors.black) // Selected
-                                  : (isDark
-                                        ? Colors.grey.shade500
-                                        : Colors.grey.shade600),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
                 ),
               ),
             ),
