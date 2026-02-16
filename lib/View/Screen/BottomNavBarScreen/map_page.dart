@@ -8,6 +8,7 @@ import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -19,7 +20,7 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   GoogleMapController? _localMapController;
   String? _lastSelectedEventId;
-  String _selectedCategory = "Vibe"; // Default as per design
+  // _selectedCategory is now managed by MapController to sync with logic
 
   @override
   void initState() {
@@ -90,62 +91,65 @@ class _MapPageState extends State<MapPage> {
             },
           ),
 
-          // --- Top Overlays (Header, Tabs, Filters) ---
+          // --- Top Overlays (Header, Search, Filters) ---
           SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // --- Custom Header ---
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 10.h,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
+                SizedBox(height: 10.h),
+                // --- 1. Centered Header ---
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.r),
+                      decoration: const BoxDecoration(
+                        color: Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
                         Icons.location_on,
                         color: const Color(0xFFB026FF),
-                        size: 30.sp,
+                        size: 32.sp,
                       ),
-                      SizedBox(width: 15.w),
-                      Text(
-                        'G A T H E R I N G',
-                        style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 4.w,
-                        ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Gathering',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
                       ),
-                    ],
-                  ),
-                ),
-
-                // --- Tabs Section ---
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Row(
-                    children: [
-                      _buildTab("Music", _selectedCategory == "Music", isDark),
-                      SizedBox(width: 30.w),
-                      _buildTab("Vibe", _selectedCategory == "Vibe", isDark),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 15.h),
 
-                // --- Filter Chips ---
+                // --- 2. Search Bar (Dynamic) ---
+                SearchTextField(
+                  hintText: "Search events, venues...",
+                  onChanged: (query) {
+                    mapCtrl.updateSearchQuery(query);
+                  },
+                ),
+                SizedBox(height: 5.h),
+
+                // --- 3. Filter Chips (Dynamic) ---
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.only(left: 20.w),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Row(
-                    children: [
-                      _buildFilterChip("Chill lounge", isDark),
-                      _buildFilterChip("High energy", isDark),
-                      _buildFilterChip("Dancing", isDark),
-                      _buildFilterChip("Brewery", isDark),
-                    ],
+                    children: mapCtrl.categories.map((cat) {
+                      return _buildNewFilterChip(
+                        cat,
+                        _getCategoryIcon(cat),
+                        false,
+                        isDark,
+                        mapCtrl,
+                      );
+                    }).toList(),
                   ),
                 ),
               ],
@@ -219,63 +223,81 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _buildTab(String label, bool isSelected, bool isDark) {
+  Widget _buildNewFilterChip(
+    String label,
+    IconData? icon,
+    bool isPrimary,
+    bool isDark,
+    MapController mapCtrl,
+  ) {
+    bool isSelected = mapCtrl.selectedCategory == label;
+
+    Color backgroundColor;
+    Color textColor;
+
+    if (isSelected) {
+      backgroundColor = const Color(0xFFB026FF);
+      textColor = Colors.white;
+    } else {
+      backgroundColor = const Color(0xFF1E1E1E).withOpacity(0.9);
+      textColor = Colors.white;
+    }
+
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedCategory = label;
-        });
+        mapCtrl.applyCategoryFilter(label);
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected
-                  ? (isDark ? Colors.white : Colors.black)
-                  : Colors.grey,
-              fontSize: 18.sp,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            ),
+      child: Container(
+        margin: EdgeInsets.only(right: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(30.r),
+          border: Border.all(
+            color: isSelected
+                ? Colors.transparent
+                : Colors.white.withOpacity(0.1),
           ),
-          if (isSelected)
-            Container(
-              margin: EdgeInsets.only(top: 5.h),
-              height: 3.h,
-              width: 30.w,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5400),
-                borderRadius: BorderRadius.circular(2.r),
+        ),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : const Color(0xFFB026FF),
+                size: 18.sp,
+              ),
+              SizedBox(width: 8.w),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, bool isDark) {
-    return Container(
-      margin: EdgeInsets.only(right: 12.w),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF121212)
-            : const Color(0xFFF5F5F5), // Off-white in light mode
-        borderRadius: BorderRadius.circular(25.r),
-        border: Border.all(
-          color: isDark ? Colors.white12 : Colors.grey.shade300,
-        ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isDark ? Colors.grey : Colors.black87,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
+  IconData? _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'bars':
+        return Icons.local_bar;
+      case 'clubs':
+        return Icons.language; // Or Icons.music_note
+      case 'lounges':
+        return Icons.wine_bar;
+      case 'music':
+        return Icons.music_note;
+      case 'party':
+        return Icons.celebration;
+      default:
+        return category == "All" ? null : Icons.local_activity;
+    }
   }
 
   Widget _buildMapToolButton(IconData icon, VoidCallback onTap) {

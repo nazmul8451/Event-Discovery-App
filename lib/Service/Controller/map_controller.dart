@@ -47,8 +47,18 @@ class MapController with ChangeNotifier {
   BitmapDescriptor? _eventIcon;
 
   /// ================= EVENTS =================
+  /// ================= EVENTS =================
+  List<EventData> _allEvents = []; // Store all fetched events
   List<EventData> _events = [];
   List<EventData> get events => _events;
+
+  List<String> _categories = ["All"];
+  List<String> get categories => _categories;
+
+  String _selectedCategory = "All";
+  String get selectedCategory => _selectedCategory;
+
+  String _searchQuery = "";
 
   EventData? _selectedEvent;
   EventData? get selectedEvent => _selectedEvent;
@@ -214,7 +224,7 @@ class MapController with ChangeNotifier {
     );
   }
 
-  /// ================= EVENTS =================
+  /// ================= EVENTS & FILTER =================
   Future<void> fetchAndAddEvents() async {
     _eventsLoading = true;
     notifyListeners();
@@ -226,37 +236,98 @@ class MapController with ChangeNotifier {
 
     if (response.isSuccess && response.body != null) {
       final model = GetAllEventModel.fromJson(response.body!);
-      _events = model.data?.data ?? [];
+      _allEvents = model.data?.data ?? [];
 
-      _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));
-
-      for (var event in _events) {
-        final lat = (event.location?.coordinates?[1] as num?)?.toDouble() ?? 0;
-        final lng = (event.location?.coordinates?[0] as num?)?.toDouble() ?? 0;
-
-        if (lat == 0 || lng == 0) continue;
-
-        _markers.add(
-          Marker(
-            markerId: MarkerId('event_${event.id ?? event.iV}'),
-            position: LatLng(lat, lng),
-            icon: _eventIcon!,
-            // infoWindow: InfoWindow(title: event.title), // Remove default info window
-            onTap: () {
-              _selectedEvent = event;
-              notifyListeners();
-              // showRouteToEvent will handle specialized camera movement
-              showRouteToEvent(LatLng(lat, lng));
-              _calculateDistance(LatLng(lat, lng));
-            },
-          ),
-        );
+      // Extract Categories
+      _categories = ["All"];
+      for (final e in _allEvents) {
+        if (e.category != null && e.category!.trim().isNotEmpty) {
+          _categories.add(e.category!.trim().capitalize());
+        }
       }
+      _categories = _categories.toSet().toList()..sort();
+
+      // Ensure selected category is valid (reset to All if it disappeared)
+      if (!_categories.contains(_selectedCategory)) {
+        _selectedCategory = "All";
+      }
+
+      _applySearchAndFilter();
+    } else {
+      _events = [];
+      _allEvents = [];
+      _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));
     }
 
     _eventsLoading = false;
     _isLoading = false;
     notifyListeners();
+  }
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query.trim();
+    _applySearchAndFilter();
+    notifyListeners();
+  }
+
+  void applyCategoryFilter(String category) {
+    _selectedCategory = category;
+    _applySearchAndFilter();
+    notifyListeners();
+  }
+
+  void _applySearchAndFilter() {
+    List<EventData> temp = List.from(_allEvents);
+
+    // 1. Category Filter
+    if (_selectedCategory != "All") {
+      temp = temp
+          .where(
+            (e) =>
+                e.category?.toLowerCase().trim() ==
+                _selectedCategory.toLowerCase().trim(),
+          )
+          .toList();
+    }
+
+    // 2. Search Filter
+    if (_searchQuery.isNotEmpty) {
+      temp = temp.where((event) {
+        final query = _searchQuery.toLowerCase();
+        return (event.title?.toLowerCase().contains(query) ?? false) ||
+            (event.address?.toLowerCase().contains(query) ?? false) ||
+            (event.category?.toLowerCase().contains(query) ?? false) ||
+            (event.description?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    _events = temp;
+    _updateMarkers();
+  }
+
+  void _updateMarkers() {
+    _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));
+
+    for (var event in _events) {
+      final lat = (event.location?.coordinates?[1] as num?)?.toDouble() ?? 0;
+      final lng = (event.location?.coordinates?[0] as num?)?.toDouble() ?? 0;
+
+      if (lat == 0 || lng == 0) continue;
+
+      _markers.add(
+        Marker(
+          markerId: MarkerId('event_${event.id ?? event.iV}'),
+          position: LatLng(lat, lng),
+          icon: _eventIcon!,
+          onTap: () {
+            _selectedEvent = event;
+            notifyListeners();
+            showRouteToEvent(LatLng(lat, lng));
+            _calculateDistance(LatLng(lat, lng));
+          },
+        ),
+      );
+    }
   }
 
   /// ================= ROUTE =================
@@ -480,5 +551,15 @@ class MapController with ChangeNotifier {
     _duration = null;
     clearRoute();
     notifyListeners();
+  }
+}
+
+// =========================
+// String Extension
+// =========================
+extension StringExt on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 }
