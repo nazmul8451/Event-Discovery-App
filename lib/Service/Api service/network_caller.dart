@@ -27,7 +27,8 @@ class NetworkCaller {
   static Future<String?> _getToken() async {
     final storage = const FlutterSecureStorage();
     final tokenFromController = AuthController().accessToken;
-    if (tokenFromController != null && tokenFromController.isNotEmpty) return tokenFromController;
+    if (tokenFromController != null && tokenFromController.isNotEmpty)
+      return tokenFromController;
     return await storage.read(key: 'access_token');
   }
 
@@ -46,12 +47,12 @@ class NetworkCaller {
       if (requireAuth) {
         final String? resolvedToken = await _getToken();
         if (resolvedToken != null && resolvedToken.isNotEmpty) {
-           if (resolvedToken.contains('.')) {
-              headers['Authorization'] = 'Bearer $resolvedToken';
-           } else {
-              headers['Authorization'] = resolvedToken;
-              headers['token'] = resolvedToken;
-           }
+          if (resolvedToken.contains('.')) {
+            headers['Authorization'] = 'Bearer $resolvedToken';
+          } else {
+            headers['Authorization'] = resolvedToken;
+            headers['token'] = resolvedToken;
+          }
         }
       }
 
@@ -189,6 +190,7 @@ class NetworkCaller {
     Map<String, String>? fields,
     String? fileKey,
     String? filePath,
+    List<String>? filePaths, // Added support for multiple files
     bool requireAuth = true,
   }) async {
     try {
@@ -196,9 +198,7 @@ class NetworkCaller {
       final request = http.MultipartRequest(method, uri);
 
       // Add headers
-      final Map<String, String> headers = {
-        'Accept': 'application/json',
-      };
+      final Map<String, String> headers = {'Accept': 'application/json'};
 
       if (requireAuth) {
         final String? resolvedToken = await _getToken();
@@ -213,33 +213,62 @@ class NetworkCaller {
         request.fields.addAll(fields);
       }
 
-      // Add file
+      // Add single file
       if (fileKey != null && filePath != null) {
-        // Detect MIME type based on extension
         MediaType? mediaType;
         if (filePath.toLowerCase().endsWith('.png')) {
           mediaType = MediaType('image', 'png');
-        } else if (filePath.toLowerCase().endsWith('.jpg') || filePath.toLowerCase().endsWith('.jpeg')) {
+        } else if (filePath.toLowerCase().endsWith('.jpg') ||
+            filePath.toLowerCase().endsWith('.jpeg')) {
           mediaType = MediaType('image', 'jpeg');
         }
 
-        request.files.add(await http.MultipartFile.fromPath(
-          fileKey,
-          filePath,
-          contentType: mediaType,
-        ));
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            fileKey,
+            filePath,
+            contentType: mediaType,
+          ),
+        );
       }
 
-      debugPrint('==== MULTIPART $method REQUEST ====\n'
-          'URL: $url\n'
-          'HEADERS: $headers\n'
-          'FIELDS: $fields\n'
-          'FILE: $filePath\n'
-          'FILE_KEY: $fileKey\n'
-          '========================');
+      // Add multiple files
+      if (fileKey != null && filePaths != null) {
+        for (var path in filePaths) {
+          MediaType? mediaType;
+          if (path.toLowerCase().endsWith('.png')) {
+            mediaType = MediaType('image', 'png');
+          } else if (path.toLowerCase().endsWith('.jpg') ||
+              path.toLowerCase().endsWith('.jpeg')) {
+            mediaType = MediaType('image', 'jpeg');
+          }
 
-      final http.StreamedResponse response = await request.send().timeout(const Duration(seconds: 60));
-      final http.Response httpResponse = await http.Response.fromStream(response);
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              fileKey,
+              path,
+              contentType: mediaType,
+            ),
+          );
+        }
+      }
+
+      debugPrint(
+        '==== MULTIPART $method REQUEST ====\n'
+        'URL: $url\n'
+        'HEADERS: $headers\n'
+        'FIELDS: $fields\n'
+        'FILE: $filePath\n'
+        'FILE_KEY: $fileKey\n'
+        '========================',
+      );
+
+      final http.StreamedResponse response = await request.send().timeout(
+        const Duration(seconds: 60),
+      );
+      final http.Response httpResponse = await http.Response.fromStream(
+        response,
+      );
 
       _logResponse(method, url, httpResponse);
 
@@ -280,7 +309,7 @@ class NetworkCaller {
       }
 
       final uri = Uri.parse(url);
-      
+
       _logRequest('DELETE', url, body, headers);
 
       http.Response response;

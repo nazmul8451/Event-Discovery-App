@@ -166,7 +166,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   singleEvent?.data?.images != null &&
                       singleEvent!.data!.images!.isNotEmpty
                   ? NetworkImage(
-                      "${Urls.baseUrl}${singleEvent!.data!.images!.first}",
+                      singleEvent!.data!.images!.first.startsWith('http')
+                          ? singleEvent!.data!.images!.first
+                          : "${Urls.baseUrl}${singleEvent!.data!.images!.first.startsWith('/') ? '' : '/'}${singleEvent!.data!.images!.first}",
                     )
                   : AssetImage('assets/images/container_img.png')
                         as ImageProvider,

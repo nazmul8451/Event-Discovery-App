@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart';
 import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
 import 'package:gathering_app/Service/Controller/notification_controller.dart';
+import 'package:gathering_app/Service/Controller/user_event_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
@@ -44,6 +45,10 @@ class _HomePageState extends State<HomePage> {
         context,
         listen: false,
       ).fetchNotifications();
+      Provider.of<UserEventController>(
+        context,
+        listen: false,
+      ).fetchUserEvents();
     });
   }
 
@@ -56,7 +61,11 @@ class _HomePageState extends State<HomePage> {
       context,
       listen: false,
     ).getAllEvents();
-    if (success) {
+    final userEventsSuccess = await Provider.of<UserEventController>(
+      context,
+      listen: false,
+    ).fetchUserEvents();
+    if (success && userEventsSuccess) {
       _refreshController.refreshCompleted();
     } else {
       _refreshController.refreshFailed();
@@ -311,8 +320,6 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
 
-                        SizedBox(height: 20.h),
-
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Align(
@@ -371,6 +378,56 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                         ),
+
+                        SizedBox(height: 20.h),
+
+                        // --- Happening Tonight Section ---
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "🔥 Happening Tonight",
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
+                        Consumer<UserEventController>(
+                          builder: (context, controller, _) {
+                            if (controller.inProgress) {
+                              return SizedBox(
+                                height: 180.h,
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+                            if (controller.userEvents.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return SizedBox(
+                              height: 180.h,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: controller.userEvents.length,
+                                padding: EdgeInsets.only(left: 16.w),
+                                itemBuilder: (context, index) {
+                                  final event = controller.userEvents[index];
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 12.w),
+                                    child: _buildHorizontalEventCard(event),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 20.h),
                       ],
                     ),
                   ),
@@ -658,40 +715,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // LIVE Badge
-            Positioned(
-              top: 12.h,
-              left: 12.w,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF9E01), // Premium Orange
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6.r,
-                      height: 6.r,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      "LIVE",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
             // Category Badge
             Positioned(
               top: 12.h,
@@ -740,7 +764,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "Tonight - ${event.category} - ${event.address ?? ''}",
+                    "Tonight - ${event.category ?? 'Event'} - ${event.address ?? 'Location TBA'}",
                     style: TextStyle(color: Colors.white70, fontSize: 11.sp),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

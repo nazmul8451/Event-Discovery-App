@@ -12,7 +12,8 @@ class NotificationController extends ChangeNotifier {
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
   NotificationModel? get notificationModel => _notificationModel;
-  List<NotificationData> get notifications => _notifications;
+  List<NotificationData> get notifications =>
+      _notifications.where((n) => n.isRead == false).toList();
 
   int get unreadCount => _notifications.where((n) => n.isRead == false).length;
 
@@ -21,7 +22,9 @@ class NotificationController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final response = await NetworkCaller.getRequest(url: Urls.getAllNotificationUrl);
+    final response = await NetworkCaller.getRequest(
+      url: Urls.getAllNotificationUrl,
+    );
 
     _inProgress = false;
 
@@ -42,7 +45,9 @@ class NotificationController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final response = await NetworkCaller.getRequest(url: Urls.getNotificationByIdUrl(id));
+    final response = await NetworkCaller.getRequest(
+      url: Urls.getNotificationByIdUrl(id),
+    );
 
     _inProgress = false;
 
@@ -58,7 +63,8 @@ class NotificationController extends ChangeNotifier {
         }
       }
     } else {
-      _errorMessage = response.errorMessage ?? 'Failed to load individual notification';
+      _errorMessage =
+          response.errorMessage ?? 'Failed to load individual notification';
     }
 
     notifyListeners();
@@ -70,12 +76,15 @@ class NotificationController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final response =
-        await NetworkCaller.patchRequest(url: Urls.readAllNotificationUrl);
+    final response = await NetworkCaller.patchRequest(
+      url: Urls.readAllNotificationUrl,
+    );
 
     _inProgress = false;
 
     if (response.isSuccess) {
+      // Clear the list locally since all are read and we only show unread
+      _notifications.clear();
       await fetchNotifications();
       return true;
     } else {
@@ -88,14 +97,16 @@ class NotificationController extends ChangeNotifier {
   // Method to mark a single notification as read
   Future<bool> markAsRead(String id) async {
     // We don't necessarily need a full page loader for this, maybe just local update
-    final response =
-        await NetworkCaller.patchRequest(url: Urls.readNotificationUrl(id));
+    final response = await NetworkCaller.patchRequest(
+      url: Urls.readNotificationUrl(id),
+    );
 
     if (response.isSuccess) {
       // Find and update locally for immediate feedback
       int index = _notifications.indexWhere((n) => n.sId == id);
       if (index != -1) {
         _notifications[index].isRead = true;
+        // Since the getter filters out read items, notifyListeners will refresh the UI to remove it
         notifyListeners();
       }
       return true;

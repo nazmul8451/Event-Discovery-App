@@ -1,8 +1,15 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:gathering_app/Service/Controller/create_event_controller.dart';
+import 'package:gathering_app/Service/Controller/getAllEvent_controller.dart';
+import 'package:gathering_app/Service/Controller/user_event_controller.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/map_page.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -13,16 +20,27 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   final TextEditingController _titleController = TextEditingController();
+  final FocusNode _titleFocusNode = FocusNode();
   final List<File> _selectedImages = [];
   bool _isPublic = true;
   String _rsvpRequirement = "21+ Only";
 
-  // New state variables for functionality
-  DateTime? _selectedDateTime;
+  // State for Date/Time and Location
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   String? _selectedLocation;
+  double? _selectedLat;
+  double? _selectedLng;
   String? _selectedVibe;
 
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _titleFocusNode.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImages() async {
     final List<XFile> images = await _picker.pickMultiImage();
@@ -39,61 +57,53 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     });
   }
 
-  Future<void> _selectDateTime() async {
-    final DateTime? pickedDate = await showDatePicker(
+  Future<void> _pickDate() async {
+    _titleFocusNode.unfocus();
+    FocusScope.of(context).unfocus();
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: const Color(0xFFB026FF),
-              onPrimary: Colors.white,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Colors.white,
-            ),
+      lastDate: DateTime(2030),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: const Color(0xFFB026FF),
+            onPrimary: Colors.white,
           ),
-          child: child!,
-        );
-      },
+        ),
+        child: child!,
+      ),
     );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  }
 
-    if (pickedDate != null) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.dark(
-                primary: const Color(0xFFB026FF),
-                onPrimary: Colors.white,
-                surface: Theme.of(context).colorScheme.surface,
-                onSurface: Colors.white,
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-
-      if (pickedTime != null) {
-        setState(() {
-          _selectedDateTime = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-      }
+  Future<void> _pickTime() async {
+    _titleFocusNode.unfocus();
+    FocusScope.of(context).unfocus();
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+            primary: const Color(0xFFB026FF),
+            onPrimary: Colors.white,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() => _selectedTime = picked);
     }
   }
 
   void _selectVibe() {
+    _titleFocusNode.unfocus();
+    FocusScope.of(context).unfocus();
     final List<String> vibes = [
       "Music",
       "Vibe",
@@ -118,7 +128,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               Text(
                 "Select Vibe",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 ),
@@ -133,7 +145,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       title: Text(
                         vibes[index],
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black87,
                           fontSize: 16.sp,
                         ),
                         textAlign: TextAlign.center,
@@ -155,51 +169,235 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  void _selectLocation() {
-    final TextEditingController locationController = TextEditingController();
-    showDialog(
+  void _resetForm() {
+    setState(() {
+      _titleController.clear();
+      _selectedImages.clear();
+      _selectedDate = null;
+      _selectedTime = null;
+      _selectedLocation = null;
+      _selectedLat = null;
+      _selectedLng = null;
+      _selectedVibe = null;
+      _isPublic = true;
+    });
+  }
+
+  Timer? _debounce;
+
+  Future<void> _selectLocation() async {
+    _titleFocusNode.unfocus();
+    FocusScope.of(context).unfocus();
+    _showLocationSearchModal();
+  }
+
+  void _showLocationSearchModal() {
+    final controller = Provider.of<CreateEventController>(
+      context,
+      listen: false,
+    );
+    final TextEditingController searchController = TextEditingController();
+
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          title: Text(
-            "Enter Location",
-            style: TextStyle(color: Colors.white, fontSize: 18.sp),
-          ),
-          content: TextField(
-            controller: locationController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: "Where's it at?",
-              hintStyle: const TextStyle(color: Colors.white30),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Search Location",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.h),
+                  // Search Bar
+                  TextField(
+                    controller: searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: "Search local area...",
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      if (_debounce?.isActive ?? false) _debounce!.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 500), () {
+                        controller.searchLocation(value).then((_) {
+                          setModalState(() {});
+                        });
+                      });
+                    },
+                  ),
+                  SizedBox(height: 10.h),
+                  // Map Option
+                  ListTile(
+                    leading: const Icon(Icons.map, color: Color(0xFFB026FF)),
+                    title: const Text(
+                      "Pick on Map",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text("Manually select a location"),
+                    onTap: () async {
+                      Navigator.pop(context); // Close search modal
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MapPage(isPicker: true),
+                        ),
+                      );
+
+                      if (result != null && result is Map<String, dynamic>) {
+                        setState(() {
+                          _selectedLat = result['lat'];
+                          _selectedLng = result['lng'];
+                          _selectedLocation = result['address'];
+                        });
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  // Results
+                  Expanded(
+                    child: Consumer<CreateEventController>(
+                      builder: (context, ctrl, _) {
+                        if (ctrl.inProgress) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (ctrl.locationSuggestions.isEmpty) {
+                          return Center(
+                            child: Text(
+                              searchController.text.isEmpty
+                                  ? "Type to search..."
+                                  : "No results found",
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          );
+                        }
+                        return ListView.builder(
+                          itemCount: ctrl.locationSuggestions.length,
+                          itemBuilder: (context, index) {
+                            final suggestion = ctrl.locationSuggestions[index];
+                            return ListTile(
+                              leading: const Icon(Icons.location_on_outlined),
+                              title: Text(suggestion.address ?? "Unknown"),
+                              onTap: () {
+                                setState(() {
+                                  _selectedLocation = suggestion.address;
+                                  _selectedLat = suggestion.location?.latitude;
+                                  _selectedLng = suggestion.location?.longitude;
+                                });
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () {
-                if (locationController.text.isNotEmpty) {
-                  setState(() {
-                    _selectedLocation = locationController.text;
-                  });
-                }
-                Navigator.pop(context);
-              },
-              child: const Text(
-                "Set",
-                style: TextStyle(color: Color(0xFFB026FF)),
-              ),
-            ),
-          ],
+            );
+          },
         );
       },
     );
+  }
+
+  Future<void> _submitEvent(CreateEventController controller) async {
+    // Removal of unused lat/lng variables as selected position is now handled by _selectedLat/_selectedLng
+    // final mapCtrl = Provider.of<MapController>(context, listen: false);
+    // double lat = mapCtrl.currentPosition?.latitude ?? 23.8103;
+    // double lng = mapCtrl.currentPosition?.longitude ?? 90.4125;
+
+    if (_selectedDate == null || _selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select date and time')),
+      );
+      return;
+    }
+
+    final DateTime combined = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      _selectedTime!.hour,
+      _selectedTime!.minute,
+    );
+
+    // Strict ISO 8601 with Z for the server
+    final String startDateStr = combined.toUtc().toIso8601String();
+    final String startTimeStr = combined
+        .add(const Duration(hours: 3))
+        .toUtc()
+        .toIso8601String();
+
+    final eventData = {
+      "title": _titleController.text.isNotEmpty
+          ? _titleController.text
+          : "Tech Meetup 2026",
+      "startDate": startDateStr,
+      "startTime": startTimeStr,
+      "vibeTags": _selectedVibe != null
+          ? [_selectedVibe!.toLowerCase()]
+          : ["tech", "networking", "startup"],
+      "visibility": _isPublic,
+      "address": _selectedLocation ?? "Banani, Dhaka, Bangladesh",
+      "location": {
+        "type": "Point",
+        "coordinates": [_selectedLng ?? 90.4125, _selectedLat ?? 23.8103],
+      },
+    };
+
+    final success = await controller.createEvent(eventData, _selectedImages);
+
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Event created successfully!')),
+      );
+      _resetForm();
+
+      // Auto-refresh event lists
+      context.read<GetAllEventController>().getAllEvents();
+      context.read<UserEventController>().fetchUserEvents();
+
+      context.read<BottomNavController>().onItemTapped(0);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(controller.errorMessage ?? 'Failed to create event'),
+        ),
+      );
+    }
   }
 
   @override
@@ -227,28 +425,41 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         ),
         centerTitle: true,
         actions: [
-          TextButton(
-            onPressed:
-                (_titleController.text.isNotEmpty &&
-                    _selectedLocation != null &&
-                    _selectedDateTime != null &&
-                    _selectedVibe != null)
-                ? () {}
-                : null,
-            child: Text(
-              "Create",
-              style: TextStyle(
-                color:
+          Consumer<CreateEventController>(
+            builder: (context, createCtrl, child) {
+              return TextButton(
+                onPressed:
                     (_titleController.text.isNotEmpty &&
                         _selectedLocation != null &&
-                        _selectedDateTime != null &&
-                        _selectedVibe != null)
-                    ? primaryColor
-                    : Colors.grey,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+                        _selectedDate != null &&
+                        _selectedTime != null &&
+                        _selectedVibe != null &&
+                        !createCtrl.inProgress)
+                    ? () => _submitEvent(createCtrl)
+                    : null,
+                child: createCtrl.inProgress
+                    ? SizedBox(
+                        height: 20.h,
+                        width: 20.w,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        "Create",
+                        style: TextStyle(
+                          color:
+                              (_titleController.text.isNotEmpty &&
+                                  _selectedLocation != null &&
+                                  _selectedDate != null &&
+                                  _selectedTime != null &&
+                                  _selectedVibe != null)
+                              ? primaryColor
+                              : Colors.grey,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              );
+            },
           ),
           SizedBox(width: 8.w),
         ],
@@ -376,7 +587,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 decoration: BoxDecoration(
                   color: containerColor,
                   borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.05),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -389,7 +604,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _titleController,
+                        focusNode: _titleFocusNode,
                         maxLength: 50,
+                        textInputAction: TextInputAction.done,
+                        onEditingComplete: () => _titleFocusNode.unfocus(),
                         onChanged: (val) => setState(() {}),
                         style: TextStyle(
                           color: isDark ? Colors.white : Colors.black,
@@ -427,13 +645,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
               _buildClickableField(
                 icon: Icons.calendar_today,
-                title: "Date & Time",
-                subtitle: _selectedDateTime != null
-                    ? DateFormat(
-                        'EEEE, MMMM d  h:mm a',
-                      ).format(_selectedDateTime!)
+                title: "Date",
+                subtitle: _selectedDate != null
+                    ? DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate!)
                     : "When's it happening?",
-                onTap: _selectDateTime,
+                onTap: _pickDate,
+              ),
+
+              _buildClickableField(
+                icon: Icons.access_time,
+                title: "Time",
+                subtitle: _selectedTime != null
+                    ? _selectedTime!.format(context)
+                    : "What time?",
+                onTap: _pickTime,
               ),
 
               _buildClickableField(
@@ -535,7 +760,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         decoration: BoxDecoration(
           color: containerColor,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
+          ),
         ),
         child: Row(
           children: [

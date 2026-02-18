@@ -18,6 +18,8 @@ import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/widget_controller/interestScreenController.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Service/Controller/notification_controller.dart';
+import 'package:gathering_app/Service/Controller/create_event_controller.dart';
+import 'package:gathering_app/Service/Controller/user_event_controller.dart';
 import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +82,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BottomNavController()),
         ChangeNotifierProvider(create: (_) => LiveChatController()),
         ChangeNotifierProvider(create: (_) => NotificationController()),
+        ChangeNotifierProvider(create: (_) => CreateEventController()),
         ChangeNotifierProvider(
           create: (_) {
             final m = MapController();
@@ -87,6 +90,7 @@ class MyApp extends StatelessWidget {
             return m;
           },
         ),
+        ChangeNotifierProvider(create: (_) => UserEventController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(439, 956),

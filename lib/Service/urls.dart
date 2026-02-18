@@ -87,4 +87,12 @@ class Urls {
 
   static String readNotificationUrl(String id) =>
       "$baseUrl/api/v1/notifications/$id/read";
+
+  //for user side create event
+  static const String createUserEvent = "$baseUrl/api/v1/userevent";
+
+  static const String getUserEventsUrl = "$baseUrl/api/v1/userevent";
+
+  static String searchLocation(String address) =>
+      "$baseUrl/api/v1/event/locations?address=$address";
 }

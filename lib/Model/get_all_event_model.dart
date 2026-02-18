@@ -133,14 +133,23 @@ class EventData {
   });
 
   factory EventData.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? locationJson =
+        json['location'] is Map<String, dynamic>
+        ? json['location'] as Map<String, dynamic>
+        : null;
+
     return EventData(
-      location: json['location'] != null
-          ? Location.fromJson(json['location'])
-          : null,
+      location: locationJson != null ? Location.fromJson(locationJson) : null,
       id: json['_id'] ?? json['id'],
       title: json['title']?.toString(),
       description: json['description']?.toString(),
-      category: json['category']?.toString(),
+      category:
+          json['category']?.toString() ??
+          ((json['vibeTags'] is List && (json['vibeTags'] as List).isNotEmpty)
+              ? json['vibeTags'][0].toString()
+              : json['tags'] is List && (json['tags'] as List).isNotEmpty
+              ? json['tags'][0].toString()
+              : null),
       tags: json['tags'] is List ? List<String>.from(json['tags']) : null,
       features: json['features'] is List
           ? List<String>.from(json['features'])
@@ -153,7 +162,8 @@ class EventData {
       startDate: _parseDate(json['startDate']),
       startTime: json['startTime']?.toString(),
       locationType: json['locationType']?.toString(),
-      address: json['address']?.toString(),
+      address:
+          json['address']?.toString() ?? locationJson?['address']?.toString(),
       capacity: json['capacity'],
       images: _parseStringList(json['images']),
       gallery: _parseStringList(json['gallery']),

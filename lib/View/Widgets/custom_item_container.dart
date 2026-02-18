@@ -149,63 +149,67 @@ class Custom_item_container extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Padding(
-                    padding: EdgeInsets.all(8.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.title ?? "Untitled Event",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                    padding: EdgeInsets.all(6.w), // Slightly less padding
+                    child: SingleChildScrollView(
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Prevent manual scroll but allow content to fit or clip
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event.title ?? "Untitled Event",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13.sp, // Slightly smaller font
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/calender_icon.png',
-                              height: 16.h,
-                            ),
-                            SizedBox(width: 3.w),
-                            Expanded(
-                              child: Text(
-                                "${event.startDate ?? "00"}",
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: Colors.grey[600],
+                          SizedBox(height: 4.h), // Less spacing
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/calender_icon.png',
+                                height: 14.h,
+                              ),
+                              SizedBox(width: 3.w),
+                              Expanded(
+                                child: Text(
+                                  "${event.startDate ?? "00"}",
+                                  style: TextStyle(
+                                    fontSize: 11.sp,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 6.h),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/location_icon.png',
-                              height: 16.h,
-                            ),
-                            SizedBox(width: 6.w),
-                            Expanded(
-                              child: Text(
-                                event.address?.isNotEmpty == true
-                                    ? event.address!
-                                    : "Location TBA",
-                                softWrap: true,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: Colors.grey[600],
+                            ],
+                          ),
+                          SizedBox(height: 4.h), // Less spacing
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/location_icon.png',
+                                height: 14.h,
+                              ),
+                              SizedBox(width: 6.w),
+                              Expanded(
+                                child: Text(
+                                  event.address?.isNotEmpty == true
+                                      ? event.address!
+                                      : "Location TBA",
+                                  softWrap: true,
+                                  maxLines: 2, // Limit to 2 lines
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

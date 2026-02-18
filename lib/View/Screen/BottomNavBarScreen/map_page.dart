@@ -11,7 +11,8 @@ import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  final bool isPicker;
+  const MapPage({super.key, this.isPicker = false});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -20,6 +21,8 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   GoogleMapController? _localMapController;
   String? _lastSelectedEventId;
+  LatLng? _pickedLocation;
+  String? _pickedAddress;
   // _selectedCategory is now managed by MapController to sync with logic
 
   @override
@@ -68,7 +71,17 @@ class _MapPageState extends State<MapPage> {
                   target: LatLng(23.8103, 90.4125),
                   zoom: 15,
                 ),
-                markers: mapCtrl.markers,
+                markers: widget.isPicker && _pickedLocation != null
+                    ? {
+                        Marker(
+                          markerId: const MarkerId("picked_location"),
+                          position: _pickedLocation!,
+                          icon: BitmapDescriptor.defaultMarkerWithHue(
+                            BitmapDescriptor.hueViolet,
+                          ),
+                        ),
+                      }
+                    : mapCtrl.markers,
                 polylines: mapCtrl.polylines,
                 onMapCreated: (controller) {
                   _localMapController = controller;
@@ -78,11 +91,22 @@ class _MapPageState extends State<MapPage> {
                     mapCtrl.moveToCurrentLocation();
                   }
                 },
-                onTap: (_) {
-                  mapCtrl.clearSelectedEvent();
-                  setState(() {
-                    _lastSelectedEventId = null;
-                  });
+                onTap: (latLng) {
+                  if (widget.isPicker) {
+                    setState(() {
+                      _pickedLocation = latLng;
+                      // In a real app, you'd geocode here.
+                      // For now, we'll use a placeholder or the MapController's service if it has one.
+                      _pickedAddress =
+                          "Selected Location (${latLng.latitude.toStringAsFixed(4)}, ${latLng.longitude.toStringAsFixed(4)})";
+                    });
+                    mapCtrl.clearSelectedEvent();
+                  } else {
+                    mapCtrl.clearSelectedEvent();
+                    setState(() {
+                      _lastSelectedEventId = null;
+                    });
+                  }
                 },
                 zoomControlsEnabled: false,
                 myLocationEnabled: true, // Show user location dot properly
@@ -217,6 +241,38 @@ class _MapPageState extends State<MapPage> {
           if (mapCtrl.isLoading || mapCtrl.eventsLoading)
             const Center(
               child: CircularProgressIndicator(color: Color(0xFFB026FF)),
+            ),
+
+          // --- Confirm Selection Button for Picker ---
+          if (widget.isPicker && _pickedLocation != null)
+            Positioned(
+              bottom: 30.h,
+              left: 20.w,
+              right: 20.w,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, {
+                    'lat': _pickedLocation!.latitude,
+                    'lng': _pickedLocation!.longitude,
+                    'address': _pickedAddress,
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB026FF),
+                  padding: EdgeInsets.symmetric(vertical: 15.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
+                ),
+                child: Text(
+                  "Confirm Location",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
         ],
       ),

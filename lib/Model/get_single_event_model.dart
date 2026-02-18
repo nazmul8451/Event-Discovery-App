@@ -83,31 +83,44 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     location = json['location'] != null
-        ? Location.fromJson(json['location'])
+        ? Location.fromJson(json['location'] as Map<String, dynamic>)
         : null;
-    sId = json['_id'];
-    title = json['title'];
-    description = json['description'];
-    category = json['category'];
+
+    Map<String, dynamic>? locationJson =
+        json['location'] is Map<String, dynamic>
+        ? json['location'] as Map<String, dynamic>
+        : null;
+
+    sId = json['_id'] ?? json['id'];
+    title = json['title']?.toString();
+    description = json['description']?.toString();
+    category =
+        json['category']?.toString() ??
+        ((json['vibeTags'] is List && (json['vibeTags'] as List).isNotEmpty)
+            ? json['vibeTags'][0].toString()
+            : json['tags'] is List && (json['tags'] as List).isNotEmpty
+            ? json['tags'][0].toString()
+            : null);
     tags = json['tags'] != null ? List<String>.from(json['tags']) : [];
     organizerId = json['organizerId'] != null
         ? OrganizerId.fromJson(json['organizerId'])
         : null;
-    status = json['status'];
-    visibility = json['visibility'];
-    startDate = json['startDate'];
-    startTime = json['startTime'];
-    locationType = json['locationType'];
-    address = json['address'];
+    status = json['status']?.toString();
+    visibility = json['visibility']?.toString();
+    startDate = json['startDate']?.toString();
+    startTime = json['startTime']?.toString();
+    locationType = json['locationType']?.toString();
+    address =
+        json['address']?.toString() ?? locationJson?['address']?.toString();
     capacity = json['capacity'];
     images = json['images'] != null ? List<String>.from(json['images']) : [];
     gallery = json['gallery'] != null ? List<String>.from(json['gallery']) : [];
     views = json['views'];
     favorites = json['favorites'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt = json['createdAt']?.toString();
+    updatedAt = json['updatedAt']?.toString();
     iV = json['__v'];
-    id = json['id'];
+    id = json['id'] ?? json['_id'];
     price = json['price']?.toString();
   }
 
