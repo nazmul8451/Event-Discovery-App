@@ -125,10 +125,15 @@ class GetAllEventController extends ChangeNotifier {
         // =========================
         // Extract categories
         // =========================
+        // Limit categories to: All, Bars, Clubs, Lounges
+        const allowedCategories = {"Bars", "Clubs", "Lounges"};
         _categories = ["All"];
         for (final e in _allEvents) {
           if (e.category != null && e.category!.trim().isNotEmpty) {
-            _categories.add(e.category!.trim().capitalize());
+            String cat = e.category!.trim().capitalize();
+            if (allowedCategories.contains(cat)) {
+              _categories.add(cat);
+            }
           }
         }
         _categories = _categories.toSet().toList()..sort();

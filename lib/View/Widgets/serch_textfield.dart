@@ -6,13 +6,11 @@ class SearchTextField extends StatelessWidget {
   final IconData? icon;
   final bool obscureText;
   final ValueChanged<String>? onChanged;
-  final VoidCallback? onClear ;
+  final VoidCallback? onClear;
   final TextEditingController? controller;
   final bool? autoFocus;
 
-
-
-   SearchTextField({
+  SearchTextField({
     super.key,
     this.icon,
     required this.hintText,
@@ -28,7 +26,7 @@ class SearchTextField extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal:16.w,vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,11 +34,8 @@ class SearchTextField extends StatelessWidget {
           Container(
             height: 56.h,
             decoration: BoxDecoration(
-              color: isDark
-                  ? Color(0xFF250143)
-                  : Colors.white,
+              color: isDark ? Color(0xFF250143) : Colors.white,
               borderRadius: BorderRadius.circular(16.r),
-
             ),
             child: TextFormField(
               // autofocus: autoFocus,
@@ -53,7 +48,7 @@ class SearchTextField extends StatelessWidget {
               ),
               cursorColor: const Color(0xFFCC18CA),
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search_rounded,color: Colors.grey,),
+                prefixIcon: Icon(Icons.search_rounded, color: Colors.grey),
                 hintText: hintText,
                 hintStyle: TextStyle(
                   color: isDark ? Colors.white60 : const Color(0xFF515151),
@@ -61,10 +56,12 @@ class SearchTextField extends StatelessWidget {
                 ),
                 suffixIcon: icon != null
                     ? Icon(
-                  icon,
-                  color: isDark ? Colors.white60 : const Color(0xFF515151),
-                  size: 22.w,
-                )
+                        icon,
+                        color: isDark
+                            ? Colors.white60
+                            : const Color(0xFF515151),
+                        size: 22.w,
+                      )
                     : null,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 20.w,
@@ -80,10 +77,7 @@ class SearchTextField extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16.r),
-                  borderSide: const BorderSide(
-                    color: Color(0xFFCC18CA),
-                    width: 1,
-                  ),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),

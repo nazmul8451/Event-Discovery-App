@@ -25,29 +25,39 @@ class LiveChatMessageModel {
     return LiveChatMessageModel(
       id: json['id'] ?? json['_id'],
       userId: json['userId'],
-      userProfile: json['userProfile'] != null 
-          ? LiveChatSender.fromJson(json['userProfile']) 
-          : (json['user'] != null ? LiveChatSender.fromJson(json['user']) : null),
+      userProfile: json['userProfile'] != null
+          ? LiveChatSender.fromJson(json['userProfile'])
+          : (json['user'] != null
+                ? LiveChatSender.fromJson(json['user'])
+                : null),
       message: json['message'] ?? '',
       messageType: json['messageType'],
       formattedTime: json['formattedTime'],
       likes: json['likes'] ?? 0,
       hasLiked: json['hasLiked'] ?? false,
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'])
+          : null,
     );
   }
 }
 
 class LiveChatSender {
+  String? id;
   String? name;
   String? avatar;
 
-  LiveChatSender({this.name, this.avatar});
+  LiveChatSender({this.id, this.name, this.avatar});
 
   factory LiveChatSender.fromJson(Map<String, dynamic> json) {
     return LiveChatSender(
+      id: json['id'] ?? json['_id'],
       name: json['name'] ?? 'Guest',
-      avatar: json['avatar'] ?? json['profile'] ?? json['profileImageUrl'] ?? json['profileImage'],
+      avatar:
+          json['avatar'] ??
+          json['profile'] ??
+          json['profileImageUrl'] ??
+          json['profileImage'],
     );
   }
 }

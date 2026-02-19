@@ -1,7 +1,7 @@
 class Urls {
   //base url
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
-  //  static const String baseUrl = "http://10.10.7.50:4005";
+  //  static const String baseUrl = "http://10.10.7.50:4006";
   static const String baseUrl = "http://195.35.6.13:4005";
 
   //auth api
@@ -62,19 +62,32 @@ class Urls {
   // static const String checkInUrl = "$baseUrl/api/v1/ticket/check-in";
 
   //live chat message api
-  static String sentMessageUrl(String streamId) =>
-      "$baseUrl/api/v1/chatmessage/$streamId/messages";
+  //live chat message api
+  // Endpoint: GET /api/v1/chatmessages/:roomId/messages
+  static String getLiveMessageUrl(
+    String roomId, {
+    int page = 1,
+    int limit = 50,
+  }) => "$baseUrl/api/v1/chatmessage/$roomId/messages?page=$page&limit=$limit";
 
-  static String getLiveMessageUrl(String streamId) =>
-      "$baseUrl/api/v1/chatmessage/$streamId/messages?limit=50";
+  // Endpoint: POST /api/v1/chatmessages/:roomId/messages
+  static String sentMessageUrl(String roomId) =>
+      "$baseUrl/api/v1/chatmessage/$roomId/messages";
 
   //like message api
+  // Endpoint: POST /api/v1/chatmessages/messages/:messageId/like
   static String likeMessageUrl(String messageId) =>
       "$baseUrl/api/v1/chatmessage/messages/$messageId/like";
 
   //delete message
+  // Endpoint: DELETE /api/v1/chatmessages/messages/:messageId
   static String deleteMessageUrl(String messageId) =>
       "$baseUrl/api/v1/chatmessage/messages/$messageId";
+
+  // Get Participants
+  // Endpoint: GET /api/v1/chatmessages/:roomId/participants
+  static String getChatParticipantsUrl(String roomId) =>
+      "$baseUrl/api/v1/chatmessage/$roomId/participants";
   static const String userInterestUrl = "$baseUrl/api/v1/user/interest";
 
   //Notification api

@@ -105,12 +105,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     _titleFocusNode.unfocus();
     FocusScope.of(context).unfocus();
     final List<String> vibes = [
-      "Music",
-      "Vibe",
-      "Chill lounge",
-      "High energy",
-      "Dancing",
-      "Brewery",
+      "Gathering",
+      "Celebration",
+      "Day Party",
+      "Party",
+      "Kickback",
     ];
 
     showModalBottomSheet(
@@ -728,7 +727,64 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       icon: Icons.badge_outlined,
                       title: "RSVP Requirements",
                       subtitle: _rsvpRequirement,
-                      onTap: () {},
+                      onTap: () {
+                        _titleFocusNode.unfocus();
+                        FocusScope.of(context).unfocus();
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20.r),
+                            ),
+                          ),
+                          builder: (context) {
+                            return Container(
+                              padding: EdgeInsets.symmetric(vertical: 20.h),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "RSVP Requirements",
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  ListTile(
+                                    title: const Text(
+                                      "18+",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    onTap: () {
+                                      setState(() => _rsvpRequirement = "18+");
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ListTile(
+                                    title: const Text(
+                                      "21+",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    onTap: () {
+                                      setState(() => _rsvpRequirement = "21+");
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),

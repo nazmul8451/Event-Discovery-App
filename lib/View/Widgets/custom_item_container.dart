@@ -187,16 +187,17 @@ class Custom_item_container extends StatelessWidget {
                           SizedBox(height: 4.h), // Less spacing
                           Row(
                             children: [
-                              Image.asset(
-                                'assets/images/location_icon.png',
-                                height: 14.h,
+                              const Icon(
+                                Icons.info_outline,
+                                size: 14,
+                                color: Colors.grey,
                               ),
                               SizedBox(width: 6.w),
                               Expanded(
                                 child: Text(
-                                  event.address?.isNotEmpty == true
-                                      ? event.address!
-                                      : "Location TBA",
+                                  event.description?.isNotEmpty == true
+                                      ? event.description!
+                                      : "No description available",
                                   softWrap: true,
                                   maxLines: 2, // Limit to 2 lines
                                   overflow: TextOverflow.ellipsis,

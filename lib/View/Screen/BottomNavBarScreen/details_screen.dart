@@ -13,6 +13,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:gathering_app/Service/Controller/map_controller.dart';
+import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:gathering_app/Model/get_all_event_model.dart'; // Needed for EventData
+import 'package:gathering_app/Service/Controller/auth_controller.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
@@ -27,6 +30,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
   SingleEventDataModel? singleEvent;
   late String eventId;
   GoogleMapController? _mapController;
+  bool _isCheckedIn = false;
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -42,7 +48,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
       context.read<EventDetailsController>().getSingleEvent(eventId);
       context.read<ReivewController>().getAllReviewsByEventId(eventId: eventId);
-      context.read<LiveChatController>().fetchMessages(eventId);
+      // Chat messages are fetched only when checking in
+      if (_isCheckedIn) {
+        context.read<LiveChatController>().fetchMessages(eventId);
+      }
     });
   }
 
@@ -75,6 +84,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
+            surfaceTintColor: Colors.transparent,
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: Padding(
@@ -92,7 +102,37 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 padding: EdgeInsets.all(8.r),
                 child: CircleAvatar(
                   backgroundColor: Colors.black.withOpacity(0.5),
-                  child: Icon(Icons.favorite_border, color: Colors.white),
+                  child: Consumer<SavedEventController>(
+                    builder: (context, savedController, child) {
+                      // Construct EventData from SingleEventDataModel
+                      final eventData = EventData(
+                        id: singleEvent?.data?.id ?? singleEvent?.data?.sId,
+                        title: singleEvent?.data?.title,
+                        description: singleEvent?.data?.description,
+                        category: singleEvent?.data?.category,
+                        startDate: singleEvent?.data?.startDate != null
+                            ? DateTime.tryParse(singleEvent!.data!.startDate!)
+                            : null,
+                        address: singleEvent?.data?.address,
+                        images: singleEvent?.data?.images,
+                        price: singleEvent?.data?.price,
+                      );
+
+                      final isSaved = savedController.isSaved(eventData);
+
+                      return IconButton(
+                        icon: Icon(
+                          isSaved ? Icons.favorite : Icons.favorite_border,
+                          color: isSaved ? Colors.red : Colors.white,
+                        ),
+                        onPressed: () {
+                          if (eventData.id != null) {
+                            savedController.toggleSave(eventData);
+                          }
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
               Padding(
@@ -369,16 +409,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   Widget _buildStatusRow() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color backgroundColor = isDark
+        ? const Color(0xFF141124).withOpacity(0.95)
+        : Colors.white;
+    final Color textColor = isDark ? Colors.white : Colors.black;
+    final Color subTextColor = isDark
+        ? const Color(0xFFA294F9)
+        : const Color(0xFF7E57C2); // Darker purple for light mode contrast
+    final Color borderColor = isDark
+        ? Colors.white.withOpacity(0.08)
+        : Colors.black.withOpacity(0.05);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         height: 65.h,
         decoration: BoxDecoration(
-          color: const Color(
-            0xFF141124,
-          ).withOpacity(0.95), // Precise dark purple
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: borderColor),
           boxShadow: [
             // Center Bottom Blur Glow
             BoxShadow(
@@ -402,7 +452,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Text(
                     "Busy Now",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: textColor,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.5,
@@ -411,7 +461,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ],
               ),
             ),
-            _buildVerticalDivider(),
+            _buildVerticalDivider(isDark),
             // Section 2: Vibe (Vertical)
             Expanded(
               flex: 2,
@@ -424,7 +474,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       Text(
                         "4.8",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: textColor,
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -445,7 +495,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Text(
                     "Vibe",
                     style: TextStyle(
-                      color: const Color(0xFFA294F9), // Light lavender labels
+                      color: subTextColor,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -453,7 +503,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 ],
               ),
             ),
-            _buildVerticalDivider(),
+            _buildVerticalDivider(isDark),
             // Section 3: Cover (Vertical)
             Expanded(
               flex: 2,
@@ -466,7 +516,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         ? "\$${singleEvent!.data!.price}"
                         : "TBA",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: textColor,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -474,7 +524,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   Text(
                     "Cover",
                     style: TextStyle(
-                      color: const Color(0xFFA294F9), // Light lavender labels
+                      color: subTextColor,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -488,11 +538,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
-  Widget _buildVerticalDivider() {
+  Widget _buildVerticalDivider(bool isDark) {
     return Container(
       width: 1,
       height: 35.h,
-      color: Colors.white.withOpacity(0.08),
+      color: isDark
+          ? Colors.white.withOpacity(0.08)
+          : Colors.black.withOpacity(0.05),
     );
   }
 
@@ -626,7 +678,37 @@ class _DetailsScreenState extends State<DetailsScreen> {
           SizedBox(height: 16.h),
           Consumer<LiveChatController>(
             builder: (context, chatController, child) {
+              if (!_isCheckedIn) {
+                return Container(
+                  height: 150.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                  ),
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock_outline, color: Colors.grey, size: 30.sp),
+                      SizedBox(height: 8.h),
+                      Text(
+                        "Check in to join the conversation!",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
               return Container(
+                height: 400.h, // Fixed height for chat area
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white.withOpacity(0.05)
@@ -636,61 +718,102 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 padding: EdgeInsets.all(12.r),
                 child: Column(
                   children: [
-                    if (chatController.isLoading)
-                      Center(child: CircularProgressIndicator())
-                    else if (chatController.messages.isEmpty)
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.h),
-                        child: Text("No messages yet. Start the conversation!"),
-                      )
-                    else
-                      ...chatController.messages
-                          .take(3)
-                          .map((msg) => _buildChatMessage(msg)),
+                    Expanded(
+                      child:
+                          chatController.isLoading &&
+                              chatController.messages.isEmpty
+                          ? Center(child: CircularProgressIndicator())
+                          : chatController.messages.isEmpty
+                          ? Center(
+                              child: Text(
+                                "No messages yet. Start the conversation!",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
+                              controller: _scrollController,
+                              reverse: true, // Show newest at bottom
+                              itemCount: chatController.messages.length,
+                              itemBuilder: (context, index) {
+                                final msg = chatController.messages[index];
+                                return _buildChatMessage(msg);
+                              },
+                            ),
+                    ),
                     SizedBox(height: 12.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 45.h,
-                            decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.black.withOpacity(0.3)
-                                  : Colors.white.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(25.r),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
-                              ),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Say something...",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Container(
-                          height: 45.h,
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFB026FF).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(25.r),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Send",
+                    Container(
+                      margin: EdgeInsets.only(top: 12.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.08)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(30.r),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: TextField(
+                              controller: _messageController,
                               style: TextStyle(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 14.sp,
+                              ),
+                              cursorColor: Color(0xFFB026FF),
+                              decoration: InputDecoration(
+                                hintText: "Type a message...",
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14.sp,
+                                ),
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8.h,
+                                ),
+                              ),
+                              onSubmitted: (_) => _sendMessage(),
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          InkWell(
+                            onTap: _sendMessage,
+                            borderRadius: BorderRadius.circular(30.r),
+                            child: Container(
+                              padding: EdgeInsets.all(10.r),
+                              decoration: BoxDecoration(
                                 color: Color(0xFFB026FF),
-                                fontWeight: FontWeight.bold,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFFB026FF).withOpacity(0.4),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.send_rounded,
+                                color: Colors.white,
+                                size: 20.sp,
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 2.w),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -702,7 +825,88 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
+  void _sendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    _messageController.clear();
+    // success handled by controller (optimistic or wait)
+    final success = await context.read<LiveChatController>().sendMessage(
+      eventId,
+      text,
+    );
+    if (!success) {
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message:
+              context.read<LiveChatController>().errorMessage ??
+              "Failed to send",
+          isError: true,
+        );
+      }
+    }
+  }
+
   Widget _buildChatMessage(LiveChatMessageModel msg) {
+    final currentUserId = AuthController().userId;
+    // Determine if the message is sent by me
+    final isMe =
+        (msg.userId != null && msg.userId == currentUserId) ||
+        (msg.userProfile?.id != null && msg.userProfile!.id == currentUserId);
+
+    if (isMe) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: 12.h, left: 50.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+              decoration: BoxDecoration(
+                color: Color(0xFFB026FF).withOpacity(0.2),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.r),
+                  topRight: Radius.circular(16.r),
+                  bottomLeft: Radius.circular(16.r),
+                  bottomRight: Radius.zero,
+                ),
+                border: Border.all(color: Color(0xFFB026FF).withOpacity(0.5)),
+              ),
+              child: Text(
+                msg.message ?? "",
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  msg.formattedTime ?? "",
+                  style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                ),
+                if (msg.likes != null && msg.likes! > 0) ...[
+                  SizedBox(width: 4.w),
+                  Icon(Icons.favorite, size: 10.sp, color: Colors.red),
+                  SizedBox(width: 2.w),
+                  Text(
+                    "${msg.likes}",
+                    style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
@@ -723,25 +927,113 @@ class _DetailsScreenState extends State<DetailsScreen> {
             child:
                 msg.userProfile?.avatar == null ||
                     msg.userProfile!.avatar!.isEmpty
-                ? Icon(Icons.person, size: 16, color: Colors.white)
+                ? Icon(Icons.person, size: 20.sp, color: Colors.grey)
                 : null,
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  msg.userProfile?.name ?? "User",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Text(
+                      msg.userProfile?.name ?? "User",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.sp,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white70
+                            : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      msg.formattedTime ?? "",
+                      style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                    ),
+                  ],
                 ),
-                Text(
-                  msg.message ?? "",
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey.shade300
-                        : Colors.black87,
+                SizedBox(height: 4.h),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
                   ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.grey.shade200,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.zero,
+                      topRight: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    msg.message ?? "",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (msg.id != null) {
+                          context.read<LiveChatController>().likeMessage(
+                            msg.id!,
+                          );
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            msg.hasLiked == true
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 14.sp,
+                            color: msg.hasLiked == true
+                                ? Colors.red
+                                : Colors.grey,
+                          ),
+                          SizedBox(width: 4.w),
+                          if (msg.likes != null && msg.likes! > 0)
+                            Text(
+                              "${msg.likes}",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16.w),
+                    if (currentUserId == msg.userId ||
+                        (msg.userProfile?.id != null &&
+                            msg.userProfile!.id == currentUserId))
+                      GestureDetector(
+                        onTap: () {
+                          if (msg.id != null) {
+                            _confirmDelete(msg.id!);
+                          }
+                        },
+                        child: Text(
+                          "Delete",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -1365,9 +1657,27 @@ class _DetailsScreenState extends State<DetailsScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        _isCheckedIn = !_isCheckedIn;
+                        if (_isCheckedIn) {
+                          context.read<LiveChatController>().joinRoom(eventId);
+                          context.read<LiveChatController>().fetchMessages(
+                            eventId,
+                          );
+                        } else {
+                          context.read<LiveChatController>().leaveRoom();
+                        }
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2E7D32).withOpacity(0.15),
+                      splashFactory: NoSplash.splashFactory, // Disable ripple
+                      overlayColor: Color(
+                        0xFF2E7D32,
+                      ).withOpacity(0.1), // Subtle highlight
+                      backgroundColor: _isCheckedIn
+                          ? Color(0xFF2E7D32).withOpacity(0.15)
+                          : Colors.transparent,
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
@@ -1381,13 +1691,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.check,
+                          _isCheckedIn
+                              ? Icons.check
+                              : Icons.location_on_outlined,
                           color: Color(0xFF2E7D32),
                           size: 18.sp,
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          "Checked In",
+                          _isCheckedIn ? "Checked In" : "Check In",
                           style: TextStyle(
                             color: Color(0xFF2E7D32),
                             fontWeight: FontWeight.bold,
@@ -1402,6 +1714,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
+                      splashFactory: NoSplash.splashFactory, // Disable ripple
+                      overlayColor: Color(
+                        0xFFB026FF,
+                      ).withOpacity(0.1), // Subtle highlight
                       backgroundColor: Color(0xFFB026FF).withOpacity(0.15),
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       shape: RoundedRectangleBorder(
@@ -1579,5 +1895,39 @@ class _DetailsScreenState extends State<DetailsScreen> {
       'Dec',
     ][localDate.month - 1];
     return "$month ${localDate.day} at $timeStr";
+  }
+
+  void _confirmDelete(String messageId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete Message"),
+        content: Text("Are you sure you want to delete this message?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+              final success = await context
+                  .read<LiveChatController>()
+                  .deleteMessage(messageId);
+              if (!success) {
+                if (mounted) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Failed to delete",
+                    isError: true,
+                  );
+                }
+              }
+            },
+            child: Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }

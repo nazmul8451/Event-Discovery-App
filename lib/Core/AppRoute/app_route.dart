@@ -5,6 +5,8 @@ import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/user_chat_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/settings_screen.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/saved_events_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/Model/ChatModel.dart';
 import 'package:gathering_app/View/Screen/authentication_screen/code_send.dart';
@@ -58,5 +60,7 @@ class AppRoutes {
       final userId = ModalRoute.of(context)!.settings.arguments as String;
       return OtherUserProfileScreen(userId: userId);
     },
+    SettingsScreen.name: (context) => const SettingsScreen(),
+    SavedEventsScreen.name: (context) => const SavedEventsScreen(),
   };
 }

@@ -52,14 +52,16 @@ class _UserChatScreenState extends State<UserChatScreen> {
         }
       }
 
-      debugPrint("📱 UserChatScreen Init - Chat Object: ${widget.chat?.toJson()}");
-      
+      debugPrint(
+        "📱 UserChatScreen Init - Chat Object: ${widget.chat?.toJson()}",
+      );
+
       final authController = AuthController();
       if (widget.chat?.id != null) {
         context.read<ChatController>().getMessages(widget.chat!.id!);
         context.read<ChatController>().initSocket(widget.chat!.id!);
       }
-      
+
       // If userId is missing, try to fetch profile to get it
       if (authController.userId == null) {
         context.read<ProfileController>().fetchProfile(forceRefresh: false);
@@ -103,17 +105,23 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   onTap: () {
                     final chatController = context.read<ChatController>();
                     final profileController = context.read<ProfileController>();
-                    final myId = AuthController().userId ?? profileController.currentUser?.id;
+                    final myId =
+                        AuthController().userId ??
+                        profileController.currentUser?.id;
 
-                    debugPrint("👆 Header Tap - MyID: $myId, OtherID in Chat: ${widget.chat?.otherUserId}");
+                    debugPrint(
+                      "👆 Header Tap - MyID: $myId, OtherID in Chat: ${widget.chat?.otherUserId}",
+                    );
 
                     // Try to get ID from widget.chat, or fallback to finding it in messages
                     String? targetId = widget.chat?.otherUserId;
-                    
-                    if (targetId == null && chatController.messageList.isNotEmpty) {
+
+                    if (targetId == null &&
+                        chatController.messageList.isNotEmpty) {
                       // Find first message not sent by me
                       for (var msg in chatController.messageList) {
-                        if (msg.sender != null && msg.sender.toString() != myId.toString()) {
+                        if (msg.sender != null &&
+                            msg.sender.toString() != myId.toString()) {
                           targetId = msg.sender.toString();
                           break;
                         }
@@ -128,10 +136,12 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                         SnackBar(
-                           content: Text("ID ERROR - MyID: $myId\nOtherID: ${widget.chat?.otherUserId}\nChatID: ${widget.chat?.id}"),
-                           duration: const Duration(seconds: 5),
-                         ),
+                        SnackBar(
+                          content: Text(
+                            "ID ERROR - MyID: $myId\nOtherID: ${widget.chat?.otherUserId}\nChatID: ${widget.chat?.id}",
+                          ),
+                          duration: const Duration(seconds: 5),
+                        ),
                       );
                     }
                   },
@@ -141,29 +151,44 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       Stack(
                         children: [
                           CircleAvatar(
-                            radius: 20.r,
-                            backgroundColor: Colors.primaries[(widget.chat?.name ?? "").hashCode % Colors.primaries.length].withOpacity(0.2),
+                            radius: 24.r,
+                            backgroundColor: Colors
+                                .primaries[(widget.chat?.name ?? "").hashCode %
+                                    Colors.primaries.length]
+                                .withOpacity(0.2),
                             child: ClipOval(
-                                child: (widget.chat?.imageIcon != null && widget.chat!.imageIcon!.isNotEmpty)
+                              child:
+                                  (widget.chat?.imageIcon != null &&
+                                      widget.chat!.imageIcon!.isNotEmpty)
                                   ? Image.network(
                                       widget.chat!.imageIcon!.startsWith('http')
                                           ? widget.chat!.imageIcon!
                                           : '${Urls.baseUrl}${widget.chat!.imageIcon!.startsWith('/') ? '' : '/'}${widget.chat!.imageIcon!}',
-                                      width: 40.r,
-                                      height: 40.r,
+                                      width: 48.r,
+                                      height: 48.r,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          const Icon(Icons.person),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.person),
                                     )
                                   : Text(
-                                      (widget.chat?.name != null && widget.chat!.name!.isNotEmpty)
+                                      (widget.chat?.name != null &&
+                                              widget.chat!.name!.isNotEmpty)
                                           ? widget.chat!.name![0].toUpperCase()
                                           : "?",
                                       style: TextStyle(
+                                        fontSize: 18.sp,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.primaries[(widget.chat?.name ?? "").hashCode % Colors.primaries.length],
+                                        color:
+                                            Colors.primaries[(widget
+                                                            .chat
+                                                            ?.name ??
+                                                        "")
+                                                    .hashCode %
+                                                Colors.primaries.length],
                                       ),
-                                    )),
+                                    ),
+                            ),
                           ),
                           // Online Dot
                           Positioned(
@@ -177,7 +202,10 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                     ? Colors.green
                                     : Colors.grey,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2.5),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2.5,
+                                ),
                               ),
                             ),
                           ),
@@ -195,12 +223,16 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               style: TextStyle(
                                 fontSize: 14.sp.clamp(14, 16),
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context).textTheme.titleLarge?.color,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.titleLarge?.color,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              widget.chat?.status == 'online' ? 'online' : 'offline',
+                              widget.chat?.status == 'online'
+                                  ? 'online'
+                                  : 'offline',
                               style: TextStyle(
                                 fontSize: 12.sp.clamp(12, 14),
                                 color: widget.chat?.status == 'online'
@@ -246,7 +278,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
           Expanded(
             child: Consumer2<ChatController, ProfileController>(
               builder: (context, chatController, profileController, child) {
-                if (chatController.inProgress && chatController.messageList.isEmpty) {
+                if (chatController.inProgress &&
+                    chatController.messageList.isEmpty) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
@@ -255,58 +288,84 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 }
 
                 final messages = chatController.messageList;
-                final myId = AuthController().userId ?? profileController.currentUser?.id;
+                final myId =
+                    AuthController().userId ??
+                    profileController.currentUser?.id;
 
                 return ListView.builder(
                   controller: _scrollController,
                   reverse: true,
                   itemCount: messages.length,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 10.h,
+                  ),
                   itemBuilder: (context, index) {
                     final message = messages[index];
-                    final isMe = message.sender != null && 
-                                 myId != null && 
-                                 message.sender!.toString().trim() == myId.toString().trim();
+                    final isMe =
+                        message.sender != null &&
+                        myId != null &&
+                        message.sender!.toString().trim() ==
+                            myId.toString().trim();
 
                     return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isMe
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
                         margin: EdgeInsets.only(bottom: 10.h),
-                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 10.h,
+                        ),
                         decoration: BoxDecoration(
-                          color: isMe ? const Color(0xFF2B004E) : Colors.grey[900],
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          color: isMe
+                              ? const Color(0xFF2B004E)
+                              : Colors.grey[900],
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                          ),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(16.r),
                             topRight: Radius.circular(16.r),
-                            bottomLeft: isMe ? Radius.circular(16.r) : Radius.zero,
-                            bottomRight: isMe ? Radius.zero : Radius.circular(16.r),
+                            bottomLeft: isMe
+                                ? Radius.circular(16.r)
+                                : Radius.zero,
+                            bottomRight: isMe
+                                ? Radius.zero
+                                : Radius.circular(16.r),
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                           if(message.image != null && message.image!.isNotEmpty)
-                             Padding(
-                               padding: const EdgeInsets.only(bottom: 5.0),
-                               child: ClipRRect(
-                                 borderRadius: BorderRadius.circular(8.r),
-                                 child: Image.network(
-                                   message.image!.startsWith('http') 
-                                     ? message.image! 
-                                     : '${Urls.baseUrl}${message.image!.startsWith('/') ? '' : '/'}${message.image!}', 
-                                   height: 150.h, 
-                                   width: 200.w,
-                                   fit: BoxFit.cover,
-                                   errorBuilder: (context, error, stackTrace) => 
-                                     const Icon(Icons.broken_image, color: Colors.grey),
-                                 ),
-                               ),
-                             ),
+                            if (message.image != null &&
+                                message.image!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.network(
+                                    message.image!.startsWith('http')
+                                        ? message.image!
+                                        : '${Urls.baseUrl}${message.image!.startsWith('/') ? '' : '/'}${message.image!}',
+                                    height: 150.h,
+                                    width: 200.w,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey,
+                                            ),
+                                  ),
+                                ),
+                              ),
                             Text(
                               message.text ?? '',
                               style: TextStyle(
-                                color: Colors.white, // Always white for dark bubbles
+                                color: Colors
+                                    .white, // Always white for dark bubbles
                                 fontSize: 14.sp,
                               ),
                             ),
@@ -357,7 +416,11 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                 color: Colors.black54,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.close, size: 16.r, color: Colors.white),
+                              child: Icon(
+                                Icons.close,
+                                size: 16.r,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -365,7 +428,10 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     ),
                   ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 8.0,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                   ),
@@ -378,7 +444,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            // color: Colors.grey[200], 
+                            // color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(50.r),
                           ),
                           child: TextFormField(
@@ -388,11 +454,11 @@ class _UserChatScreenState extends State<UserChatScreen> {
                             textAlignVertical: TextAlignVertical.center,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 15.w,
-                                  vertical: 10.h
+                                horizontal: 15.w,
+                                vertical: 10.h,
                               ),
                               hintText: 'Type a message...',
-                              border: InputBorder.none, 
+                              border: InputBorder.none,
                             ),
                           ),
                         ),
@@ -401,44 +467,52 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         onTap: () async {
                           final text = _textController.text.trim();
                           final imagePath = _selectedImage?.path;
-                          
+
                           if (text.isEmpty && imagePath == null) return;
-                          
+
                           if (widget.chat?.id == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Cannot send message: Chat ID missing"))
+                              const SnackBar(
+                                content: Text(
+                                  "Cannot send message: Chat ID missing",
+                                ),
+                              ),
                             );
                             return;
                           }
 
                           // Store original text in case of failure
                           final originalText = _textController.text;
-                          
+
                           _textController.clear();
                           setState(() {
                             _selectedImage = null;
                           });
-                          
-                          bool success = await context.read<ChatController>().sendMessage(
-                            widget.chat!.id!, 
-                            text.isEmpty ? null : text,
-                            imagePath: imagePath,
-                          );
 
-                          if(success) {
+                          bool success = await context
+                              .read<ChatController>()
+                              .sendMessage(
+                                widget.chat!.id!,
+                                text.isEmpty ? null : text,
+                                imagePath: imagePath,
+                              );
+
+                          if (success) {
                             if (_scrollController.hasClients) {
-                                _scrollController.animateTo(
-                                  0.0, 
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeOut,
-                                );
+                              _scrollController.animateTo(
+                                0.0,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
                             }
                           } else {
                             // Restore text on failure
                             _textController.text = originalText;
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Failed to send message"))
+                                const SnackBar(
+                                  content: Text("Failed to send message"),
+                                ),
                               );
                             }
                           }
@@ -455,7 +529,11 @@ class _UserChatScreenState extends State<UserChatScreen> {
                           ),
                           height: 44.r,
                           width: 44.r,
-                          child: Icon(Icons.send, color: Colors.white, size: 20.sp),
+                          child: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                            size: 20.sp,
+                          ),
                         ),
                       ),
                     ],

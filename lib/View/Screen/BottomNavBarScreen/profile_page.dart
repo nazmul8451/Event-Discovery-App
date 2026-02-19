@@ -1,18 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gathering_app/Service/Controller/notification_controller.dart';
+
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
+
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/auth_textFormField.dart';
 import 'package:gathering_app/View/Widgets/customSnacBar.dart';
-import 'package:gathering_app/Service/Controller/auth_controller.dart';
-import 'package:gathering_app/View/Screen/authentication_screen/log_in_screen.dart';
+
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/settings_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
@@ -344,7 +344,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       // appBar: AppBar(
       //   surfaceTintColor: Colors.transparent,
-      //   ///ekhon comment thak pore dekha jabe 
+      //   ///ekhon comment thak pore dekha jabe
       //   // actions: [
       //   //   Consumer<NotificationController>(
       //   //     builder: (context, notificationController, child) => Stack(
@@ -383,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage> {
           return Consumer<ProfileController>(
             builder: (context, profileController, child) {
               final user = profileController.currentUser;
-              
+
               // Debug: Print user stats
               if (kDebugMode) {
                 print('🔍 Profile Page - User: ${user?.name}');
@@ -391,10 +391,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 print('🔍 Profile Page - Followers: ${user?.stats?.followers}');
                 print('🔍 Profile Page - Following: ${user?.stats?.following}');
               }
-              
+
               return SafeArea(
                 child: RefreshIndicator(
-                  onRefresh: () => profileController.fetchProfile(forceRefresh: true),
+                  onRefresh: () =>
+                      profileController.fetchProfile(forceRefresh: true),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: SingleChildScrollView(
@@ -402,173 +403,189 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           Row(
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(3.w),
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: [Colors.deepPurpleAccent, Colors.purpleAccent],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                  ),
-                                  child: Container(
-                                    height: 100.h,
-                                    width: 100.h,
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: BoxDecoration(
+                            children: [
+                              Stack(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(3.w),
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Provider.of<ThemeProvider>(context).isDarkMode
-                                          ? Colors.grey[800]
-                                          : Colors.white,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.deepPurpleAccent,
+                                          Colors.purpleAccent,
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
                                     ),
-                                    child: user?.profile != null && user!.profile!.isNotEmpty
-                                        ? CachedNetworkImage(
-                                            imageUrl: Uri.encodeFull(user.profile!.startsWith('http')
-                                                ? user.profile!
-                                                : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}'),
-                                            fit: BoxFit.cover,
-                                            placeholder: (context, url) => Shimmer.fromColors(
-                                              baseColor: Colors.grey[300]!,
-                                              highlightColor: Colors.grey[100]!,
-                                              child: Container(
-                                                color: Colors.white,
+                                    child: Container(
+                                      height: 100.h,
+                                      width: 100.h,
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color:
+                                            Provider.of<ThemeProvider>(
+                                              context,
+                                            ).isDarkMode
+                                            ? Colors.grey[800]
+                                            : Colors.white,
+                                      ),
+                                      child:
+                                          user?.profile != null &&
+                                              user!.profile!.isNotEmpty
+                                          ? CachedNetworkImage(
+                                              imageUrl: Uri.encodeFull(
+                                                user.profile!.startsWith('http')
+                                                    ? user.profile!
+                                                    : '${Urls.baseUrl}${user.profile!.startsWith('/') ? '' : '/'}${user.profile}',
+                                              ),
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  Shimmer.fromColors(
+                                                    baseColor:
+                                                        Colors.grey[300]!,
+                                                    highlightColor:
+                                                        Colors.grey[100]!,
+                                                    child: Container(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                              errorWidget:
+                                                  (context, url, error) => Icon(
+                                                    Icons.person,
+                                                    size: 50.sp,
+                                                    color: Colors.grey,
+                                                  ),
+                                            )
+                                          : Center(
+                                              child: Icon(
+                                                Icons.person,
+                                                size: 50.sp,
+                                                color: Colors.grey,
                                               ),
                                             ),
-                                            errorWidget: (context, url, error) => Icon(
-                                              Icons.person,
-                                              size: 50.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          )
-                                        : Center(
-                                            child: Icon(
-                                              Icons.person,
-                                              size: 50.sp,
-                                              color: Colors.grey,
-                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        final success = await profileController
+                                            .uploadProfileImage();
+                                        if (success && context.mounted) {
+                                          showCustomSnackBar(
+                                            context: context,
+                                            message:
+                                                'Profile image updated successfully',
+                                            isError: false,
+                                          );
+                                        } else if (profileController
+                                                    .errorMessage !=
+                                                null &&
+                                            context.mounted) {
+                                          showCustomSnackBar(
+                                            context: context,
+                                            message:
+                                                profileController.errorMessage!,
+                                            isError: true,
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 35.r,
+                                        width: 35.r,
+                                        decoration: BoxDecoration(
+                                          color: Colors.deepPurpleAccent,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
                                           ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      final success = await profileController.uploadProfileImage();
-                                      if (success && context.mounted) {
-                                        showCustomSnackBar(context: context, message: 'Profile image updated successfully', isError: false);
-                                      } else if (profileController.errorMessage != null && context.mounted) {
-                                        showCustomSnackBar(context: context, message: profileController.errorMessage!, isError: true);
-                                      }
-                                    },
-                                    child: Container(
-                                      height: 35.r,
-                                      width: 35.r,
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepPurpleAccent,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2),
-                                      ),
-                                      child: Icon(Icons.camera_alt, size: 18.sp, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                                if (profileController.inProgress)
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black26,
-                                      ),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(color: Colors.white),
+                                        ),
+                                        child: Icon(
+                                          Icons.camera_alt,
+                                          size: 18.sp,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                            SizedBox(width: 15.w),
-                            // make the right column flexible so long text wraps instead of overflowing
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${user?.name}',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleLarge!.copyWith(),
-                                  ),
-                                  // email should be a single line with ellipsis
-                                  Text(
-                                    '${user?.email}',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall!
-                                        .copyWith(color: Colors.grey),
-                                  ),
-                          
-                                  SizedBox(height: 4.h),
-                                  Text(
-                                    '${user?.description ?? ''}',
-                                    maxLines: 4,
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: true,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(fontWeight: FontWeight.w200),
-                                  ),
+                                  if (profileController.inProgress)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black26,
+                                        ),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildStatColumn(context, '${user?.stats?.events ?? 0}', 'Events'),
-                            _buildStatColumn(context, '${user?.stats?.followers ?? 0}', 'Followers'),
-                            _buildStatColumn(context, '${user?.stats?.following ?? 0}', 'Following'),
-                          ],
-                        ),
-                        SizedBox(height: 15.h),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 48),
-                                  backgroundColor: const Color(0xFF0D0D15),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                ),
-                                onPressed: () =>
-                                    _showEditProfileDialog(context),
-                                child: Text(
-                                  'Edit Profile',
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              SizedBox(width: 15.w),
+                              // make the right column flexible so long text wraps instead of overflowing
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${user?.name}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge!.copyWith(),
+                                    ),
+                                    // email should be a single line with ellipsis
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      '${user?.description ?? ''}',
+                                      maxLines: 4,
+                                      overflow: TextOverflow.ellipsis,
+                                      softWrap: true,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                            fontWeight: FontWeight.w200,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
+                            ],
+                          ),
+                          SizedBox(height: 10.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildStatColumn(
+                                context,
+                                '${user?.stats?.events ?? 0}',
+                                'Events',
+                              ),
+                              _buildStatColumn(
+                                context,
+                                '${user?.stats?.followers ?? 0}',
+                                'Followers',
+                              ),
+                              _buildStatColumn(
+                                context,
+                                '${user?.stats?.following ?? 0}',
+                                'Following',
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 15.h),
 
-                            SizedBox(width: 10.w),
-
-                            Expanded(
-                              child: SizedBox(
+                          Row(
+                            children: [
+                              Expanded(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     minimumSize: Size(double.infinity, 48),
@@ -577,12 +594,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       borderRadius: BorderRadius.circular(12.r),
                                     ),
                                   ),
-                                  onPressed: () {
-                                    // TODO: Navigate to settings screen
-                                    // Navigator.pushNamed(context, SettingsScreen.name);
-                                  },
+                                  onPressed: () =>
+                                      _showEditProfileDialog(context),
                                   child: Text(
-                                    'Setting',
+                                    'Edit Profile',
                                     style: TextStyle(
                                       fontSize: 15.sp,
                                       color: Colors.white,
@@ -591,283 +606,216 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
 
-                        SizedBox(height: 20.h),
+                              SizedBox(width: 10.w),
 
-                        ///favorite spots
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'FAVORITE SPOTS',
-                            style: Theme.of(context).textTheme.titleSmall!
-                                .copyWith(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                          ),
-                        ),
-                        SizedBox(height: 15.h),
-
-                        // Favorite Spots List
-                        SizedBox(
-                          height: 230.h,
-                          child: Consumer<SavedEventController>(
-                            builder: (context, savedController, child) {
-                              final savedEvents = savedController.savedEvents;
-
-                              if (savedController.inProgress) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-
-                              if (savedEvents.isEmpty) {
-                                return Center(
-                                  child: Text(
-                                    'No saved yet 💾',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(color: Colors.grey),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(
+                                      double.infinity,
+                                      48,
+                                    ),
+                                    backgroundColor: const Color(0xFF0D0D15),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
                                   ),
-                                );
-                              }
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      SettingsScreen.name,
+                                    );
+                                  },
+                                  child: Text(
+                                    'Settings',
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
 
-                              return ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: savedEvents.length,
-                                itemBuilder: (context, index) {
-                                  final event = savedEvents[index];
+                          SizedBox(height: 20.h),
 
-                                  return Padding(
-                                    padding: EdgeInsets.only(right: 12.w),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          DetailsScreen.name,
-                                          arguments: event.event.id,
-                                        );
-                                      },
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 180.h,
-                                            width: 180.w,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(16.r),
-                                              image: DecorationImage(
-                                                image:
-                                                    (event.event.images !=
-                                                            null &&
-                                                        event
-                                                            .event
-                                                            .images!
-                                                            .isNotEmpty)
-                                                    ? NetworkImage(
-                                                        "${Urls.baseUrl}${event.event.images!.first}",
-                                                      )
-                                                    : const AssetImage(
-                                                            'assets/images/container_img.png',
-                                                          )
-                                                          as ImageProvider,
-                                                fit: BoxFit.cover,
+                          ///favorite spots
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'FAVORITE SPOTS',
+                              style: Theme.of(context).textTheme.titleSmall!
+                                  .copyWith(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                          ),
+                          SizedBox(height: 15.h),
+
+                          // Favorite Spots List
+                          SizedBox(
+                            height: 230.h,
+                            child: Consumer<SavedEventController>(
+                              builder: (context, savedController, child) {
+                                final savedEvents = savedController.savedEvents;
+
+                                if (savedController.inProgress) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+
+                                if (savedEvents.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                      'No saved yet 💾',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(color: Colors.grey),
+                                    ),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: savedEvents.length,
+                                  itemBuilder: (context, index) {
+                                    final event = savedEvents[index];
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(right: 12.w),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            DetailsScreen.name,
+                                            arguments: event.event.id,
+                                          );
+                                        },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              height: 180.h,
+                                              width: 180.w,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(16.r),
+                                                image: DecorationImage(
+                                                  image:
+                                                      (event.event.images !=
+                                                              null &&
+                                                          event
+                                                              .event
+                                                              .images!
+                                                              .isNotEmpty)
+                                                      ? NetworkImage(
+                                                          "${Urls.baseUrl}${event.event.images!.first}",
+                                                        )
+                                                      : const AssetImage(
+                                                              'assets/images/container_img.png',
+                                                            )
+                                                            as ImageProvider,
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
-                                            ),
 
-                                            /// 🔖 UNSAVE BUTTON
-                                            child: Align(
-                                              alignment: Alignment.topRight,
-                                              child: Padding(
-                                                padding: EdgeInsets.all(8.w),
-                                                child: IconButton(
-                                                  icon: Icon(
-                                                    Icons.bookmark,
-                                                    color: const Color(
-                                                      0xFFFF006E,
+                                              /// 🔖 UNSAVE BUTTON
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(8.w),
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      Icons.bookmark,
+                                                      color: const Color(
+                                                        0xFFFF006E,
+                                                      ),
+                                                      size: 28.sp,
                                                     ),
-                                                    size: 28.sp,
-                                                  ),
-                                                  onPressed: () async {
-                                                    final result =
-                                                        await savedController
-                                                            .toggleSave(
-                                                              event.event,
-                                                            );
+                                                    onPressed: () async {
+                                                      final result =
+                                                          await savedController
+                                                              .toggleSave(
+                                                                event.event,
+                                                              );
 
-                                                    if (result == false) {
-                                                      ScaffoldMessenger.of(
-                                                        context,
-                                                      ).showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text(
-                                                            'Removed from saved',
+                                                      if (result == false) {
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                              'Removed from saved',
+                                                            ),
+                                                            duration: Duration(
+                                                              milliseconds: 800,
+                                                            ),
                                                           ),
-                                                          duration: Duration(
-                                                            milliseconds: 800,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Expanded(
-                                            child: SizedBox(
-                                              width: 180.w,
-                                              child: Text(
-                                                event.event.title ??
-                                                    'Untitled Event',
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.titleMedium,
+                                            SizedBox(height: 8.h),
+                                            Expanded(
+                                              child: SizedBox(
+                                                width: 180.w,
+                                                child: Text(
+                                                  event.event.title ??
+                                                      'Untitled Event',
+                                                  style: Theme.of(
+                                                    context,
+                                                  ).textTheme.titleMedium,
 
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
-                        ),
 
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Interests',
-                                  style: Theme.of(context).textTheme.titleSmall!
-                                      .copyWith(
-                                        // color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Interests',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(
+                                          // color: Colors.black,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
                                 ),
-                              ),
 
-                              SizedBox(height: 20.h),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: 60.h,
-                                          width: 60.h,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          child: Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                8.0,
-                                              ),
-                                              child: Image.asset(
-                                                height: 20,
-                                                width: 20,
-                                                'assets/images/calender_icon.png',
-                                                color: Color(0xFFB026FF),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          '${user?.stats?.events ?? 0}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(fontSize: 25.sp),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          'Events Attended',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                                fontSize: 12.sp.clamp(12, 12),
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          height: 60.h,
-                                          width: 60.h,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Color(
-                                              0xFFCC18CA,
-                                            ).withOpacity(0.15),
-                                          ),
-                                          child: Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                8.0,
-                                              ),
-                                              child: Image.asset(
-                                                height: 20,
-                                                width: 20,
-                                                'assets/images/review_icon.png',
-                                                color: Color(0xFFB026FF),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          '${user?.stats?.followers ?? 0}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(fontSize: 25.sp),
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          'Reviews',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                                fontSize: 12.sp.clamp(12, 12),
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        context
-                                            .read<BottomNavController>()
-                                            .onItemTapped(2);
-                                      },
+                                SizedBox(height: 20.h),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
                                       child: Column(
                                         children: [
                                           Container(
@@ -887,7 +835,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 child: Image.asset(
                                                   height: 20,
                                                   width: 20,
-                                                  'assets/images/fav_icon.png',
+                                                  'assets/images/calender_icon.png',
                                                   color: Color(0xFFB026FF),
                                                 ),
                                               ),
@@ -895,7 +843,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                           SizedBox(height: 2.h),
                                           Text(
-                                            '${user?.stats?.following ?? 0}',
+                                            '${user?.stats?.events ?? 0}',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleMedium!
@@ -903,7 +851,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                           SizedBox(height: 2.h),
                                           Text(
-                                            'Favorites',
+                                            'Events Attended',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleSmall!
@@ -914,538 +862,127 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 20.h),
-                              child: SizedBox(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(
-                                        0xFFCC18CA,
-                                      ).withOpacity(0.15),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Settings',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 60.h,
+                                            width: 60.h,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Color(
+                                                0xFFCC18CA,
+                                              ).withOpacity(0.15),
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: Image.asset(
+                                                  height: 20,
+                                                  width: 20,
+                                                  'assets/images/review_icon.png',
+                                                  color: Color(0xFFB026FF),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(height: 30.h),
-
-                                        Consumer<ProfileController>(
-                                          builder: (context, profileController, child) {
-                                            final settings = profileController
-                                                .currentUser
-                                                ?.settings;
-
-                                            // যদি data না থাকে
-                                            if (settings == null) {
-                                              return const Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              );
-                                            }
-
-                                            return Column(
-                                              children: [
-                                                // Push Notification
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Push Notification',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                        Text(
-                                                          'Get notified about events',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                fontSize: 10.sp
-                                                                    .clamp(
-                                                                      10,
-                                                                      13,
-                                                                    ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Transform.scale(
-                                                      scale: 0.78,
-                                                      child: Switch(
-                                                        value: settings
-                                                            .pushNotification,
-                                                        activeColor: Color(
-                                                          0xFFB026FF,
-                                                        ),
-                                                        onChanged: (newValue) {
-                                                          profileController
-                                                              .updateSettingsLocally(
-                                                                pushNotification:
-                                                                    newValue,
-                                                              );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 10.h),
-                                                Divider(
-                                                  color: const Color(
-                                                    0xFFCC18CA,
-                                                  ).withOpacity(0.15),
-                                                ),
-                                                SizedBox(height: 10.h),
-
-                                                // Email Notifications
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Email Notifications',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                        Text(
-                                                          'Receive event updates via email',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                fontSize: 10.sp
-                                                                    .clamp(
-                                                                      10,
-                                                                      13,
-                                                                    ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Transform.scale(
-                                                      scale: 0.78,
-                                                      child: Switch(
-                                                        value: settings
-                                                            .emailNotification,
-                                                        activeColor: Color(
-                                                          0xFFB026FF,
-                                                        ),
-                                                        onChanged: (newValue) {
-                                                          profileController
-                                                              .updateSettingsLocally(
-                                                                emailNotification:
-                                                                    newValue,
-                                                              );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 10.h),
-                                                Divider(
-                                                  color: const Color(
-                                                    0xFFCC18CA,
-                                                  ).withOpacity(0.15),
-                                                ),
-                                                SizedBox(height: 10.h),
-
-                                                // Location Services
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Location Services',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                        Text(
-                                                          'Find events near you',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                fontSize: 10.sp
-                                                                    .clamp(
-                                                                      10,
-                                                                      13,
-                                                                    ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Transform.scale(
-                                                      scale: 0.78,
-                                                      child: Switch(
-                                                        value: settings
-                                                            .locationService,
-                                                        activeColor: Color(
-                                                          0xFFB026FF,
-                                                        ),
-                                                        onChanged: (newValue) {
-                                                          profileController
-                                                              .updateSettingsLocally(
-                                                                locationService:
-                                                                    newValue,
-                                                              );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 10.h),
-                                                Divider(
-                                                  color: const Color(
-                                                    0xFFCC18CA,
-                                                  ).withOpacity(0.15),
-                                                ),
-                                                SizedBox(height: 10.h),
-
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Profile Status',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                        Text(
-                                                          'Profile Public Or Private',
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                fontSize: 10.sp
-                                                                    .clamp(
-                                                                      10,
-                                                                      13,
-                                                                    ),
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                              ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    DropdownButton<String>(
-                                                      value: settings
-                                                          .profileStatus,
-                                                      icon: const Icon(
-                                                        Icons.arrow_drop_down,
-                                                      ),
-                                                      underline:
-                                                          const SizedBox(),
-                                                      items: const [
-                                                        DropdownMenuItem(
-                                                          value: "public",
-                                                          child: Text("Public"),
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          value: "private",
-                                                          child: Text(
-                                                            "Private",
-                                                          ),
-                                                        ),
-                                                      ],
-                                                      onChanged: (newValue) {
-                                                        if (newValue != null) {
-                                                          profileController
-                                                              .updateSettingsLocally(
-                                                                profileStatus:
-                                                                    newValue,
-                                                              );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 20.h),
-
-                                                // Dark Mode (এটা আগের মতোই রাখো — ThemeProvider দিয়ে)
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Dark Mode',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                        SizedBox(height: 4.h),
-                                                        Text(
-                                                          Provider.of<
-                                                                    ThemeProvider
-                                                                  >(context)
-                                                                  .isDarkMode
-                                                              ? 'Currently Dark'
-                                                              : 'Currently Light',
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .bodySmall
-                                                                  ?.copyWith(
-                                                                    color: Colors
-                                                                        .grey,
-                                                                    fontSize: 10
-                                                                        .sp
-                                                                        .clamp(
-                                                                          10,
-                                                                          13,
-                                                                        ),
-                                                                  ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Transform.scale(
-                                                      scale: 0.85,
-                                                      child: Switch(
-                                                        value:
-                                                            Provider.of<
-                                                                  ThemeProvider
-                                                                >(context)
-                                                                .isDarkMode,
-                                                        activeColor: Color(
-                                                          0xFFB026FF,
-                                                        ),
-                                                        onChanged: (value) {
-                                                          Provider.of<
-                                                                ThemeProvider
-                                                              >(
-                                                                context,
-                                                                listen: false,
-                                                              )
-                                                              .toggleTheme();
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-
-                                        SizedBox(height: 20.h),
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 10.h),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 20.h),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 20.h),
-                              child: SizedBox(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: Color(
-                                        0xFFCC18CA,
-                                      ).withOpacity(0.15),
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            'Quick Actions',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                          ),
-                                        ),
-                                        SizedBox(height: 30.h),
-
-                                        // Row(
-                                        //   children: [
-                                        //     Icon(Icons.person),
-                                        //     SizedBox(width: 5.w),
-                                        //     Text(
-                                        //       'Edit Profile',
-                                        //       style: Theme.of(
-                                        //         context,
-                                        //       ).textTheme.titleMedium,
-                                        //     ),
-                                        //   ],
-                                        // ),
-                                        ListTile(
-                                          leading: Icon(Icons.person),
-                                          title: Text(
-                                            'Change Password',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                          ),
-                                          trailing: Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16.sp,
-                                          ),
-                                          onTap: () {
-                                            // Edit Profile এ যাওয়ার লজিক এখানে যোগ করো
-                                          },
-                                        ),
-                                        SizedBox(height: 20.h),
-
-                                        ListTile(
-                                          leading: Icon(Icons.favorite_border),
-                                          title: Text(
-                                            'Saved Events',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium,
-                                          ),
-                                          trailing: Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16.sp,
-                                          ),
-                                          onTap: () {
-                                            context
-                                                .read<BottomNavController>()
-                                                .onItemTapped(2);
-                                          },
-                                        ),
-
-                                        Divider(
-                                          color: Color(
-                                            0xFFCC18CA,
-                                          ).withOpacity(0.15),
-                                        ),
-                                        SizedBox(height: 20.h),
-
-                                        ListTile(
-                                          leading: Icon(
-                                            Icons.logout_outlined,
-                                            color: Colors.red,
-                                          ),
-                                          title: Text(
-                                            'Sign Out',
+                                          SizedBox(height: 2.h),
+                                          Text(
+                                            '${user?.stats?.followers ?? 0}',
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .titleMedium!
-                                                .copyWith(color: Colors.red),
+                                                .copyWith(fontSize: 25.sp),
                                           ),
-                                          trailing: Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16.sp,
+                                          SizedBox(height: 2.h),
+                                          Text(
+                                            'Reviews',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall!
+                                                .copyWith(
+                                                  fontSize: 12.sp.clamp(12, 12),
+                                                ),
                                           ),
-                                          onTap: () async {
-                                            // Sign Out Confirmation or Direct Logout
-                                            final authController = context.read<AuthController>();
-                                            await authController.logout();
-                                            
-                                            if (mounted) {
-                                              Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(builder: (_) => LogInScreen()),
-                                                (route) => false, // Remove all previous routes
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          context
+                                              .read<BottomNavController>()
+                                              .onItemTapped(2);
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 60.h,
+                                              width: 60.h,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Color(
+                                                  0xFFCC18CA,
+                                                ).withOpacity(0.15),
+                                              ),
+                                              child: Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    8.0,
+                                                  ),
+                                                  child: Image.asset(
+                                                    height: 20,
+                                                    width: 20,
+                                                    'assets/images/fav_icon.png',
+                                                    color: Color(0xFFB026FF),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Text(
+                                              '${user?.stats?.following ?? 0}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .copyWith(fontSize: 25.sp),
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Text(
+                                              'Favorites',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleSmall!
+                                                  .copyWith(
+                                                    fontSize: 12.sp.clamp(
+                                                      12,
+                                                      12,
+                                                    ),
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
-        );
-    },
-  ),
-);
-}
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
 
   Widget _buildCustomFilterChip({
     required String label,
@@ -1489,18 +1026,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildStatColumn(BuildContext context, String count, String label) {
     return Column(
       children: [
-        Text(
-          count,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text(count, style: Theme.of(context).textTheme.titleMedium),
         SizedBox(height: 5.h),
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Provider.of<ThemeProvider>(context).isDarkMode
-                    ? Colors.grey
-                    : Colors.black,
-              ),
+            color: Provider.of<ThemeProvider>(context).isDarkMode
+                ? Colors.grey
+                : Colors.black,
+          ),
         ),
       ],
     );

@@ -715,17 +715,14 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
-            // Category Badge
+            // Category Chip (top right)
             Positioned(
               top: 12.h,
               right: 12.w,
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: const Color(
-                    0xFFB026FF,
-                  ).withOpacity(0.8), // Glassmorphism-like
+                  color: const Color(0xFFB026FF).withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(

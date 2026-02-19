@@ -24,10 +24,13 @@ class _ChatPageState extends State<ChatPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = AuthController();
       if (auth.userId == null) {
-         context.read<ProfileController>().fetchProfile(forceRefresh: false).then((_) {
-           context.read<ChatController>().getChats();
-           context.read<ChatController>().initChatListSocket();
-         });
+        context
+            .read<ProfileController>()
+            .fetchProfile(forceRefresh: false)
+            .then((_) {
+              context.read<ChatController>().getChats();
+              context.read<ChatController>().initChatListSocket();
+            });
       } else {
         context.read<ChatController>().getChats();
         context.read<ChatController>().initChatListSocket();
@@ -56,42 +59,46 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text("Messages",style: Theme.of(context).textTheme.titleLarge,),
-              Text('Connect with Community',style: Theme.of(context).textTheme.titleSmall,)
+              Text("Messages", style: Theme.of(context).textTheme.titleLarge),
             ],
           ),
         ),
-
       ),
 
       // Body
       body: Column(
         children: [
           // Search Bar
-          SearchTextField(hintText: 'Search Conversation...',),
+          SearchTextField(hintText: 'Search Conversation...'),
 
           // Chat List
           Expanded(
             child: Consumer<ChatController>(
-               builder: (context, controller, child) {
-    debugPrint("🔄 ChatPage rebuild - inProgress: ${controller.inProgress}, chatCount: ${controller.chatList.length}");
-    
-    if (controller.inProgress && controller.chatList.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    
-    if (controller.chatList.isEmpty) {
-      if (controller.errorMessage != null) {
-        return Center(child: Text("Error: ${controller.errorMessage!}"));
-      }
-      return const Center(child: Text("No conversations yet"));
-    }
+              builder: (context, controller, child) {
+                debugPrint(
+                  "🔄 ChatPage rebuild - inProgress: ${controller.inProgress}, chatCount: ${controller.chatList.length}",
+                );
 
-    // Show the actual data for debugging
-    debugPrint("📱 Displaying ${controller.chatList.length} chats:");
-    for (var chat in controller.chatList) {
-      debugPrint("  - ${chat.name}: ${chat.currentMessage}");
-    }
+                if (controller.inProgress && controller.chatList.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.chatList.isEmpty) {
+                  if (controller.errorMessage != null) {
+                    return Center(
+                      child: Text("Error: ${controller.errorMessage!}"),
+                    );
+                  }
+                  return const Center(child: Text("No conversations yet"));
+                }
+
+                // Show the actual data for debugging
+                debugPrint(
+                  "📱 Displaying ${controller.chatList.length} chats:",
+                );
+                for (var chat in controller.chatList) {
+                  debugPrint("  - ${chat.name}: ${chat.currentMessage}");
+                }
                 return RefreshIndicator(
                   onRefresh: () async {
                     await context.read<ChatController>().getChats();
@@ -103,20 +110,34 @@ class _ChatPageState extends State<ChatPage> {
                       return ListTile(
                         leading: CircleAvatar(
                           radius: 26.r,
-                          backgroundColor: Colors.primaries[userChat.name.hashCode % Colors.primaries.length].withOpacity(0.2),
-                          backgroundImage: (userChat.imageIcon != null && userChat.imageIcon!.isNotEmpty)
-                              ? NetworkImage(userChat.imageIcon!.startsWith('http') 
-                                  ? userChat.imageIcon! 
-                                  : '${Urls.baseUrl}${userChat.imageIcon!.startsWith('/') ? '' : '/'}${userChat.imageIcon!}')
+                          backgroundColor: Colors
+                              .primaries[userChat.name.hashCode %
+                                  Colors.primaries.length]
+                              .withOpacity(0.2),
+                          backgroundImage:
+                              (userChat.imageIcon != null &&
+                                  userChat.imageIcon!.isNotEmpty)
+                              ? NetworkImage(
+                                  userChat.imageIcon!.startsWith('http')
+                                      ? userChat.imageIcon!
+                                      : '${Urls.baseUrl}${userChat.imageIcon!.startsWith('/') ? '' : '/'}${userChat.imageIcon!}',
+                                )
                               : null,
-                          child: (userChat.imageIcon == null || userChat.imageIcon!.isEmpty)
+                          child:
+                              (userChat.imageIcon == null ||
+                                  userChat.imageIcon!.isEmpty)
                               ? Text(
-                                  (userChat.name != null && userChat.name!.isNotEmpty)
+                                  (userChat.name != null &&
+                                          userChat.name!.isNotEmpty)
                                       ? userChat.name![0].toUpperCase()
                                       : "?",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.primaries[userChat.name.hashCode % Colors.primaries.length],
+                                    color:
+                                        Colors.primaries[userChat
+                                                .name
+                                                .hashCode %
+                                            Colors.primaries.length],
                                   ),
                                 )
                               : null,
@@ -127,11 +148,19 @@ class _ChatPageState extends State<ChatPage> {
                               child: Text(
                                 userChat.name ?? 'Unknown',
                                 style: TextStyle(
-                                  fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.w600,
+                                  fontWeight: userChat.isSeen == false
+                                      ? FontWeight.bold
+                                      : FontWeight.w600,
                                   fontSize: 14.sp,
-                                  color: userChat.isSeen == false 
-                                      ? Theme.of(context).textTheme.titleMedium?.color 
-                                      : Theme.of(context).textTheme.titleMedium?.color?.withOpacity(0.8),
+                                  color: userChat.isSeen == false
+                                      ? Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium?.color
+                                      : Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.color
+                                            ?.withOpacity(0.8),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -143,10 +172,13 @@ class _ChatPageState extends State<ChatPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: userChat.isSeen == false 
-                                ? Theme.of(context).textTheme.bodyMedium?.color 
-                                : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
-                            fontWeight: userChat.isSeen == false ? FontWeight.bold : FontWeight.normal,
+                            color: userChat.isSeen == false
+                                ? Theme.of(context).textTheme.bodyMedium?.color
+                                : Theme.of(context).textTheme.bodyMedium?.color
+                                      ?.withOpacity(0.6),
+                            fontWeight: userChat.isSeen == false
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                         trailing: Text(
@@ -154,7 +186,12 @@ class _ChatPageState extends State<ChatPage> {
                           style: TextStyle(color: Colors.grey, fontSize: 12.sp),
                         ),
                         onTap: () async {
-                          await Navigator.push(context, MaterialPageRoute(builder: (_) => UserChatScreen(chat: userChat)));
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => UserChatScreen(chat: userChat),
+                            ),
+                          );
                           // When returning, if we have a chat ID, mark it as seen locally for immediate feedback
                           if (userChat.id != null) {
                             controller.markChatAsSeenLocally(userChat.id!);
