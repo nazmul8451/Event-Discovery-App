@@ -56,6 +56,8 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   fluttertoast: ^9.0.0
+  share_plus: ^10.1.4
+  screenshot: ^3.0.0
 
 
 

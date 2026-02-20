@@ -18,6 +18,11 @@ import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart'; // Needed for EventData
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key});
@@ -35,6 +40,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   bool _isCheckedIn = false;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final ScreenshotController _screenshotController = ScreenshotController();
 
   @override
   void initState() {
@@ -71,6 +77,175 @@ class _DetailsScreenState extends State<DetailsScreen> {
       mapCtrl.setMapController(_mapController!);
     }
     mapCtrl.showRouteToEvent(LatLng(lat, lng));
+  }
+
+  Future<void> _shareEventImage() async {
+    if (singleEvent?.data == null) return;
+
+    try {
+      // Show a toast or snackbar to indicate loading
+      showCustomSnackBar(
+        context: context,
+        message: "Generating shareable image...",
+        duration: const Duration(seconds: 1),
+      );
+
+      final Uint8List image = await _screenshotController.captureFromWidget(
+        Material(
+          child: MediaQuery(
+            data: MediaQuery.of(context),
+            child: _buildShareCard(singleEvent!.data!),
+          ),
+        ),
+        delay: const Duration(milliseconds: 500), // Increased delay for images
+        context: context,
+      );
+
+      final directory = await getTemporaryDirectory();
+      final String path =
+          "${directory.path}/event_${DateTime.now().millisecondsSinceEpoch}.png";
+      final File imageFile = File(path);
+      await imageFile.writeAsBytes(image);
+
+      await Share.shareXFiles(
+        [XFile(imageFile.path)],
+        text:
+            "Check out this amazing event '${singleEvent!.data!.title}' on Gathering App! 🎈",
+      );
+    } catch (e) {
+      debugPrint("Detailed Error sharing: $e");
+      if (mounted) {
+        showCustomSnackBar(
+          context: context,
+          message: "Share failed: ${e.toString().split('\n').first}",
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Widget _buildShareCard(Data event) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: 400.w,
+      padding: EdgeInsets.all(20.r),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF141124) : Colors.white,
+        borderRadius: BorderRadius.circular(24.r),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Event Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16.r),
+            child: event.images != null && event.images!.isNotEmpty
+                ? Image.network(
+                    event.images!.first.startsWith('http')
+                        ? event.images!.first
+                        : "${Urls.baseUrl}${event.images!.first.startsWith('/') ? '' : '/'}${event.images!.first}",
+                    height: 200.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'assets/images/container_img.png',
+                    height: 200.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+          ),
+          SizedBox(height: 16.h),
+          // Title
+          Text(
+            event.title ?? "Untitled Event",
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          // Location
+          Row(
+            children: [
+              Icon(
+                Icons.location_on,
+                color: const Color(0xFFB026FF),
+                size: 16.sp,
+              ),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Text(
+                  event.address ?? "Location TBD",
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          // Date & Time
+          Row(
+            children: [
+              Icon(Icons.calendar_today, color: Colors.grey, size: 14.sp),
+              SizedBox(width: 8.w),
+              Text(
+                _formatEventDateTime(event.startDate, event.startTime),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                ),
+              ),
+              const Spacer(),
+              // Price Tag
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB026FF).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  event.price != null && event.price!.isNotEmpty
+                      ? "\$${event.price}"
+                      : "FREE",
+                  style: TextStyle(
+                    color: const Color(0xFFB026FF),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20.h),
+          // Branding Footer
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: const Color(0xFFB026FF),
+                size: 14.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "Gathering App",
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFB026FF),
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -141,7 +316,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 padding: EdgeInsets.all(8.r),
                 child: CircleAvatar(
                   backgroundColor: Colors.black.withOpacity(0.5),
-                  child: Icon(Icons.share, color: Colors.white),
+                  child: IconButton(
+                    icon: Icon(Icons.share, color: Colors.white),
+                    onPressed: _shareEventImage,
+                  ),
                 ),
               ),
             ],
