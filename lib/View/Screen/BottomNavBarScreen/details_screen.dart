@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
 import 'package:gathering_app/Model/live_chat_message_model.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/all_reviews_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/Service/Controller/event_details_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
@@ -1308,69 +1309,144 @@ class _DetailsScreenState extends State<DetailsScreen> {
       builder: (context, reviewCtrl, child) {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER with Rating and Crowd Favorite
-              Row(
+          child: Builder(
+            builder: (context) {
+              // Calculate average rating
+              double avgRating = 0.0;
+              if (reviewCtrl.review.isNotEmpty) {
+                avgRating =
+                    reviewCtrl.review
+                        .map((e) => e.rating)
+                        .reduce((a, b) => a + b) /
+                    reviewCtrl.review.length;
+              }
+
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
+                  //HEADER with Rating and Crowd Favorite
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "4.8",
-                        style: TextStyle(
-                          fontSize: 48.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            avgRating == 0.0
+                                ? "0.0"
+                                : avgRating.toStringAsFixed(1),
+                            style: TextStyle(
+                              fontSize: 48.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: List.generate(
+                              5,
+                              (index) => Icon(
+                                index < avgRating.floor()
+                                    ? Icons.star
+                                    : (index < avgRating
+                                          ? Icons.star_half
+                                          : Icons.star_border),
+                                color: Colors.amber,
+                                size: 16.sp,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "${reviewCtrl.totalReview} check-ins & reviews",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
-                      Row(
-                        children: List.generate(
-                          5,
-                          (index) => Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                            size: 16.sp,
+                      const Spacer(),
+                      Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        "${reviewCtrl.totalReview} check-ins & reviews",
-                        style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.local_fire_department,
+                              color: Colors.orange,
+                              size: 20.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Crowd Favorite",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                Text(
+                                  "Based on activity",
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  Spacer(),
+                  SizedBox(height: 24.h),
+
+                  // Vibe Summary
                   Container(
-                    padding: EdgeInsets.all(12.r),
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.local_fire_department,
-                          color: Colors.orange,
-                          size: 20.sp,
+                        Text(
+                          "Vibe Summary",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        SizedBox(width: 8.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        SizedBox(height: 8.h),
+                        Text(
+                          "Guests say this spot has a high-energy crowd, great DJs, and strong late-night vibes. Most reviews mention good music and cocktails.",
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade400,
+                            height: 1.4,
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
                           children: [
-                            Text(
-                              "Crowd Favorite",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.sp,
-                              ),
+                            Icon(
+                              Icons.auto_awesome,
+                              color: Colors.grey,
+                              size: 14.sp,
                             ),
+                            SizedBox(width: 4.w),
                             Text(
-                              "Based on activity",
+                              "Automatically summarized from reviews",
                               style: TextStyle(
                                 fontSize: 10.sp,
                                 color: Colors.grey,
@@ -1381,134 +1457,97 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 24.h),
+                  SizedBox(height: 32.h),
 
-              // Vibe Summary
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Vibe Summary",
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      "Guests say this spot has a high-energy crowd, great DJs, and strong late-night vibes. Most reviews mention good music and cocktails.",
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey.shade400,
-                        height: 1.4,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.auto_awesome,
-                          color: Colors.grey,
-                          size: 14.sp,
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 18.sp),
+                      SizedBox(width: 8.w),
+                      Text(
+                        "Most Helpful Tonight",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          "Automatically summarized from reviews",
-                          style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 32.h),
-
-              Row(
-                children: [
-                  Icon(Icons.star, color: Colors.amber, size: 18.sp),
-                  SizedBox(width: 8.w),
-                  Text(
-                    "Most Helpful Tonight",
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Spacer(),
-                  TextButton(
-                    onPressed: () => WriteReviewAlertDialogue(context),
-                    child: Text(
-                      "Write Review",
-                      style: TextStyle(
-                        color: Color(0xFFB026FF),
-                        fontSize: 14.sp,
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-
-              if (reviewCtrl.inProgress)
-                Center(child: CircularProgressIndicator())
-              else if (reviewCtrl.review.isEmpty)
-                Center(child: Text("No reviews yet"))
-              else
-                SizedBox(
-                  height: 180.h,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: reviewCtrl.review.length,
-                    itemBuilder: (context, index) {
-                      return _buildHorizontalReviewCard(
-                        reviewCtrl.review[index],
-                      );
-                    },
-                  ),
-                ),
-
-              SizedBox(height: 24.h),
-              Center(
-                child: InkWell(
-                  onTap: () {},
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.w,
-                      vertical: 12.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(25.r),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Show all ${reviewCtrl.totalReview} reviews",
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => WriteReviewAlertDialogue(context),
+                        child: Text(
+                          "Write Review",
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFFB026FF),
                             fontSize: 14.sp,
                           ),
                         ),
-                        SizedBox(width: 8.w),
-                        Icon(Icons.arrow_forward_ios, size: 12.sp),
-                      ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+
+                  if (reviewCtrl.inProgress)
+                    const Center(child: CircularProgressIndicator())
+                  else if (reviewCtrl.review.isEmpty)
+                    const Center(child: Text("No reviews yet"))
+                  else
+                    SizedBox(
+                      height: 180.h,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: reviewCtrl.review.length,
+                        itemBuilder: (context, index) {
+                          return _buildHorizontalReviewCard(
+                            reviewCtrl.review[index],
+                          );
+                        },
+                      ),
+                    ),
+
+                  SizedBox(height: 24.h),
+                  Center(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(25.r),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AllReviewsScreen(eventId: eventId),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.w,
+                          vertical: 12.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(25.r),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Show all ${reviewCtrl.totalReview} reviews",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Icon(Icons.arrow_forward_ios, size: 12.sp),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: 32.h),
-            ],
+                  SizedBox(height: 32.h),
+                ],
+              );
+            },
           ),
         );
       },
@@ -1528,13 +1567,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ? Colors.white.withOpacity(0.08)
               : Colors.black.withOpacity(0.05),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+        //     blurRadius: 10,
+        //     offset: Offset(0, 4),
+        //   ),
+        // ],
       ),
       child: Material(
         color: Colors.transparent,

@@ -10,11 +10,9 @@ import 'package:gathering_app/Service/urls.dart';
 
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/details_screen.dart';
 import 'package:gathering_app/View/Screen/BottomNavBarScreen/notification_screen.dart';
-import 'package:gathering_app/View/Screen/BottomNavBarScreen/view_event_screen.dart';
 import 'package:gathering_app/View/Theme/theme_provider.dart';
 import 'package:gathering_app/View/Widgets/serch_textfield.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
-import 'package:gathering_app/ViewModel/event_cartModel.dart';
 import 'package:gathering_app/View/Widgets/custom_item_container.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
