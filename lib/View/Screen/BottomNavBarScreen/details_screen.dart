@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
 import 'package:gathering_app/Model/get_single_event_model.dart';
 import 'package:gathering_app/Model/live_chat_message_model.dart';
+import 'package:gathering_app/View/Screen/BottomNavBarScreen/other_user_profile_screen.dart';
 import 'package:gathering_app/Service/Controller/event_details_controller.dart';
 import 'package:gathering_app/Service/Controller/reivew_controller.dart';
 import 'package:gathering_app/Service/Controller/live_chat_controller.dart';
@@ -1515,95 +1516,184 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   Widget _buildHorizontalReviewCard(AllReviewModelByEventId review) {
+    bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 250.w,
-      margin: EdgeInsets.only(right: 16.w),
-      padding: EdgeInsets.all(16.r),
+      margin: EdgeInsets.only(right: 16.w, bottom: 8.h),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.black.withOpacity(0.05),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 18.r,
-                backgroundImage: review.reviewerImage.isNotEmpty
-                    ? NetworkImage("${Urls.baseUrl}${review.reviewerImage}")
-                    : null,
-                child: review.reviewerImage.isEmpty ? Icon(Icons.person) : null,
-              ),
-              SizedBox(width: 10.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20.r),
+          onTap: () {
+            if (review.reviewerId.isNotEmpty) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      OtherUserProfileScreen(userId: review.reviewerId),
+                ),
+              );
+            } else {
+              showCustomSnackBar(
+                context: context,
+                message: "User profile not found.",
+                isError: true,
+              );
+            }
+          },
+          child: Padding(
+            padding: EdgeInsets.all(16.r),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      review.reviewerName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFFB026FF).withOpacity(0.5),
+                          width: 1.5,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: CircleAvatar(
+                        radius: 18.r,
+                        backgroundColor: isDark
+                            ? Colors.grey[800]
+                            : Colors.grey[200],
+                        backgroundImage: review.reviewerImage.isNotEmpty
+                            ? NetworkImage(
+                                review.reviewerImage.startsWith('http')
+                                    ? review.reviewerImage
+                                    : "${Urls.baseUrl}${review.reviewerImage}",
+                              )
+                            : null,
+                        child: review.reviewerImage.isEmpty
+                            ? Icon(
+                                Icons.person,
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                              )
+                            : null,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        ...List.generate(
-                          5,
-                          (index) => Icon(
-                            Icons.star,
-                            color: Colors.amber,
-                            size: 10.sp,
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            review.reviewerName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          _formatReviewTime(review.createdAt),
-                          style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-                        ),
-                      ],
+                          SizedBox(height: 2.h),
+                          Row(
+                            children: [
+                              ...List.generate(
+                                5,
+                                (index) => Icon(
+                                  index < review.rating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 10.sp,
+                                ),
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                _formatReviewTime(review.createdAt),
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Expanded(
-            child: Text(
-              review.review,
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade300),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
+                SizedBox(height: 12.h),
+                Expanded(
+                  child: Text(
+                    review.review,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      height: 1.3,
+                      color: isDark ? Colors.grey.shade300 : Colors.black54,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department,
+                            color: Colors.orange,
+                            size: 12.sp,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            "Helpful",
+                            style: TextStyle(
+                              fontSize: 10.sp,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Spacer(),
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.grey,
+                      size: 14.sp,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 8.h),
-          Row(
-            children: [
-              Icon(
-                Icons.local_fire_department,
-                color: Colors.orange,
-                size: 14.sp,
-              ),
-              SizedBox(width: 4.w),
-              Text(
-                "23 Helpful",
-                style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-              ),
-              Spacer(),
-              Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 14.sp),
-              SizedBox(width: 4.w),
-              Text(
-                "23",
-                style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

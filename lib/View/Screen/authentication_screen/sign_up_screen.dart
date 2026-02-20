@@ -53,20 +53,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: SizedBox(), // উপরের স্পেস
                   ),
                   Center(
-                    child: Image.asset(
-                      Theme.of(context).brightness == Brightness.dark
-                          ? 'assets/images/splash2.png'
-                          : 'assets/images/splash_img.png',
-               height: 100.h.clamp(100,100),
-                    width: 100.h.clamp(100,100),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.8, end: 1.0),
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutBack,
+                      builder: (context, scale, child) {
+                        return Transform.scale(scale: scale, child: child);
+                      },
+                      child: Image.asset(
+                        Theme.of(context).brightness == Brightness.dark
+                            ? 'assets/images/splash2.png'
+                            : 'assets/images/splash_img.png',
+                        height: 100.h.clamp(100.0, 100.0),
+                        width: 100.h.clamp(100.0, 100.0),
+                      ),
                     ),
                   ),
                   SizedBox(height: 10.h),
-                
+
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Form(
                       key: _formKey,
+                      autovalidateMode: AutovalidateMode
+                          .onUserInteraction, // Added for better UX
                       child: Column(
                         children: [
                           Row(
@@ -165,15 +175,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                          ContinueWithContainer(
-                            iconImg: 'assets/images/gmail_icon.png',
-                          ),
-                          ContinueWithContainer(
-                            iconImg: 'assets/images/facebook_icon.png',
-                          ),
-                          ContinueWithContainer(
-                            iconImg: 'assets/images/phone_icon.png',
-                          ),
+                              ContinueWithContainer(
+                                iconImg: 'assets/images/gmail_icon.png',
+                              ),
+                              ContinueWithContainer(
+                                iconImg: 'assets/images/facebook_icon.png',
+                              ),
+                              ContinueWithContainer(
+                                iconImg: 'assets/images/phone_icon.png',
+                              ),
                             ],
                           ),
                           SizedBox(height: 30.h),
@@ -238,8 +248,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   //  sign up api calling
   Future<void> _signUp() async {
     final email = emialController.text.trim();
-    final signUpController =
-        Provider.of<SignUpController>(context, listen: false);
+    final signUpController = Provider.of<SignUpController>(
+      context,
+      listen: false,
+    );
 
     bool isSuccess = await signUpController.signUp(
       email: emialController.text.trim(),
@@ -258,9 +270,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
       AppUtils.navigatorKey.currentState?.push(
         MaterialPageRoute(
-          builder: (context) => VerifyAccount(
-            email: email.trim(),
-          ),
+          builder: (context) => VerifyAccount(email: email.trim()),
         ),
       );
       print("Email : $email");
@@ -295,8 +305,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 // Social Login Container – Dark Mode Ready
 class ContinueWithContainer extends StatelessWidget {
   final String iconImg;
+  final VoidCallback? onTap;
 
-  const ContinueWithContainer({super.key, required this.iconImg});
+  const ContinueWithContainer({super.key, required this.iconImg, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -325,11 +336,14 @@ class ContinueWithContainer extends StatelessWidget {
                 ),
               ],
       ),
-      child: Center(
-        child: Image.asset(
-          iconImg,
-          height: 18.h,
-          width: 18.h,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.r),
+          onTap: onTap ?? () {}, // Added touch feedback for better UX
+          child: Center(
+            child: Image.asset(iconImg, height: 18.h, width: 18.h),
+          ),
         ),
       ),
     );
