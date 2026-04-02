@@ -2,12 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:gathering_app/Model/notification_model.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/Service/Socket/socket_service.dart';
 
 class NotificationController extends ChangeNotifier {
   bool _inProgress = false;
   String? _errorMessage;
   NotificationModel? _notificationModel;
   List<NotificationData> _notifications = [];
+
+  NotificationController() {
+    _initSocketListener();
+  }
+
+  void _initSocketListener() {
+    SocketService().eventStream.listen((eventData) {
+      if (eventData['event'] == 'notification') {
+        final data = eventData['data'];
+        if (data != null) {
+          debugPrint("🔔 Real-time notification received in Controller: $data");
+          try {
+            // Adjust parsing based on the actual notification payload structure
+            // Usually, data contains the notification object or is the notification object
+            final newNotification = NotificationData.fromJson(data);
+            
+            // Insert at the beginning of the list
+            _notifications.insert(0, newNotification);
+            notifyListeners();
+          } catch (e) {
+            debugPrint("⚠️ Failed to parse real-time notification: $e");
+            // If parsing fails, we could just refresh the list from API
+            fetchNotifications();
+          }
+        }
+      }
+    });
+  }
 
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;

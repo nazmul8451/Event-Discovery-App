@@ -31,11 +31,14 @@ class LiveChatController extends ChangeNotifier {
     final token = AuthController().accessToken;
 
     if (token != null) {
-      _socketService.connect(token);
-      _socketService.emit('join-room', roomId);
-      debugPrint("🚀 Joined room: $roomId");
+      final userId = AuthController().userId;
+      if (userId != null) {
+        _socketService.connect(token, userId);
+        _socketService.emit('join-room', roomId);
+        debugPrint("🚀 Joined room: $roomId");
 
-      _listenToEvents(roomId);
+        _listenToEvents(roomId);
+      }
     }
   }
 

@@ -16,11 +16,32 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+
+    _controller.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -29,13 +50,13 @@ class _SplashScreenState extends State<SplashScreen> {
         if (!mounted) return;
 
         final auth = Provider.of<AuthController>(context, listen: false);
-        
+
         // Use a timeout for safety
         await auth.initialize().timeout(
           const Duration(seconds: 3),
           onTimeout: () => debugPrint("Splash: Auth initialization timed out"),
         );
-        
+
         if (!mounted) return;
 
         if (auth.isLoggedIn) {
@@ -43,11 +64,12 @@ class _SplashScreenState extends State<SplashScreen> {
         } else {
           bool hasSeenOnboarding = false;
           try {
-             hasSeenOnboarding = GetStorage().read<bool>('hasSeenOnboarding') ?? false;
+            hasSeenOnboarding =
+                GetStorage().read<bool>('hasSeenOnboarding') ?? false;
           } catch (e) {
             debugPrint("GetStorage error: $e");
           }
-          
+
           if (hasSeenOnboarding) {
             Navigator.of(context).pushReplacementNamed(LogInScreen.name);
           } else {
@@ -65,17 +87,35 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
-        child: Image.asset(
-          isDark ? 'assets/images/splash2.png' : 'assets/images/splash_img.png',
-          height: 300.h,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _opacityAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Image.asset(
+                  isDark
+                      ? 'assets/images/splash2.png'
+                      : 'assets/images/splash_img.png',
+                  height: 300.h,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
-

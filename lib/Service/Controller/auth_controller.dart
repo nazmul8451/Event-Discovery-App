@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
 import 'package:gathering_app/Service/Controller/profile_page_controller.dart';
 import 'package:gathering_app/Service/urls.dart';
+import 'package:gathering_app/Service/Socket/socket_service.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
@@ -64,6 +65,10 @@ class AuthController extends ChangeNotifier {
     );
 
     debugPrint("✅ Tokens & User data saved successfully");
+    
+    // Connect socket after saving data
+    SocketService().connect(_accessToken!, _userId!);
+    
     notifyListeners();
   }
   //ki je kori 
@@ -85,6 +90,10 @@ class AuthController extends ChangeNotifier {
 
       _isLoggedIn = _accessToken != null && _accessToken!.trim().isNotEmpty;
       debugPrint("🔄 Auth initialized - Logged in: $_isLoggedIn, User: $_userName");
+      
+      if (_isLoggedIn && _accessToken != null && _userId != null) {
+        SocketService().connect(_accessToken!, _userId!);
+      }
     } catch (e) {
       debugPrint("⚠️ Auth initialization failure/timeout: $e");
       // Fallback: assume not logged in instead of hanging
@@ -185,6 +194,9 @@ class AuthController extends ChangeNotifier {
 
     // প্রোফাইল ক্লিয়ার
     // Provider.of<ProfileController>(context, listen: false).clear(); // context না থাকলে অন্যভাবে করো
+
+    // Disconnect socket on logout
+    SocketService().disconnect();
 
     debugPrint("🚪 User logged out completely");
     notifyListeners();

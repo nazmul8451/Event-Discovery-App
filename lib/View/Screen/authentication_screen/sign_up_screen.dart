@@ -163,30 +163,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
 
                           SizedBox(height: 20.h),
-                          Text(
-                            'OR CONTINUE WITH',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Theme.of(context).hintColor,
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/gmail_icon.png',
-                              ),
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/facebook_icon.png',
-                              ),
-                              ContinueWithContainer(
-                                iconImg: 'assets/images/phone_icon.png',
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 30.h),
                           Center(
                             child: RichText(
                               text: TextSpan(
@@ -299,53 +275,5 @@ class _SignUpScreenState extends State<SignUpScreen> {
     emialController.dispose();
     passController.dispose();
     super.dispose();
-  }
-}
-
-// Social Login Container – Dark Mode Ready
-class ContinueWithContainer extends StatelessWidget {
-  final String iconImg;
-  final VoidCallback? onTap;
-
-  const ContinueWithContainer({super.key, required this.iconImg, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      margin: EdgeInsets.only(right: 12.w),
-      height: 36.h,
-      width: 70.w,
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black.withOpacity(0.06) : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.2)
-              : const Color(0xFFE2E8F0),
-          width: 1.2,
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.r),
-          onTap: onTap ?? () {}, // Added touch feedback for better UX
-          child: Center(
-            child: Image.asset(iconImg, height: 18.h, width: 18.h),
-          ),
-        ),
-      ),
-    );
   }
 }

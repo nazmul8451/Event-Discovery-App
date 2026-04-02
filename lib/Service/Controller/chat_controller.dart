@@ -33,8 +33,8 @@ class ChatController extends ChangeNotifier {
     final token = AuthController().accessToken;
     debugPrint("🚀 initSocket - chatId: $chatId, myId: $myId, hasToken: ${token != null}");
 
-    if (token != null) {
-      _socketService.connect(token);
+    if (token != null && myId != null) {
+      _socketService.connect(token, myId);
       
       // Listen for messages: getMessage::chatId
       final eventName = "getMessage::$chatId";
@@ -77,7 +77,7 @@ class ChatController extends ChangeNotifier {
     debugPrint("🚀 initChatListSocket - myId: $myId, hasToken: ${token != null}");
 
     if (myId != null && token != null) {
-      _socketService.connect(token);
+      _socketService.connect(token, myId);
       
       final eventName = "updateChatList::$myId";
       debugPrint("👂 Listening for chat list socket event: $eventName");
