@@ -1,3 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:gathering_app/firebase_options.dart';
+import 'package:gathering_app/Service/PushNotification/notification_service.dart';
 import 'package:gathering_app/Service/Controller/chat_controller.dart';
 import 'package:gathering_app/Service/Controller/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +34,8 @@ import 'View/Theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.init();
 
   // Run heavy initializations and await them
   await GetStorage.init();
