@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gathering_app/Service/Api%20service/network_caller.dart';
+import 'package:gathering_app/Service/Api%20service/google_places_service.dart';
 import 'package:gathering_app/Service/urls.dart';
 import 'package:gathering_app/Model/location_suggestion_model.dart';
 

@@ -229,14 +229,32 @@ class MapController with ChangeNotifier {
     _eventsLoading = true;
     notifyListeners();
 
-    final response = await NetworkCaller.getRequest(
-      url: Urls.getAllEvent,
-      requireAuth: true,
-    );
+    try {
+      // 1. Fetch main events
+      final mainResponse = await NetworkCaller.getRequest(
+        url: Urls.getAllEvent,
+        requireAuth: true,
+      );
 
-    if (response.isSuccess && response.body != null) {
-      final model = GetAllEventModel.fromJson(response.body!);
-      _allEvents = model.data?.data ?? [];
+      List<EventData> allFetched = [];
+
+      if (mainResponse.isSuccess && mainResponse.body != null) {
+        final model = GetAllEventModel.fromJson(mainResponse.body!);
+        allFetched.addAll(model.data?.data ?? []);
+      }
+
+      // 2. Fetch user events
+      final userResponse = await NetworkCaller.getRequest(
+        url: Urls.getUserEventsUrl,
+        requireAuth: true,
+      );
+
+      if (userResponse.isSuccess && userResponse.body != null) {
+        final model = GetAllEventModel.fromJson(userResponse.body!);
+        allFetched.addAll(model.data?.data ?? []);
+      }
+
+      _allEvents = allFetched;
 
       // Extract Categories
       _categories = ["All"];
@@ -247,13 +265,14 @@ class MapController with ChangeNotifier {
       }
       _categories = _categories.toSet().toList()..sort();
 
-      // Ensure selected category is valid (reset to All if it disappeared)
+      // Ensure selected category is valid
       if (!_categories.contains(_selectedCategory)) {
         _selectedCategory = "All";
       }
 
       _applySearchAndFilter();
-    } else {
+    } catch (e) {
+      debugPrint("Error fetching map events: $e");
       _events = [];
       _allEvents = [];
       _markers.removeWhere((m) => m.markerId.value.startsWith('event_'));

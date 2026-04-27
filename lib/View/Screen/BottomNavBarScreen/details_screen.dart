@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:gathering_app/Service/Controller/map_controller.dart';
 import 'package:gathering_app/View/view_controller/saved_event_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:gathering_app/Model/get_all_event_model.dart'; // Needed for EventData
 import 'package:gathering_app/Service/Controller/auth_controller.dart';
 import 'package:screenshot/screenshot.dart';
@@ -2034,7 +2035,36 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (singleEvent?.data?.location?.coordinates != null &&
+                          singleEvent!.data!.location!.coordinates!.length >=
+                              2) {
+                        final lat =
+                            singleEvent!.data!.location!.coordinates![1];
+                        final lng =
+                            singleEvent!.data!.location!.coordinates![0];
+                        final url =
+                            "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(
+                            Uri.parse(url),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      } else if (singleEvent?.data?.address != null) {
+                        final query = Uri.encodeComponent(
+                          singleEvent!.data!.address!,
+                        );
+                        final url =
+                            "https://www.google.com/maps/search/?api=1&query=$query";
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(
+                            Uri.parse(url),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       splashFactory: NoSplash.splashFactory, // Disable ripple
                       overlayColor: Color(
