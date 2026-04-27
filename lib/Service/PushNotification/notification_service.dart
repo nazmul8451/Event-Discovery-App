@@ -136,6 +136,13 @@ class NotificationService {
   }
 
   static Future<String?> getFCMToken() async {
-    return await _firebaseMessaging.getToken();
+    try {
+      return await _firebaseMessaging.getToken();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error getting FCM Token: $e");
+      }
+      return null;
+    }
   }
 }

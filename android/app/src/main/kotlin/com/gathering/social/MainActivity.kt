@@ -1,4 +1,4 @@
-package com.example.gathering_app
+package com.gathering.social
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

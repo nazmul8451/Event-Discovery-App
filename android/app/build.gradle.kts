@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gathering_app"
+    namespace = "com.gathering.social"
 
     // Plugins need higher SDK, safe to use
     compileSdk = 36
@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.gathering_app"
+        applicationId = "com.gathering.social"
 
         // 🔥 VERY IMPORTANT: minSdk must be fixed for low phones
         minSdk = flutter.minSdkVersion   

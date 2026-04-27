@@ -35,7 +35,11 @@ import 'View/Theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationService.init();
+  try {
+    await NotificationService.init();
+  } catch (e) {
+    debugPrint('Notification initialization error: $e');
+  }
 
   // Run heavy initializations and await them
   await GetStorage.init();
