@@ -16,13 +16,24 @@ class EventDetailsController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await NetworkCaller.getRequest(
+      var response = await NetworkCaller.getRequest(
         url: Urls.getSingleEvent(eventId),
         token: "",
       );
 
-      print("=====================Response========================");
+      print("=====================Main Event Response========================");
       print(response.body);
+
+      // If main event fails with 404 or success is false, try userevent
+      if (!response.isSuccess || response.body?['success'] != true) {
+        print("🔄 Falling back to UserEvent fetch...");
+        response = await NetworkCaller.getRequest(
+          url: Urls.getSingleUserEvent(eventId),
+          requireAuth: true,
+        );
+        print("=====================User Event Response========================");
+        print(response.body);
+      }
 
       if (response.isSuccess) {
         final Map<String, dynamic> responseBody = response.body is String

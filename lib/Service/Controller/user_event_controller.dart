@@ -8,9 +8,32 @@ class UserEventController extends ChangeNotifier {
   String? _errorMessage;
   List<EventData> _userEvents = [];
 
+  List<EventData> _allUserEvents = [];
+  List<EventData> _filteredUserEvents = [];
+  String _searchQuery = "";
+
   bool get inProgress => _inProgress;
   String? get errorMessage => _errorMessage;
-  List<EventData> get userEvents => _userEvents;
+  List<EventData> get userEvents => _filteredUserEvents;
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query.toLowerCase().trim();
+    _applySearch();
+    notifyListeners();
+  }
+
+  void _applySearch() {
+    if (_searchQuery.isEmpty) {
+      _filteredUserEvents = List.from(_allUserEvents);
+    } else {
+      _filteredUserEvents = _allUserEvents.where((event) {
+        return (event.title?.toLowerCase().contains(_searchQuery) ?? false) ||
+            (event.address?.toLowerCase().contains(_searchQuery) ?? false) ||
+            (event.category?.toLowerCase().contains(_searchQuery) ?? false) ||
+            (event.description?.toLowerCase().contains(_searchQuery) ?? false);
+      }).toList();
+    }
+  }
 
   Future<bool> fetchUserEvents() async {
     _inProgress = true;
@@ -23,12 +46,12 @@ class UserEventController extends ChangeNotifier {
         final GetAllEventModel model = GetAllEventModel.fromJson(
           response.body!,
         );
-        // Assuming the API returns data in the same structure as GetAllEventModel
-        //Adjust parsing if the API structure is different
         if (model.data?.data != null) {
-          _userEvents = model.data!.data!;
+          _allUserEvents = model.data!.data!;
+          _applySearch();
         } else {
-          _userEvents = [];
+          _allUserEvents = [];
+          _filteredUserEvents = [];
         }
         _inProgress = false;
         notifyListeners();

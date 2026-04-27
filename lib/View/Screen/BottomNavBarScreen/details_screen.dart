@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gathering_app/Model/get_all_review_model_by_event_id.dart';
@@ -107,10 +107,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
       final File imageFile = File(path);
       await imageFile.writeAsBytes(image);
 
+      final box = context.findRenderObject() as RenderBox?;
       await Share.shareXFiles(
         [XFile(imageFile.path)],
         text:
             "Check out this amazing event '${singleEvent!.data!.title}' on Gathering App! 🎈",
+        sharePositionOrigin:
+            box != null ? box.localToGlobal(Offset.zero) & box.size : null,
       );
     } catch (e) {
       debugPrint("Detailed Error sharing: $e");
@@ -806,25 +809,28 @@ class _DetailsScreenState extends State<DetailsScreen> {
       children: [
         Icon(icon, color: Colors.grey, size: 18.sp),
         SizedBox(width: 8.w),
-        RichText(
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey.shade300
-                  : Colors.black87,
-            ),
-            children: [
-              if (label.isNotEmpty)
-                TextSpan(
-                  text: label,
-                  style: TextStyle(color: Colors.grey),
-                ),
-              TextSpan(
-                text: value,
-                style: TextStyle(fontWeight: FontWeight.bold),
+        Expanded(
+          child: RichText(
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade300
+                    : Colors.black87,
               ),
-            ],
+              children: [
+                if (label.isNotEmpty)
+                  TextSpan(
+                    text: label,
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                TextSpan(
+                  text: value,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -1471,10 +1477,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (dateStr == null) return "Date TBA";
     try {
       final date = DateTime.parse(dateStr);
-      final formatter = DateFormat('MMM dd, yyyy');
-      String result = formatter.format(date);
+      final dateFormatter = DateFormat('MMM dd, yyyy');
+      String result = dateFormatter.format(date);
+
       if (timeStr != null && timeStr.isNotEmpty) {
-        result += " at $timeStr";
+        try {
+          // Try to parse timeStr as a full ISO DateTime
+          final time = DateTime.parse(timeStr);
+          final timeFormatter = DateFormat('hh:mm a');
+          result += " at ${timeFormatter.format(time)}";
+        } catch (_) {
+          // Fallback to raw string if not a valid ISO date
+          result += " at $timeStr";
+        }
       }
       return result;
     } catch (e) {

@@ -202,15 +202,13 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
 
-                        Consumer<GetAllEventController>(
-                          builder: (context, controller, child) =>
-                              SearchTextField(
-                                controller: searchController,
-                                onChanged: (query) {
-                                  controller.updateSearchQuery(query);
-                                },
-                                hintText: 'Search events, venues',
-                              ),
+                        SearchTextField(
+                          controller: searchController,
+                          onChanged: (query) {
+                            context.read<GetAllEventController>().updateSearchQuery(query);
+                            context.read<UserEventController>().updateSearchQuery(query);
+                          },
+                          hintText: 'Search events, venues',
                         ),
 
                         Consumer<GetAllEventController>(

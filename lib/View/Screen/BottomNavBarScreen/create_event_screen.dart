@@ -23,7 +23,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final FocusNode _titleFocusNode = FocusNode();
   final List<File> _selectedImages = [];
   bool _isPublic = true;
-  String _rsvpRequirement = "21+ Only";
+  String _rsvpRequirement = "21+";
 
   // State for Date/Time and Location
   DateTime? _selectedDate;
@@ -370,6 +370,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           ? [_selectedVibe!.toLowerCase()]
           : ["tech", "networking", "startup"],
       "visibility": _isPublic,
+      "rsvp": _rsvpRequirement,
       "address": _selectedLocation ?? "Banani, Dhaka, Bangladesh",
       "location": {
         "type": "Point",

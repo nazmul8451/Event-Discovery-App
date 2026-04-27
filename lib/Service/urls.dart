@@ -2,7 +2,7 @@ class Urls {
   //base url
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
   //  static const String baseUrl = "http://10.10.7.50:4006";
-  static const String baseUrl = "http://10.10.7.50:4006";
+  static const String baseUrl = "http://167.71.254.250:4006";
 
   //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
@@ -104,6 +104,8 @@ class Urls {
   static const String createUserEvent = "$baseUrl/api/v1/userevent";
 
   static const String getUserEventsUrl = "$baseUrl/api/v1/userevent";
+
+  static String getSingleUserEvent(String id) => "$baseUrl/api/v1/userevent/$id";
 
   static String searchLocation(String address) =>
       "$baseUrl/api/v1/event/locations?address=$address";
