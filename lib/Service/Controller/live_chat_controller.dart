@@ -238,7 +238,7 @@ class LiveChatController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      print("Error liking message: $e");
+      debugPrint("Error liking message: $e");
     }
   }
 

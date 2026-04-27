@@ -15,7 +15,7 @@ class OtpVerifyController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     final body = {"email": email, "oneTimeCode": otp};
-    print('User email: $email, OTP: $otp');
+    debugPrint('User email: $email, OTP: $otp');
 
     try {
       final response = await NetworkCaller.postRequest(

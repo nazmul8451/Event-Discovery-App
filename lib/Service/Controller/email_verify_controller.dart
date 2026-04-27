@@ -17,7 +17,7 @@ class EmailVerifyController extends ChangeNotifier {
   // Step 1: SignUp এর পর এটা কল হবে → email সেভ + OTP পাঠাবে
   Future<bool> initializeAndSendOtp(String userEmail) async {
     _email = userEmail.trim();
-    print("Email saved in controller: $_email"); 
+    debugPrint("Email saved in controller: $_email"); 
 
     _isLoading = true;
     _errorMessage = null;
@@ -31,7 +31,7 @@ class EmailVerifyController extends ChangeNotifier {
       );
 
       if (response.isSuccess) {
-        print("OTP sent successfully to $_email");
+        debugPrint("OTP sent successfully to $_email");
         return true;
       } else {
         _errorMessage = response.errorMessage ?? "Failed to send OTP";
@@ -39,7 +39,7 @@ class EmailVerifyController extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = "No internet connection";
-      print("OTP send error: $e");
+      debugPrint("OTP send error: $e");
       return false;
     } finally {
       _isLoading = false;
@@ -55,7 +55,7 @@ class EmailVerifyController extends ChangeNotifier {
       return false;
     }
 
-    print("Verifying OTP for: $_email");
+    debugPrint("Verifying OTP for: $_email");
 
     _isLoading = true;
     _errorMessage = null;
@@ -72,7 +72,7 @@ class EmailVerifyController extends ChangeNotifier {
 
       if (response.isSuccess) {
         _otpToken = response.body?['data']?['token']?.toString();
-        print("OTP Verified Successfully!");
+        debugPrint("OTP Verified Successfully!");
         return true;
       } else {
         _errorMessage = response.errorMessage ?? "Wrong OTP";
@@ -80,7 +80,7 @@ class EmailVerifyController extends ChangeNotifier {
       }
     } catch (e) {
       _errorMessage = "Verification failed";
-      print("Verify error: $e");
+      debugPrint("Verify error: $e");
       return false;
     } finally {
       _isLoading = false;

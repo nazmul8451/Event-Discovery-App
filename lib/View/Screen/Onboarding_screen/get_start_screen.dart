@@ -32,7 +32,7 @@ class _GetStartScreenState extends State<GetStartScreen> {
       );
       setState(() {});
     } else {
-      print('clicked');
+      debugPrint('clicked');
       Navigator.pushNamed(context, InterestScreen.name);
     }
   }

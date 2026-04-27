@@ -21,18 +21,18 @@ class EventDetailsController extends ChangeNotifier {
         token: "",
       );
 
-      print("=====================Main Event Response========================");
-      print(response.body);
+      debugPrint("=====================Main Event Response========================");
+      debugPrint(response.body);
 
       // If main event fails with 404 or success is false, try userevent
       if (!response.isSuccess || response.body?['success'] != true) {
-        print("🔄 Falling back to UserEvent fetch...");
+        debugPrint("🔄 Falling back to UserEvent fetch...");
         response = await NetworkCaller.getRequest(
           url: Urls.getSingleUserEvent(eventId),
           requireAuth: true,
         );
-        print("=====================User Event Response========================");
-        print(response.body);
+        debugPrint("=====================User Event Response========================");
+        debugPrint(response.body);
       }
 
       if (response.isSuccess) {
@@ -49,7 +49,7 @@ class EventDetailsController extends ChangeNotifier {
       }
     } catch (e) {
       errorMessage = "Exception: $e";
-      print("Error in getSingleEvent: $e");
+      debugPrint("Error in getSingleEvent: $e");
     } finally {
       inProgress = false;
       notifyListeners();

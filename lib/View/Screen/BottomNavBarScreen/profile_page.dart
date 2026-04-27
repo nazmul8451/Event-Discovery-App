@@ -386,10 +386,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // Debug: Print user stats
               if (kDebugMode) {
-                print('🔍 Profile Page - User: ${user?.name}');
-                print('🔍 Profile Page - Events: ${user?.stats?.events}');
-                print('🔍 Profile Page - Followers: ${user?.stats?.followers}');
-                print('🔍 Profile Page - Following: ${user?.stats?.following}');
+                debugPrint('🔍 Profile Page - User: ${user?.name}');
+                debugPrint('🔍 Profile Page - Events: ${user?.stats?.events}');
+                debugPrint('🔍 Profile Page - Followers: ${user?.stats?.followers}');
+                debugPrint('🔍 Profile Page - Following: ${user?.stats?.following}');
               }
 
               return SafeArea(

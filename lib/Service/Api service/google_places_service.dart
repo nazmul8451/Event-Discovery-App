@@ -10,7 +10,7 @@ class GooglePlacesService {
 
     final String url = 'https://places.googleapis.com/v1/places:autocomplete';
 
-    print("🌐 Google Places (New) Request: $url");
+    debugPrint("🌐 Google Places (New) Request: $url");
 
     try {
       final response = await http.post(
@@ -22,8 +22,8 @@ class GooglePlacesService {
         body: json.encode({'input': query}),
       );
 
-      print("🌐 Google Places (New) Response Status: ${response.statusCode}");
-      print("🌐 Google Places (New) Response Body: ${response.body}");
+      debugPrint("🌐 Google Places (New) Response Status: ${response.statusCode}");
+      debugPrint("🌐 Google Places (New) Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -50,7 +50,7 @@ class GooglePlacesService {
         return suggestions;
       }
     } catch (e) {
-      print("Google Places Error: $e");
+      debugPrint("Google Places Error: $e");
     }
     return [];
   }
@@ -58,7 +58,7 @@ class GooglePlacesService {
   static Future<Map<String, double>?> getPlaceDetails(String placeId) async {
     final String url = 'https://places.googleapis.com/v1/places/$placeId';
 
-    print("🌐 Google Place Details (New) Request: $url");
+    debugPrint("🌐 Google Place Details (New) Request: $url");
 
     try {
       final response = await http.get(
@@ -69,8 +69,8 @@ class GooglePlacesService {
         },
       );
 
-      print("🌐 Google Place Details Status: ${response.statusCode}");
-      print("🌐 Google Place Details Body: ${response.body}");
+      debugPrint("🌐 Google Place Details Status: ${response.statusCode}");
+      debugPrint("🌐 Google Place Details Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -81,7 +81,7 @@ class GooglePlacesService {
         };
       }
     } catch (e) {
-      print("Google Place Details Error: $e");
+      debugPrint("Google Place Details Error: $e");
     }
     return null;
   }

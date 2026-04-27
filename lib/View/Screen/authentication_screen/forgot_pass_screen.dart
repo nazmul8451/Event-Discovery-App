@@ -100,7 +100,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
       emailController.text.trim(),
     );
 
-    print('Your Current Saved Email-${forgotPassController.savedEmail}');
+    debugPrint('Your Current Saved Email-${forgotPassController.savedEmail}');
 
     if (isSuccess) {
       showCustomSnackBar(

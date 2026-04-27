@@ -36,7 +36,7 @@ class SavedEventController extends ChangeNotifier {
           requireAuth: true,
         );
 
-        print("Delete response: ${response.body}");
+        debugPrint("Delete response: ${response.body}");
 
         if (response.isSuccess && response.body?['success'] == true) {
           _savedEvents.remove(existingSaved);
@@ -53,7 +53,7 @@ class SavedEventController extends ChangeNotifier {
           requireAuth: true,
         );
 
-        print("Save response: ${response.body}");
+        debugPrint("Save response: ${response.body}");
 
         if (response.isSuccess &&
             response.body?['success'] == true &&
@@ -73,7 +73,7 @@ class SavedEventController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      print("Toggle save error: $e");
+      debugPrint("Toggle save error: $e");
       _errorMessage = "Something went wrong";
       result = null;
     }
@@ -95,7 +95,7 @@ class SavedEventController extends ChangeNotifier {
         requireAuth: true,
       );
 
-      print("Load saved events raw response: ${response.body}");
+      debugPrint("Load saved events raw response: ${response.body}");
 
       if (response.isSuccess && response.body != null) {
         final List<dynamic> list =
@@ -108,17 +108,17 @@ class SavedEventController extends ChangeNotifier {
             final savedEvent = SavedEventData.fromJson(json);
             _savedEvents.add(savedEvent);
           } catch (e) {
-            print("Error parsing saved event: $e, json: $json");
+            debugPrint("Error parsing saved event: $e, json: $json");
           }
         }
 
-        print("Successfully loaded ${_savedEvents.length} saved events");
+        debugPrint("Successfully loaded ${_savedEvents.length} saved events");
       } else {
         _errorMessage =
             response.body?['message'] ?? "Failed to load saved events";
       }
     } catch (e) {
-      print("Load saved events error: $e");
+      debugPrint("Load saved events error: $e");
       _errorMessage = "Network error";
     }
 

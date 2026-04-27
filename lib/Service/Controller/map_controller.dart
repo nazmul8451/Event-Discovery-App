@@ -540,7 +540,7 @@ class MapController with ChangeNotifier {
           : 'assets/map_style.json';
       final String style = await rootBundle.loadString(stylePath);
       await _mapController!.setMapStyle(style);
-      print("🗺️ Map style applied: ${isDarkMode ? 'Dark' : 'Light'}");
+      debugPrint("🗺️ Map style applied: ${isDarkMode ? 'Dark' : 'Light'}");
     } catch (e) {
       debugPrint('Error applying map style: $e');
     }

@@ -96,7 +96,7 @@ class _CodeSubmitState extends State<CodeSubmit> {
                 appContext: context,
                 onChanged: (value) {},
                 onCompleted: (value) {
-                  print("OTP: $value");
+                  debugPrint("OTP: $value");
                 },
               ),
               SizedBox(height: 20.h),

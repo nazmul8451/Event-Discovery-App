@@ -38,7 +38,7 @@ class ChatController extends ChangeNotifier {
       
       // Listen for messages: getMessage::chatId
       final eventName = "getMessage::$chatId";
-      print("EventName: $eventName"); 
+      debugPrint("EventName: $eventName"); 
       debugPrint("👂 Listening for socket event: $eventName");
       
       _socketService.off(eventName); // Ensure no duplicate listeners

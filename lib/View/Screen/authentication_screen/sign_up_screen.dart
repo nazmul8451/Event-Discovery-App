@@ -249,7 +249,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           builder: (context) => VerifyAccount(email: email.trim()),
         ),
       );
-      print("Email : $email");
+      debugPrint("Email : $email");
     } else {
       showCustomSnackBar(
         context: context,

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (kDebugMode) {
-    print("Background Message: ${message.messageId}");
+    debugPrint("Background Message: ${message.messageId}");
   }
 }
 
@@ -33,7 +33,7 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       if (kDebugMode) {
-        print('User granted permission');
+        debugPrint('User granted permission');
       }
     }
 
@@ -66,7 +66,7 @@ class NotificationService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Handle local notification click here
         if (kDebugMode) {
-          print("Notification clicked: ${response.payload}");
+          debugPrint("Notification clicked: ${response.payload}");
         }
       },
     );
@@ -74,7 +74,7 @@ class NotificationService {
     // Get FCM Token
     String? token = await getFCMToken();
     if (kDebugMode) {
-      print("FCM Token: $token");
+      debugPrint("FCM Token: $token");
     }
 
     // Handle background messages
@@ -83,7 +83,7 @@ class NotificationService {
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
-        print("Foreground Message: ${message.notification?.title}");
+        debugPrint("Foreground Message: ${message.notification?.title}");
       }
       showLocalNotification(message);
     });
@@ -91,7 +91,7 @@ class NotificationService {
     // Handle when app is in background but opened from notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if (kDebugMode) {
-        print("Message opened app: ${message.notification?.title}");
+        debugPrint("Message opened app: ${message.notification?.title}");
       }
     });
 
@@ -100,7 +100,7 @@ class NotificationService {
         .getInitialMessage();
     if (initialMessage != null) {
       if (kDebugMode) {
-        print("Initial Message: ${initialMessage.notification?.title}");
+        debugPrint("Initial Message: ${initialMessage.notification?.title}");
       }
     }
   }
@@ -140,7 +140,7 @@ class NotificationService {
       return await _firebaseMessaging.getToken();
     } catch (e) {
       if (kDebugMode) {
-        print("Error getting FCM Token: $e");
+        debugPrint("Error getting FCM Token: $e");
       }
       return null;
     }

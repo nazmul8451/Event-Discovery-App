@@ -64,7 +64,7 @@ class ForgotPasswordController extends ChangeNotifier {
       "oneTimeCode": code.trim(),
     };
 
-    print('Verifying OTP for Email: $savedEmail');
+    debugPrint('Verifying OTP for Email: $savedEmail');
 
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -73,7 +73,7 @@ class ForgotPasswordController extends ChangeNotifier {
         requireAuth: false,
       );
 
-      print('OTP Verify Response Body: ${response.body}');
+      debugPrint('OTP Verify Response Body: ${response.body}');
 
       if (response.isSuccess && response.body != null) {
         final data = response.body?['data'];
@@ -88,11 +88,11 @@ class ForgotPasswordController extends ChangeNotifier {
 
         if (token != null && token.isNotEmpty) {
           _passwordResetToken = token;
-          print("SUCCESS: Session Token caught: $_passwordResetToken");
+          debugPrint("SUCCESS: Session Token caught: $_passwordResetToken");
           
           return true;
         } else {
-          print("ERROR: Token not found in response body.");
+          debugPrint("ERROR: Token not found in response body.");
           _errorMessage = "Verification succeeded but token missing";
           return false;
         }
@@ -133,9 +133,9 @@ class ForgotPasswordController extends ChangeNotifier {
       "confirmPassword": confirmPass,
     };
 
-    print('URL: ${Urls.resetPassUrl}');
-    print('Body: $requestBody');
-    print('Using Token: $_passwordResetToken');
+    debugPrint('URL: ${Urls.resetPassUrl}');
+    debugPrint('Body: $requestBody');
+    debugPrint('Using Token: $_passwordResetToken');
 
     try {
       final NetworkResponse response = await NetworkCaller.postRequest(
@@ -147,11 +147,11 @@ class ForgotPasswordController extends ChangeNotifier {
       if (response.isSuccess) {
         _passwordResetToken = null; // Clear token after successful reset
         await AuthController().logout(); // Ensure session is cleared so user MUST login
-        print("Password reset successful!");
+        debugPrint("Password reset successful!");
         return true;
       } else {
-        print("RESET PASSWORD FAILED - STATUS: ${response.statusCode}");
-        print("RESET PASSWORD FAILED - BODY: ${response.body}");
+        debugPrint("RESET PASSWORD FAILED - STATUS: ${response.statusCode}");
+        debugPrint("RESET PASSWORD FAILED - BODY: ${response.body}");
         _errorMessage = response.errorMessage ?? "Failed to reset password";
         return false;
       }

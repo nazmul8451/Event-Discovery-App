@@ -132,7 +132,7 @@ class _VerifyAccountState extends State<VerifyAccount> {
               appContext: context,
               onChanged: (value) {},
               onCompleted: (value) {
-                print("OTP: $value");
+                debugPrint("OTP: $value");
               },
             ),
             SizedBox(height: 40.h),
