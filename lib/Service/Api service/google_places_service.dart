@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:gathering_app/Model/location_suggestion_model.dart';
 
 class GooglePlacesService {
-  static const String _apiKey = 'AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM';
+  static const String _apiKey = Urls.googleMapsApiKey;
 
   static Future<List<LocationSuggestion>> searchAddress(String query) async {
     if (query.isEmpty) return [];

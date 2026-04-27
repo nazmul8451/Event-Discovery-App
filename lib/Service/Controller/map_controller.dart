@@ -72,7 +72,7 @@ class MapController with ChangeNotifier {
   /// ================= INIT =================
   Future<void> init() async {
     _polylinePoints = PolylinePoints(
-      apiKey: 'AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM',
+      apiKey: Urls.googleMapsApiKey,
     );
     await _loadEventIcon();
     await getCurrentLocation();
@@ -381,7 +381,7 @@ class MapController with ChangeNotifier {
     clearRoute();
 
     final polylinePoints = PolylinePoints(
-      apiKey: 'AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM',
+      apiKey: Urls.googleMapsApiKey,
     );
 
     try {
@@ -445,7 +445,7 @@ class MapController with ChangeNotifier {
     double destLat,
     double destLng,
   ) async {
-    const apiKey = 'AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM';
+    final apiKey = Urls.googleMapsApiKey;
     final url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=$originLat,$originLng&destination=$destLat,$destLng&key=$apiKey';
 

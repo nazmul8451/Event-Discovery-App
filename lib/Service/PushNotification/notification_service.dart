@@ -61,15 +61,15 @@ class NotificationService {
         >()
         ?.createNotificationChannel(_channel);
 
-    // await _flutterLocalNotificationsPlugin.initialize(
-    //   initializationSettings,
-    //   onDidReceiveNotificationResponse: (NotificationResponse response) {
-    //     // Handle local notification click here
-    //     if (kDebugMode) {
-    //       print("Notification clicked: ${response.payload}");
-    //     }
-    //   },
-    // );
+    await _flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Handle local notification click here
+        if (kDebugMode) {
+          print("Notification clicked: ${response.payload}");
+        }
+      },
+    );
 
     // Get FCM Token
     String? token = await getFCMToken();
@@ -125,13 +125,13 @@ class NotificationService {
         android: androidNotificationDetails,
       );
 
-      // await _flutterLocalNotificationsPlugin.show(
-      //   DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      //   notification.title,
-      //   notification.body,
-      //   notificationDetails,
-      //   payload: 'item x',
-      // );
+      await _flutterLocalNotificationsPlugin.show(
+        id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: notificationDetails,
+        payload: 'item x',
+      );
     }
   }
 

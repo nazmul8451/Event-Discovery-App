@@ -71,5 +71,20 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Gathering needs access to your photo library to let you upload photos for your events.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Gathering needs access to your camera to let you take photos for your events.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Gathering needs access to your microphone to capture audio for event videos.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>googlemaps</string>
+		<string>comgooglemaps</string>
+	</array>
 </dict>
 </plist>

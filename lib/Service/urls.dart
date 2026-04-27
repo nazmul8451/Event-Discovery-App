@@ -3,6 +3,7 @@ class Urls {
   // static const String baseUrl = "https://mohosin5001.binarybards.online";
   //  static const String baseUrl = "http://10.10.7.50:4006";
   static const String baseUrl = "http://167.71.254.250:4006";
+  static const String googleMapsApiKey = "AIzaSyA6w5wid9n0Vii4W6YxQTn9BG69jI_scuM";
 
   //auth api
   static const String registrationUrl = "$baseUrl/api/v1/auth/signup";
